@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "DocNest",
+    "slug": "docnest",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "scheme": "docnest",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.medicave.docnest"
+    },
+    "android": {
+      "package": "com.medicave.docnest",
+      "adaptiveIcon": {
+        "backgroundColor": "#0A8F6C",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-status-bar",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0A8F6C",
+          "image": "./assets/icon.png",
+          "imageWidth": 200
+        }
+      ],
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": ""
+      }
+    }
+  }
+}
