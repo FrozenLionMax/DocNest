@@ -4,9 +4,7 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   StyleSheet,
-  Image,
   FlatList,
   Linking,
 } from 'react-native';
@@ -22,7 +20,10 @@ import {
   Star,
   ShieldCheck,
   Activity,
-  AlertCircle,
+  Calendar,
+  Sparkles,
+  Stethoscope,
+  HeartPulse,
 } from 'lucide-react-native';
 import { COLORS, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { SPECIALTIES } from '../../../../packages/shared/constants/specialties';
@@ -33,14 +34,14 @@ export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
 
-  const [selectedBlock, setSelectedBlock] = useState('Deoria Sadar');
+  const [selectedBlock] = useState('Deoria Sadar');
   const [doctors, setDoctors] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Demo active queue state (realtime listening connected in backend)
-  const [activeQueue, setActiveQueue] = useState({
+  // Live Queue Counter State
+  const [activeQueue] = useState({
     doctorName: 'Dr. Amit Kumar',
-    specialty: 'Orthopedic (हड्डी रोग)',
+    specialty: 'Orthopedic Surgeon (हड्डी रोग)',
     currentToken: 14,
     userToken: 18,
     estimatedWaitMins: 20,
@@ -53,7 +54,7 @@ export default function HomeScreen() {
 
   const fetchTopDoctors = async () => {
     try {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('doctors')
         .select('*')
         .eq('is_active', true)
@@ -62,7 +63,6 @@ export default function HomeScreen() {
       if (data && data.length > 0) {
         setDoctors(data);
       } else {
-        // Fallback demo data for Deoria doctors
         setDoctors([
           {
             id: '1',
@@ -72,8 +72,8 @@ export default function HomeScreen() {
             experience_years: 12,
             consultation_fee: 300,
             clinic_name: 'Gupta Clinic, Station Road, Deoria',
-            avg_rating: 4.8,
-            total_reviews: 124,
+            avg_rating: 4.9,
+            total_reviews: 142,
             is_verified: true,
           },
           {
@@ -84,8 +84,20 @@ export default function HomeScreen() {
             experience_years: 15,
             consultation_fee: 400,
             clinic_name: 'Rai Hospital, Malviya Road, Deoria',
-            avg_rating: 4.9,
-            total_reviews: 180,
+            avg_rating: 4.8,
+            total_reviews: 198,
+            is_verified: true,
+          },
+          {
+            id: '3',
+            full_name: 'Dr. Rajesh Verma',
+            specialization: 'General Physician',
+            qualification: 'MBBS, MD (Medicine)',
+            experience_years: 18,
+            consultation_fee: 250,
+            clinic_name: 'Verma Clinic, Civil Lines, Deoria',
+            avg_rating: 4.7,
+            total_reviews: 110,
             is_verified: true,
           },
         ]);
@@ -103,84 +115,79 @@ export default function HomeScreen() {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Top Header */}
+      {/* Top Professional Header */}
       <View style={styles.header}>
-        <View style={styles.locationContainer}>
-          <MapPin size={18} color={COLORS.white} />
-          <Text style={styles.locationTitle}>📍 Deoria, UP</Text>
-          <Text style={styles.locationSubtitle}>({selectedBlock})</Text>
-        </View>
-        <TouchableOpacity
-          style={styles.medicaveHeaderBadge}
-          onPress={() => openMedicaveOrder()}
-        >
-          <Pill size={16} color={COLORS.white} />
-          <Text style={styles.medicaveBadgeText}>Medicave</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={styles.headerRow}>
+          <View style={styles.locationTag}>
+            <MapPin size={14} color={COLORS.primary} />
+            <Text style={styles.locationText}>📍 Deoria, UP ({selectedBlock})</Text>
+          </View>
 
-      {/* Hero Banner / Search Bar */}
-      <View style={styles.heroSection}>
-        <Text style={styles.heroTitle}>
+          <TouchableOpacity
+            style={styles.medicavePill}
+            onPress={() => openMedicaveOrder()}
+          >
+            <Pill size={14} color={COLORS.white} />
+            <Text style={styles.medicavePillText}>Medicave Store</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.heroGreeting}>
           {t('home.hero_title', 'देवरिया के डॉक्टर खोजें')}
         </Text>
-        <Text style={styles.heroSubtitle}>
-          {t('home.hero_subtitle', 'अपॉइंटमेंट बुक करें और लाइव पर्ची नंबर देखें')}
+        <Text style={styles.heroSubText}>
+          विश्वसनीय डॉक्टर, ऑनलाइन अपॉइंटमेंट व क्लिनिक टोकन नंबर
         </Text>
 
+        {/* Search Input Bar */}
         <TouchableOpacity
-          style={styles.searchBar}
+          style={styles.searchContainer}
           onPress={() => router.push('/(tabs)/search')}
         >
-          <Search size={20} color={COLORS.textMuted} />
+          <Search size={18} color={COLORS.textMuted} />
           <Text style={styles.searchPlaceholder}>
-            {t('home.search_placeholder', 'डॉक्टर, क्लिनिक या बीमारी खोजें...')}
+            डॉक्टर का नाम, बीमारी या क्लिनिक खोजें...
           </Text>
         </TouchableOpacity>
       </View>
 
-      {/* LIVE QUEUE TRACKER WIDGET */}
-      <View style={styles.sectionContainer}>
+      {/* SLEEK LIVE QUEUE COUNTER WIDGET */}
+      <View style={styles.sectionMargin}>
         <View style={styles.queueCard}>
           <View style={styles.queueHeader}>
-            <View style={styles.liveIndicator}>
-              <View style={styles.liveDot} />
-              <Text style={styles.liveText}>LIVE COUNTER</Text>
+            <View style={styles.liveStatusBadge}>
+              <View style={styles.pulseDot} />
+              <Text style={styles.liveStatusText}>LIVE COUNTER</Text>
             </View>
-            <Text style={styles.queueClinicText}>{activeQueue.clinicName}</Text>
+            <Text style={styles.queueClinicName}>{activeQueue.clinicName}</Text>
           </View>
 
-          <Text style={styles.queueDoctorName}>{activeQueue.doctorName}</Text>
-          <Text style={styles.queueDoctorSub}>{activeQueue.specialty}</Text>
+          <Text style={styles.queueDocTitle}>{activeQueue.doctorName}</Text>
+          <Text style={styles.queueDocSub}>{activeQueue.specialty}</Text>
 
-          {/* Token Numbers Box */}
+          {/* Tokens Visual Row */}
           <View style={styles.tokenRow}>
-            <View style={styles.tokenBoxCurrent}>
-              <Text style={styles.tokenBoxLabel}>चालू नंबर (Current)</Text>
-              <Text style={styles.tokenNumberCurrent}>
-                #{activeQueue.currentToken}
-              </Text>
+            <View style={styles.tokenBox}>
+              <Text style={styles.tokenLabel}>चालू नंबर (Current)</Text>
+              <Text style={styles.tokenNumberCurrent}>#{activeQueue.currentToken}</Text>
             </View>
 
-            <View style={styles.tokenDivider} />
+            <View style={styles.tokenSeparator} />
 
-            <View style={styles.tokenBoxUser}>
-              <Text style={styles.tokenBoxLabel}>आपका नंबर (Your Token)</Text>
-              <Text style={styles.tokenNumberUser}>
-                #{activeQueue.userToken}
-              </Text>
+            <View style={styles.tokenBox}>
+              <Text style={styles.tokenLabel}>आपका नंबर (Your Token)</Text>
+              <Text style={styles.tokenNumberUser}>#{activeQueue.userToken}</Text>
             </View>
           </View>
 
           <View style={styles.queueFooter}>
-            <View style={styles.waitBox}>
-              <Clock size={16} color={COLORS.secondary} />
-              <Text style={styles.waitText}>
-                अनुमानित समय: ~{activeQueue.estimatedWaitMins} मिनट
-              </Text>
+            <View style={styles.waitBadge}>
+              <Clock size={14} color={COLORS.primary} />
+              <Text style={styles.waitText}>इंतज़ार: ~{activeQueue.estimatedWaitMins} मिनट</Text>
             </View>
+
             <TouchableOpacity
-              style={styles.shareQueueBtn}
+              style={styles.shareWhatsappBtn}
               onPress={() =>
                 shareLiveQueueStatus(
                   activeQueue.doctorName,
@@ -190,54 +197,47 @@ export default function HomeScreen() {
                 )
               }
             >
-              <Text style={styles.shareQueueText}>व्हाट्सएप शेयर</Text>
+              <Text style={styles.shareWhatsappText}>व्हाट्सएप शेयर</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
 
-      {/* QUICK ACTIONS ROW */}
-      <View style={styles.sectionContainer}>
-        <View style={styles.quickActionsGrid}>
-          {/* Emergency Button */}
+      {/* QUICK ACTIONS CARDS */}
+      <View style={styles.sectionMargin}>
+        <View style={styles.quickGrid}>
+          {/* Emergency Direct Call */}
           <TouchableOpacity
-            style={[styles.quickCard, { backgroundColor: '#FFF0F0' }]}
+            style={[styles.quickCard, { backgroundColor: '#FEF2F2', borderColor: '#FCA5A5' }]}
             onPress={handleCallEmergency}
           >
-            <View style={[styles.quickIconCircle, { backgroundColor: '#FF4D4D' }]}>
-              <PhoneCall size={22} color={COLORS.white} />
+            <View style={[styles.quickIconCircle, { backgroundColor: '#EF4444' }]}>
+              <PhoneCall size={20} color={COLORS.white} />
             </View>
-            <Text style={[styles.quickTitle, { color: '#D32F2F' }]}>
-              🚑 Emergency
-            </Text>
-
-            <Text style={styles.quickSub}>Call 108 / 112</Text>
+            <Text style={[styles.quickCardTitle, { color: '#991B1B' }]}>🚑 Emergency</Text>
+            <Text style={styles.quickCardSub}>108 / 112 हेल्प कॉल</Text>
           </TouchableOpacity>
 
-          {/* Medicave Pharmacy Button */}
+          {/* Medicave Medicine Orders */}
           <TouchableOpacity
-            style={[styles.quickCard, { backgroundColor: '#FFF6F0' }]}
+            style={[styles.quickCard, { backgroundColor: '#FFF7ED', borderColor: '#FDBA74' }]}
             onPress={() => openMedicaveOrder()}
           >
             <View style={[styles.quickIconCircle, { backgroundColor: COLORS.secondary }]}>
-              <Pill size={22} color={COLORS.white} />
+              <Pill size={20} color={COLORS.white} />
             </View>
-            <Text style={[styles.quickTitle, { color: COLORS.secondary }]}>
-              💊 Medicave
-            </Text>
-            <Text style={styles.quickSub}>दवाई व्हाट्सएप करें</Text>
+            <Text style={[styles.quickCardTitle, { color: '#C2410C' }]}>💊 Medicave</Text>
+            <Text style={styles.quickCardSub}>दवाई पर्चा व्हाट्सएप करें</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       {/* SPECIALTIES GRID */}
-      <View style={styles.sectionContainer}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>
-            {t('home.specialties', 'विशेषज्ञता द्वारा खोजें')}
-          </Text>
+      <View style={styles.sectionMargin}>
+        <View style={styles.sectionHeaderRow}>
+          <Text style={styles.sectionTitle}>विशेषज्ञता द्वारा खोजें (Specialties)</Text>
           <TouchableOpacity onPress={() => router.push('/(tabs)/search')}>
-            <Text style={styles.seeAllText}>सभी देखें</Text>
+            <Text style={styles.seeAllLink}>सभी देखें →</Text>
           </TouchableOpacity>
         </View>
 
@@ -245,13 +245,13 @@ export default function HomeScreen() {
           {SPECIALTIES.slice(0, 8).map((spec) => (
             <TouchableOpacity
               key={spec.id}
-              style={styles.specialtyItem}
+              style={styles.specialtyCard}
               onPress={() => router.push(`/(tabs)/search?specialty=${spec.id}`)}
             >
-              <View style={styles.specialtyIconBg}>
-                <StethoscopeIcon id={spec.id} />
+              <View style={styles.specialtyIconCircle}>
+                <Stethoscope size={22} color={COLORS.primary} />
               </View>
-              <Text style={styles.specialtyName} numberOfLines={1}>
+              <Text style={styles.specialtyLabel} numberOfLines={1}>
                 {spec.name_hi}
               </Text>
             </TouchableOpacity>
@@ -259,48 +259,47 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* TOP DOCTORS IN DEORIA */}
-      <View style={[styles.sectionContainer, { marginBottom: SPACING.xxl }]}>
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>
-            {t('home.top_doctors', 'देवरिया के प्रमुख डॉक्टर')}
-          </Text>
+      {/* FEATURED DOCTORS IN DEORIA */}
+      <View style={[styles.sectionMargin, { marginBottom: SPACING.xxl }]}>
+        <View style={styles.sectionHeaderRow}>
+          <Text style={styles.sectionTitle}>देवरिया के शीर्ष डॉक्टर (Top Doctors)</Text>
         </View>
 
         {doctors.map((doc) => (
           <TouchableOpacity
             key={doc.id}
             style={styles.doctorCard}
-            onPress={() => router.push(`/(tabs)/search?doctor=${doc.id}`)}
+            onPress={() => router.push(`/doctor/${doc.id}`)}
           >
             <View style={styles.doctorAvatar}>
-              <Text style={styles.avatarText}>{doc.full_name[4] || 'D'}</Text>
+              <Text style={styles.doctorAvatarText}>{doc.full_name[4] || 'D'}</Text>
             </View>
 
-            <View style={styles.doctorInfo}>
+            <View style={styles.doctorContent}>
               <View style={styles.docTitleRow}>
-                <Text style={styles.docName}>{doc.full_name}</Text>
-                {doc.is_verified && (
-                  <ShieldCheck size={16} color={COLORS.primary} />
-                )}
+                <Text style={styles.doctorNameText}>{doc.full_name}</Text>
+                {doc.is_verified && <ShieldCheck size={16} color={COLORS.primary} />}
               </View>
 
-              <Text style={styles.docSpecialty}>{doc.specialization}</Text>
-              <Text style={styles.docClinic} numberOfLines={1}>
+              <Text style={styles.doctorSpecText}>{doc.specialization}</Text>
+              <Text style={styles.doctorClinicText} numberOfLines={1}>
                 📍 {doc.clinic_name}
               </Text>
 
-              <View style={styles.docMetaRow}>
+              <View style={styles.doctorMetaRow}>
                 <View style={styles.ratingBadge}>
-                  <Star size={12} color="#FFD700" fill="#FFD700" />
-                  <Text style={styles.ratingText}>{doc.avg_rating || 4.8}</Text>
+                  <Star size={12} color="#F59E0B" fill="#F59E0B" />
+                  <Text style={styles.ratingValText}>{doc.avg_rating || 4.9}</Text>
                 </View>
-                <Text style={styles.feeText}>₹{doc.consultation_fee}</Text>
+                <Text style={styles.feeTag}>₹{doc.consultation_fee}</Text>
               </View>
             </View>
 
-            <TouchableOpacity style={styles.bookBtn}>
-              <Text style={styles.bookBtnText}>बुकिंग</Text>
+            <TouchableOpacity
+              style={styles.bookSlotBtn}
+              onPress={() => router.push(`/doctor/${doc.id}`)}
+            >
+              <Text style={styles.bookSlotBtnText}>बुकिंग</Text>
             </TouchableOpacity>
           </TouchableOpacity>
         ))}
@@ -309,87 +308,81 @@ export default function HomeScreen() {
   );
 }
 
-// Specialty Icon Helper
-function StethoscopeIcon({ id }: { id: string }) {
-  return <Activity size={24} color={COLORS.primary} />;
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.backgroundSecondary,
   },
   header: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.white,
     paddingHorizontal: SPACING.lg,
     paddingTop: SPACING.xl,
-    paddingBottom: SPACING.md,
+    paddingBottom: SPACING.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: SPACING.md,
   },
-  locationContainer: {
+  locationTag: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: COLORS.tealLight,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: RADIUS.full,
     gap: 4,
   },
-  locationTitle: {
-    color: COLORS.white,
+  locationText: {
+    fontSize: 12,
     fontWeight: '700',
-    fontSize: 16,
+    color: COLORS.primary,
   },
-  locationSubtitle: {
-    color: COLORS.tealLight,
-    fontSize: 13,
-  },
-  medicaveHeaderBadge: {
+  medicavePill: {
     backgroundColor: COLORS.secondary,
-    paddingHorizontal: SPACING.md,
+    paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: RADIUS.full,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
   },
-  medicaveBadgeText: {
+  medicavePillText: {
     color: COLORS.white,
     fontSize: 12,
     fontWeight: '700',
   },
-  heroSection: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.lg,
-    paddingBottom: SPACING.xl,
-    borderBottomLeftRadius: RADIUS.xxl,
-    borderBottomRightRadius: RADIUS.xxl,
-  },
-  heroTitle: {
-    color: COLORS.white,
+  heroGreeting: {
     fontSize: 22,
     fontWeight: '800',
-    marginTop: 4,
+    color: COLORS.textPrimary,
+    letterSpacing: -0.3,
   },
-  heroSubtitle: {
-    color: COLORS.tealLight,
+  heroSubText: {
     fontSize: 13,
+    color: COLORS.textSecondary,
     marginTop: 2,
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.md,
   },
-  searchBar: {
-    backgroundColor: COLORS.white,
-    height: 50,
+  searchContainer: {
+    backgroundColor: COLORS.backgroundSecondary,
+    height: 48,
     borderRadius: RADIUS.lg,
     paddingHorizontal: SPACING.md,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    ...SHADOWS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   searchPlaceholder: {
     color: COLORS.textMuted,
     fontSize: 14,
   },
-  sectionContainer: {
+  sectionMargin: {
     paddingHorizontal: SPACING.lg,
     marginTop: SPACING.lg,
   },
@@ -397,46 +390,46 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: RADIUS.xl,
     padding: SPACING.lg,
-    borderWidth: 1.5,
-    borderColor: COLORS.primaryLight,
-    ...SHADOWS.modal,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    ...SHADOWS.card,
   },
   queueHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: SPACING.xs,
   },
-  liveIndicator: {
+  liveStatusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E8F8F5',
+    backgroundColor: COLORS.tealLight,
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 3,
     borderRadius: RADIUS.sm,
     gap: 6,
   },
-  liveDot: {
+  pulseDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#00C853',
+    backgroundColor: COLORS.primary,
   },
-  liveText: {
+  liveStatusText: {
     color: COLORS.primary,
     fontSize: 10,
     fontWeight: '800',
   },
-  queueClinicText: {
+  queueClinicName: {
     color: COLORS.textMuted,
     fontSize: 12,
   },
-  queueDoctorName: {
+  queueDocTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: '800',
     color: COLORS.textPrimary,
   },
-  queueDoctorSub: {
+  queueDocSub: {
     fontSize: 13,
     color: COLORS.textSecondary,
     marginBottom: SPACING.md,
@@ -449,20 +442,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: SPACING.md,
   },
-  tokenBoxCurrent: {
+  tokenBox: {
     flex: 1,
     alignItems: 'center',
   },
-  tokenBoxUser: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  tokenDivider: {
+  tokenSeparator: {
     width: 1,
-    height: 40,
+    height: 36,
     backgroundColor: COLORS.border,
   },
-  tokenBoxLabel: {
+  tokenLabel: {
     fontSize: 11,
     color: COLORS.textMuted,
     fontWeight: '600',
@@ -482,7 +471,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  waitBox: {
+  waitBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
@@ -492,18 +481,18 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontWeight: '600',
   },
-  shareQueueBtn: {
-    backgroundColor: '#25D366',
+  shareWhatsappBtn: {
+    backgroundColor: COLORS.whatsappGreen,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: RADIUS.md,
   },
-  shareQueueText: {
+  shareWhatsappText: {
     color: COLORS.white,
     fontSize: 12,
     fontWeight: '700',
   },
-  quickActionsGrid: {
+  quickGrid: {
     flexDirection: 'row',
     gap: SPACING.md,
   },
@@ -512,59 +501,63 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     borderRadius: RADIUS.lg,
     alignItems: 'center',
+    borderWidth: 1,
   },
   quickIconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
-  quickTitle: {
+  quickCardTitle: {
     fontSize: 14,
     fontWeight: '700',
   },
-  quickSub: {
+  quickCardSub: {
     fontSize: 11,
     color: COLORS.textMuted,
+    marginTop: 1,
   },
-  sectionHeader: {
+  sectionHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SPACING.md,
   },
   sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '800',
     color: COLORS.textPrimary,
   },
-  seeAllText: {
+  seeAllLink: {
     color: COLORS.primary,
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   specialtiesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 10,
   },
-  specialtyItem: {
+  specialtyCard: {
     width: '22%',
     alignItems: 'center',
   },
-  specialtyIconBg: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+  specialtyIconCircle: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
     backgroundColor: COLORS.tealLight,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
+    borderWidth: 1,
+    borderColor: COLORS.primaryMuted,
   },
-  specialtyName: {
-    fontSize: 12,
+  specialtyLabel: {
+    fontSize: 11,
     fontWeight: '600',
     color: COLORS.textPrimary,
     textAlign: 'center',
@@ -576,23 +569,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     ...SHADOWS.card,
   },
   doctorAvatar: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: COLORS.tealLight,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.md,
   },
-  avatarText: {
+  doctorAvatarText: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: '800',
     color: COLORS.primary,
   },
-  doctorInfo: {
+  doctorContent: {
     flex: 1,
   },
   docTitleRow: {
@@ -600,24 +595,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
-  docName: {
+  doctorNameText: {
     fontSize: 15,
     fontWeight: '700',
     color: COLORS.textPrimary,
   },
-  docSpecialty: {
+  doctorSpecText: {
     fontSize: 12,
     color: COLORS.textSecondary,
   },
-  docClinic: {
+  doctorClinicText: {
     fontSize: 11,
     color: COLORS.textMuted,
     marginTop: 2,
   },
-  docMetaRow: {
+  doctorMetaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
     marginTop: 4,
   },
   ratingBadge: {
@@ -625,24 +620,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 3,
   },
-  ratingText: {
+  ratingValText: {
     fontSize: 12,
     fontWeight: '700',
     color: COLORS.textPrimary,
   },
-  feeText: {
+  feeTag: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
     color: COLORS.primary,
   },
-  bookBtn: {
-    backgroundColor: COLORS.tealLight,
+  bookSlotBtn: {
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: RADIUS.md,
   },
-  bookBtnText: {
-    color: COLORS.primary,
+  bookSlotBtnText: {
+    color: COLORS.white,
     fontSize: 12,
     fontWeight: '700',
   },
