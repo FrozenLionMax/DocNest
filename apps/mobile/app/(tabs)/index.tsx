@@ -24,6 +24,7 @@ import {
   Sparkles,
   Stethoscope,
   HeartPulse,
+  Globe,
 } from 'lucide-react-native';
 import { COLORS, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { SPECIALTIES } from '../../constants/specialties';
@@ -32,7 +33,12 @@ import { supabase } from '../../lib/supabase';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const toggleLanguage = () => {
+    const nextLang = i18n.language === 'hi' ? 'en' : 'hi';
+    i18n.changeLanguage(nextLang);
+  };
 
   const [selectedBlock] = useState('Deoria Sadar');
   const [doctors, setDoctors] = useState<any[]>([]);
@@ -137,16 +143,25 @@ export default function HomeScreen() {
         <View style={styles.headerRow}>
           <View style={styles.locationTag}>
             <MapPin size={14} color={COLORS.primary} />
-            <Text style={styles.locationText}>📍 Deoria, UP ({selectedBlock})</Text>
+            <Text style={styles.locationText}>📍 Deoria ({selectedBlock})</Text>
           </View>
 
-          <TouchableOpacity
-            style={styles.medicavePill}
-            onPress={() => openMedicaveOrder()}
-          >
-            <Pill size={14} color={COLORS.white} />
-            <Text style={styles.medicavePillText}>Medicave Store</Text>
-          </TouchableOpacity>
+          <View style={styles.headerRightActions}>
+            <TouchableOpacity style={styles.langTogglePill} onPress={toggleLanguage}>
+              <Globe size={13} color={COLORS.primary} />
+              <Text style={styles.langToggleText}>
+                {i18n.language === 'hi' ? 'ENG' : 'हिंदी'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.medicavePill}
+              onPress={() => openMedicaveOrder()}
+            >
+              <Pill size={13} color={COLORS.white} />
+              <Text style={styles.medicavePillText}>Medicave Store</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <Text style={styles.heroGreeting}>
@@ -358,14 +373,35 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.primary,
   },
-  medicavePill: {
-    backgroundColor: COLORS.secondary,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+  headerRightActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  langTogglePill: {
+    backgroundColor: COLORS.tealLight,
+    borderWidth: 1,
+    borderColor: COLORS.primaryMuted,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: RADIUS.full,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
+  },
+  langToggleText: {
+    color: COLORS.primary,
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  medicavePill: {
+    backgroundColor: COLORS.secondary,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: RADIUS.full,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   medicavePillText: {
     color: COLORS.white,
