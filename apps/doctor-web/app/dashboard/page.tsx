@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { supabase } from '../../lib/supabase';
 import {
   Users,
@@ -16,6 +17,7 @@ import {
   Calendar,
   ChevronRight,
   Sparkles,
+  FileText,
 } from 'lucide-react';
 
 export default function DoctorDashboard() {
@@ -103,6 +105,14 @@ export default function DoctorDashboard() {
         </div>
 
         <div className="flex items-center space-x-4">
+          <Link
+            href="/prescription"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3.5 py-2 rounded-xl flex items-center space-x-1.5 shadow transition"
+          >
+            <FileText className="w-4 h-4" />
+            <span>+ डिजिटल पर्चा (Rx)</span>
+          </Link>
+
           <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>Dr. Amit Kumar (Orthopedic)</span>

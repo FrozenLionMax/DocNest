@@ -57,7 +57,7 @@ export default function ProfileTabScreen() {
       {/* Options Menu List */}
       <View style={styles.menuContainer}>
         {/* Family Members */}
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/family')}>
           <View style={styles.menuIconBg}>
             <Users size={20} color={COLORS.primary} />
           </View>
@@ -69,7 +69,7 @@ export default function ProfileTabScreen() {
         </TouchableOpacity>
 
         {/* Health Records */}
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/records')}>
           <View style={styles.menuIconBg}>
             <FileText size={20} color={COLORS.primary} />
           </View>
