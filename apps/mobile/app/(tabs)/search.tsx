@@ -13,7 +13,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { Search, Filter, Star, ShieldCheck, MapPin } from 'lucide-react-native';
 import { COLORS, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
-import { SPECIALTIES } from '../../../../packages/shared/constants/specialties';
+import { SPECIALTIES } from '../../constants/specialties';
 import { supabase } from '../../lib/supabase';
 
 export default function SearchScreen() {

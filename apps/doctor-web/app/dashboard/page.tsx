@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
 import {
   Users,
   Play,
@@ -31,9 +32,36 @@ export default function DoctorDashboard() {
     { token: 17, name: 'Sunita Devi (सुनीता देवी)', time: '10:45 AM', status: 'Waiting', type: 'Offline पर्चा' },
   ]);
 
-  const handleNextToken = () => {
+  // Realtime channel setup
+  useEffect(() => {
+    const channel = supabase.channel('opd-live-queue')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'clinic_queues' }, (payload: any) => {
+        if (payload.new && payload.new.current_token) {
+          setCurrentToken(payload.new.current_token);
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const handleNextToken = async () => {
     if (currentToken < totalIssued) {
-      setCurrentToken((prev) => prev + 1);
+      const nextVal = currentToken + 1;
+      setCurrentToken(nextVal);
+      
+      // Broadcast via Supabase Realtime channel
+      try {
+        await supabase.channel('opd-live-queue').send({
+          type: 'broadcast',
+          event: 'token-update',
+          payload: { currentToken: nextVal, doctorId: 'doc-001' },
+        });
+      } catch (e) {
+        console.log('Realtime broadcast:', e);
+      }
     }
   };
 

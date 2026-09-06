@@ -2,6 +2,11 @@
 node_modules/
 .pnpm-store/
 
+# Next.js Build Output
+.next/
+out/
+build/
+
 # Expo & React Native
 .expo/
 dist/

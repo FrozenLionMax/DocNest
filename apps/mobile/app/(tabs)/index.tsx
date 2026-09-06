@@ -26,7 +26,7 @@ import {
   HeartPulse,
 } from 'lucide-react-native';
 import { COLORS, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
-import { SPECIALTIES } from '../../../../packages/shared/constants/specialties';
+import { SPECIALTIES } from '../../constants/specialties';
 import { openMedicaveOrder, shareLiveQueueStatus } from '../../lib/whatsapp';
 import { supabase } from '../../lib/supabase';
 
@@ -39,7 +39,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
 
   // Live Queue Counter State
-  const [activeQueue] = useState({
+  const [activeQueue, setActiveQueue] = useState({
     doctorName: 'Dr. Amit Kumar',
     specialty: 'Orthopedic Surgeon (हड्डी रोग)',
     currentToken: 14,
@@ -50,6 +50,23 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchTopDoctors();
+
+    // Subscribe to OPD Live Queue Realtime updates
+    const channel = supabase.channel('opd-live-queue')
+      .on('broadcast', { event: 'token-update' }, (payload: any) => {
+        if (payload.payload && payload.payload.currentToken) {
+          setActiveQueue((prev) => ({
+            ...prev,
+            currentToken: payload.payload.currentToken,
+            estimatedWaitMins: Math.max(0, (prev.userToken - payload.payload.currentToken) * 5),
+          }));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchTopDoctors = async () => {
