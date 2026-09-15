@@ -158,88 +158,226 @@ export default function DoctorDashboard() {
   const filteredPatients = patients.filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.token.toString().includes(searchQuery) || p.phone.includes(searchQuery));
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* Top bar */}
-      <header className="bg-white border-b border-slate-200 px-6 py-4 flex flex-wrap justify-between items-center shadow-sm gap-4">
-        <div><h1 className="text-xl font-bold text-slate-900 tracking-tight">OPD Queue Management</h1><p className="text-xs text-slate-500 font-medium">{session?.clinic || 'Clinic Dashboard'}</p></div>
+    <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
+      {/* Top Header Bar */}
+      <div className="flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+        <div>
+          <h1 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center space-x-2">
+            <span>OPD Live Queue Controller</span>
+          </h1>
+          <p className="text-xs text-slate-400 font-medium mt-0.5">{session?.clinic || 'Gupta Clinic & Joint Care Center — Deoria'}</p>
+        </div>
+
         <div className="flex items-center space-x-3">
-          <button onClick={() => setSoundEnabled(!soundEnabled)} className="p-2 text-slate-400 hover:text-slate-600 rounded-lg">{soundEnabled ? <Volume2 className="w-5 h-5 text-emerald-600" /> : <VolumeX className="w-5 h-5" />}</button>
-          <div className="bg-emerald-50 border border-emerald-200 text-emerald-800 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center space-x-2"><span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /><span>{session?.name || 'Doctor'}</span></div>
+          <button
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition"
+            title="Toggle Audio & Voice Callouts"
+          >
+            {soundEnabled ? <Volume2 className="w-5 h-5 text-emerald-400" /> : <VolumeX className="w-5 h-5 text-slate-500" />}
+          </button>
+          <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span>{session?.name || 'Dr. Amit Kumar'}</span>
+          </div>
         </div>
-      </header>
+      </div>
 
-      <main className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full space-y-8">
-        {/* LIVE QUEUE CONTROLLER */}
-        <section className="bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950 text-white rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden">
-          <div className="absolute right-0 top-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
+      {/* LIVE QUEUE HERO CARD */}
+      <section className="bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 text-white border border-emerald-500/20 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+        <div className="absolute right-0 top-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 relative z-10">
+          <div>
+            <div className="inline-flex items-center space-x-2 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-xs font-semibold mb-3 border border-emerald-500/30">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>OPD TOKEN CONTROLLER</span>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">क्लिनिक टोकन काउंटर</h2>
+            <p className="text-emerald-200/80 text-xs md:text-sm mt-1">Realtime Supabase Sync & Voice Announcements</p>
+          </div>
+          
+          <div className="bg-slate-950/80 backdrop-blur border border-emerald-500/30 rounded-2xl p-5 text-center min-w-[220px] w-full lg:w-auto shadow-xl">
+            <p className="text-xs text-emerald-400 uppercase tracking-wider font-extrabold">Now Serving</p>
+            <p className="text-5xl md:text-6xl font-black text-emerald-400 my-1 font-mono">#{currentToken}</p>
+            <p className="text-xs text-slate-400 font-semibold">Total Issued: #{totalIssued}</p>
+          </div>
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-slate-800 flex flex-wrap items-center justify-between gap-4 relative z-10">
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={handleNextToken}
+              className="bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black px-6 py-3.5 rounded-xl text-sm flex items-center space-x-2 shadow-lg transition"
+            >
+              <Play className="w-5 h-5 fill-slate-950" />
+              <span>Next Patient (अगला टोकन)</span>
+            </button>
+            <button
+              onClick={handleToggleQueueStatus}
+              className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-4 py-3.5 rounded-xl text-sm border border-slate-700 flex items-center space-x-2 transition"
+            >
+              <Pause className="w-4 h-4" />
+              <span>{queueStatus === 'active' ? 'Pause OPD' : 'Resume OPD'}</span>
+            </button>
+            <button
+              onClick={handleResetQueue}
+              className="bg-slate-900 hover:bg-slate-800 text-slate-400 font-medium px-4 py-3.5 rounded-xl text-xs border border-slate-800 flex items-center space-x-2 transition"
+            >
+              <RotateCcw className="w-4 h-4" />
+              <span>Reset Token #1</span>
+            </button>
+          </div>
+
+          <span className={`px-3 py-1.5 rounded-xl text-xs font-bold border ${
+            queueStatus === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+          }`}>
+            {queueStatus === 'active' ? '● OPD ACTIVE' : 'PAUSED'}
+          </span>
+        </div>
+      </section>
+
+      {/* TWO COLUMN GRID / RESPONSIVE */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column: Walk-in Registration Form */}
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 h-fit space-y-4">
+          <h3 className="text-lg font-bold text-white flex items-center space-x-2">
+            <Plus className="w-5 h-5 text-emerald-400" />
+            <span>Add Walk-in Patient</span>
+          </h3>
+          <form onSubmit={handleAddOfflinePatient} className="space-y-4">
             <div>
-              <div className="inline-flex items-center space-x-2 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-xs font-semibold mb-3 border border-emerald-500/30"><span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" /><span>OPD LIVE TOKEN CONTROLLER</span></div>
-              <h2 className="text-3xl font-extrabold tracking-tight">क्लिनिक पर्ची / टोकन काउंटर</h2>
-              <p className="text-emerald-200/80 text-sm mt-1">Realtime Supabase Sync</p>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">Patient Name *</label>
+              <input
+                type="text"
+                placeholder="Enter patient name"
+                value={offlineName}
+                onChange={(e) => setOfflineName(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500 transition"
+                required
+              />
             </div>
-            <div className="bg-white/10 backdrop-blur-md border border-white/15 rounded-2xl p-6 text-center min-w-[240px] shadow-inner">
-              <p className="text-xs text-emerald-200 uppercase tracking-wider font-semibold">Now Serving</p>
-              <p className="text-6xl font-black text-emerald-400 my-1 font-mono">#{currentToken}</p>
-              <p className="text-xs text-slate-300">Total: #{totalIssued}</p>
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">Mobile Number (Optional)</label>
+              <input
+                type="tel"
+                placeholder="9876543210"
+                value={offlinePhone}
+                onChange={(e) => setOfflinePhone(e.target.value)}
+                maxLength={10}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500 font-mono transition"
+              />
             </div>
-          </div>
-          <div className="mt-8 pt-6 border-t border-white/10 flex flex-wrap items-center justify-between gap-4">
+            <button
+              type="submit"
+              disabled={addingPatient}
+              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm shadow transition flex items-center justify-center space-x-2 disabled:opacity-60"
+            >
+              {addingPatient ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>+ Add Token #{(patients.length > 0 ? Math.max(...patients.map((p) => p.token)) : 0) + 1}</span>}
+            </button>
+          </form>
+        </div>
+
+        {/* Right Column: Patient List Table (Responsive) */}
+        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
+            <h3 className="text-lg font-bold text-white">Today's Patient Queue</h3>
             <div className="flex items-center space-x-3">
-              <button onClick={handleNextToken} className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold px-6 py-3.5 rounded-xl flex items-center space-x-2 shadow-lg transition active:scale-95"><Play className="w-5 h-5 fill-slate-950" /><span>Next Patient</span></button>
-              <button onClick={handleToggleQueueStatus} className="bg-white/10 hover:bg-white/20 text-white font-semibold px-4 py-3.5 rounded-xl flex items-center space-x-2 transition"><Pause className="w-4 h-4" /><span>{queueStatus === 'active' ? 'Pause' : 'Resume'}</span></button>
-              <button onClick={handleResetQueue} className="bg-white/5 hover:bg-white/10 text-slate-300 font-medium px-4 py-3.5 rounded-xl flex items-center space-x-2 transition text-xs"><RotateCcw className="w-4 h-4" /><span>Reset</span></button>
-            </div>
-            <span className={`px-3 py-1 rounded-lg text-xs font-bold border ${queueStatus === 'active' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-amber-500/20 text-amber-300 border-amber-500/30'}`}>{queueStatus === 'active' ? '● OPD ACTIVE' : 'PAUSED'}</span>
-          </div>
-        </section>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Walk-in form */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm h-fit space-y-4">
-            <div><h3 className="text-lg font-bold text-slate-900 flex items-center space-x-2"><Plus className="w-5 h-5 text-emerald-600" /><span>Add Walk-in Patient</span></h3></div>
-            <form onSubmit={handleAddOfflinePatient} className="space-y-4">
-              <div><label className="block text-xs font-semibold text-slate-700 mb-1">Patient Name *</label><input type="text" placeholder="Enter name" value={offlineName} onChange={(e) => setOfflineName(e.target.value)} className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-emerald-500" required /></div>
-              <div><label className="block text-xs font-semibold text-slate-700 mb-1">Mobile (Optional)</label><input type="tel" placeholder="9876543210" value={offlinePhone} onChange={(e) => setOfflinePhone(e.target.value)} maxLength={10} className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-emerald-500 font-mono" /></div>
-              <button type="submit" disabled={addingPatient} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm shadow transition flex items-center justify-center space-x-2 disabled:opacity-60">{addingPatient ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>+ Token #{(patients.length > 0 ? Math.max(...patients.map((p) => p.token)) : 0) + 1}</span>}</button>
-            </form>
-          </div>
-
-          {/* Patient Table */}
-          <div className="lg:col-span-2 bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div><h3 className="text-lg font-bold text-slate-900">Today's Patients</h3></div>
-              <div className="flex items-center space-x-3">
-                <div className="relative"><Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" /><input type="text" placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 pr-3 py-1.5 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-500 w-44" /></div>
-                <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-1.5 rounded-lg">{patients.length} patients</span>
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
+                <input
+                  type="text"
+                  placeholder="Search name or token..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 pr-3 py-1.5 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-emerald-500 w-44"
+                />
               </div>
+              <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl">
+                {patients.length} Total
+              </span>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead><tr className="border-b border-slate-200 text-xs font-semibold text-slate-400 uppercase tracking-wider"><th className="py-3 px-3">Token</th><th className="py-3 px-3">Name</th><th className="py-3 px-3">Type</th><th className="py-3 px-3">Time</th><th className="py-3 px-3">Status</th><th className="py-3 px-3 text-right">Actions</th></tr></thead>
-                <tbody className="divide-y divide-slate-100 text-sm">
-                  {filteredPatients.map((p) => {
-                    const isCurrent = p.token === currentToken;
-                    return (
-                      <tr key={p.id} className={isCurrent ? 'bg-emerald-50/70 font-semibold' : 'hover:bg-slate-50'}>
-                        <td className="py-3.5 px-3 font-extrabold text-emerald-700 font-mono">#{p.token}</td>
-                        <td className="py-3.5 px-3"><div className="text-slate-900">{p.name}</div>{p.phone !== 'N/A' && <div className="text-[11px] text-slate-400 font-mono">{p.phone}</div>}</td>
-                        <td className="py-3.5 px-3"><span className={`inline-block text-[11px] px-2 py-0.5 rounded-md font-semibold ${p.type === 'Online Booking' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>{p.type}</span></td>
-                        <td className="py-3.5 px-3 text-xs text-slate-500">{p.time}</td>
-                        <td className="py-3.5 px-3">{p.status === 'in_consultation' || isCurrent ? <span className="inline-flex items-center text-xs text-emerald-700 font-bold bg-emerald-100 px-2.5 py-1 rounded-full">● In Consultation</span> : p.status === 'completed' ? <span className="text-xs text-slate-400">Completed</span> : p.status === 'skipped' ? <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded">Skipped</span> : p.status === 'cancelled' ? <span className="text-xs text-rose-500 bg-rose-50 px-2 py-0.5 rounded">Cancelled</span> : <span className="text-xs text-slate-500">Waiting</span>}</td>
-                        <td className="py-3.5 px-3 text-right"><div className="flex items-center justify-end space-x-1.5">
-                          <Link href={`/doctor/prescription?patient=${encodeURIComponent(p.name)}&token=${p.token}`} className="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-lg font-semibold transition flex items-center space-x-1"><FileText className="w-3.5 h-3.5" /><span>Rx</span></Link>
-                          {p.status === 'waiting' && <><button onClick={() => updatePatientStatus(p.id, 'skipped')} className="p-1 text-slate-400 hover:text-amber-600 rounded"><SkipForward className="w-4 h-4" /></button><button onClick={() => updatePatientStatus(p.id, 'cancelled')} className="p-1 text-slate-400 hover:text-rose-600 rounded"><XCircle className="w-4 h-4" /></button></>}
-                        </div></td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse text-sm min-w-[500px]">
+              <thead>
+                <tr className="border-b border-slate-800 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  <th className="py-3 px-3">Token</th>
+                  <th className="py-3 px-3">Patient Name</th>
+                  <th className="py-3 px-3">Type</th>
+                  <th className="py-3 px-3">Status</th>
+                  <th className="py-3 px-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60">
+                {filteredPatients.map((p) => {
+                  const isCurrent = p.token === currentToken;
+                  return (
+                    <tr key={p.id} className={isCurrent ? 'bg-emerald-500/10 font-bold' : 'hover:bg-slate-800/40'}>
+                      <td className="py-3.5 px-3 font-mono font-black text-emerald-400">#{p.token}</td>
+                      <td className="py-3.5 px-3">
+                        <div className="text-white font-semibold">{p.name}</div>
+                        {p.phone !== 'N/A' && <div className="text-[11px] text-slate-400 font-mono">{p.phone}</div>}
+                      </td>
+                      <td className="py-3.5 px-3">
+                        <span className={`inline-block text-[11px] px-2.5 py-0.5 rounded-md font-semibold ${
+                          p.type === 'Online Booking' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                        }`}>
+                          {p.type}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-3">
+                        {p.status === 'in_consultation' || isCurrent ? (
+                          <span className="inline-flex items-center text-xs text-emerald-400 font-bold bg-emerald-500/20 border border-emerald-500/30 px-2.5 py-1 rounded-full">
+                            ● In Consultation
+                          </span>
+                        ) : p.status === 'completed' ? (
+                          <span className="text-xs text-slate-500 font-medium">Completed</span>
+                        ) : p.status === 'skipped' ? (
+                          <span className="text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">Skipped</span>
+                        ) : p.status === 'cancelled' ? (
+                          <span className="text-xs text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded border border-rose-500/20">Cancelled</span>
+                        ) : (
+                          <span className="text-xs text-slate-400">Waiting</span>
+                        )}
+                      </td>
+                      <td className="py-3.5 px-3 text-right">
+                        <div className="flex items-center justify-end space-x-2">
+                          <Link
+                            href={`/doctor/prescription?patient=${encodeURIComponent(p.name)}&token=${p.token}`}
+                            className="text-xs bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl font-bold transition flex items-center space-x-1"
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                            <span>Rx</span>
+                          </Link>
+                          {p.status === 'waiting' && (
+                            <>
+                              <button
+                                onClick={() => updatePatientStatus(p.id, 'skipped')}
+                                className="p-1.5 text-slate-400 hover:text-amber-400 bg-slate-800 rounded-lg transition"
+                                title="Skip Patient"
+                              >
+                                <SkipForward className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => updatePatientStatus(p.id, 'cancelled')}
+                                className="p-1.5 text-slate-400 hover:text-rose-400 bg-slate-800 rounded-lg transition"
+                                title="Cancel Token"
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
