@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, Calendar as CalendarIcon, Clock, User, Check } from 'lucide-react-native';
+import { ArrowLeft, Calendar as CalendarIcon, Clock, User, Check, ShieldAlert } from 'lucide-react-native';
 import { COLORS, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { useBookingStore } from '../../store/bookingStore';
+import { supabase } from '../../lib/supabase';
 
 export default function SlotPickerScreen() {
   const router = useRouter();
@@ -27,21 +29,68 @@ export default function SlotPickerScreen() {
       dayName: i === 0 ? 'आज (Today)' : i === 1 ? 'कल (Tomorrow)' : d.toLocaleDateString('hi-IN', { weekday: 'short' }),
       dateNum: d.getDate(),
       month: d.toLocaleDateString('hi-IN', { month: 'short' }),
+      dayOfWeek: d.getDay(),
     };
   });
 
   const [selectedDate, setSelectedDate] = useState(dates[0].fullDate);
   const [selectedSlotTime, setSelectedSlotTime] = useState<string | null>('10:00 AM');
   const [patientType, setPatientType] = useState<'self' | 'family'>('self');
+  const [familyMembers, setFamilyMembers] = useState<any[]>([]);
+  const [selectedFamilyMemberId, setSelectedFamilyMemberId] = useState<string | null>(null);
 
-  const morningSlots = ['09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM'];
-  const afternoonSlots = ['04:00 PM', '04:30 PM', '05:00 PM', '05:30 PM', '06:00 PM'];
+  const [morningSlots, setMorningSlots] = useState(['09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM']);
+  const [afternoonSlots, setAfternoonSlots] = useState(['04:00 PM', '04:30 PM', '05:00 PM', '05:30 PM', '06:00 PM']);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+
+  useEffect(() => {
+    fetchFamilyMembers();
+  }, []);
+
+  useEffect(() => {
+    fetchBookedSlotsAndSchedules(selectedDate);
+  }, [selectedDate, doctorId]);
+
+  const fetchFamilyMembers = async () => {
+    try {
+      const { data } = await supabase.from('family_members').select('*');
+      if (data && data.length > 0) {
+        setFamilyMembers(data);
+        setSelectedFamilyMemberId(data[0].id);
+      }
+    } catch (e) {
+      console.log('Family members fetch fallback');
+    }
+  };
+
+  const fetchBookedSlotsAndSchedules = async (dateStr: string) => {
+    setLoadingSlots(true);
+    try {
+      // 1. Fetch already booked appointments for this doctor on this date
+      const { data: apptData } = await supabase
+        .from('appointments')
+        .select('appointment_time')
+        .eq('doctor_id', doctorId)
+        .eq('appointment_date', dateStr)
+        .neq('status', 'cancelled');
+
+      if (apptData) {
+        const booked = apptData.map((a: any) => a.appointment_time);
+        setBookedSlots(booked);
+      }
+    } catch (e) {
+      console.log('Booked slots fetch fallback');
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
 
   const handleContinue = () => {
     if (!selectedSlotTime) return;
     setDate(selectedDate);
     setSlot(selectedSlotTime);
-    setFamilyMember(patientType === 'self' ? null : 'family_1');
+    setFamilyMember(patientType === 'self' ? null : selectedFamilyMemberId || 'family_1');
     router.push('/booking/confirm');
   };
 
@@ -132,49 +181,63 @@ export default function SlotPickerScreen() {
         {/* Morning Time Slots Grid */}
         <Text style={styles.sectionHeading}>🌅 सुबह का समय (Morning Slots)</Text>
         <View style={styles.slotsGrid}>
-          {morningSlots.map((slot) => (
-            <TouchableOpacity
-              key={slot}
-              style={[
-                styles.slotPill,
-                selectedSlotTime === slot && styles.slotPillActive,
-              ]}
-              onPress={() => setSelectedSlotTime(slot)}
-            >
-              <Text
+          {morningSlots.map((slot) => {
+            const isBooked = bookedSlots.includes(slot);
+            const isSelected = selectedSlotTime === slot;
+            return (
+              <TouchableOpacity
+                key={slot}
+                disabled={isBooked}
                 style={[
-                  styles.slotText,
-                  selectedSlotTime === slot && styles.slotTextActive,
+                  styles.slotPill,
+                  isSelected && styles.slotPillActive,
+                  isBooked && styles.slotPillBooked,
                 ]}
+                onPress={() => setSelectedSlotTime(slot)}
               >
-                {slot}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  style={[
+                    styles.slotText,
+                    isSelected && styles.slotTextActive,
+                    isBooked && styles.slotTextBooked,
+                  ]}
+                >
+                  {isBooked ? `${slot} (Booked)` : slot}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {/* Evening Time Slots Grid */}
         <Text style={styles.sectionHeading}>🌆 शाम का समय (Evening Slots)</Text>
         <View style={styles.slotsGrid}>
-          {afternoonSlots.map((slot) => (
-            <TouchableOpacity
-              key={slot}
-              style={[
-                styles.slotPill,
-                selectedSlotTime === slot && styles.slotPillActive,
-              ]}
-              onPress={() => setSelectedSlotTime(slot)}
-            >
-              <Text
+          {afternoonSlots.map((slot) => {
+            const isBooked = bookedSlots.includes(slot);
+            const isSelected = selectedSlotTime === slot;
+            return (
+              <TouchableOpacity
+                key={slot}
+                disabled={isBooked}
                 style={[
-                  styles.slotText,
-                  selectedSlotTime === slot && styles.slotTextActive,
+                  styles.slotPill,
+                  isSelected && styles.slotPillActive,
+                  isBooked && styles.slotPillBooked,
                 ]}
+                onPress={() => setSelectedSlotTime(slot)}
               >
-                {slot}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  style={[
+                    styles.slotText,
+                    isSelected && styles.slotTextActive,
+                    isBooked && styles.slotTextBooked,
+                  ]}
+                >
+                  {isBooked ? `${slot} (Booked)` : slot}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
 
@@ -340,6 +403,11 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     borderColor: COLORS.primary,
   },
+  slotPillBooked: {
+    backgroundColor: '#F3F4F6',
+    borderColor: '#E5E7EB',
+    opacity: 0.6,
+  },
   slotText: {
     fontSize: 13,
     fontWeight: '600',
@@ -348,6 +416,10 @@ const styles = StyleSheet.create({
   slotTextActive: {
     color: COLORS.white,
     fontWeight: '700',
+  },
+  slotTextBooked: {
+    color: '#9CA3AF',
+    textDecorationLine: 'line-through',
   },
   bottomBar: {
     position: 'absolute',

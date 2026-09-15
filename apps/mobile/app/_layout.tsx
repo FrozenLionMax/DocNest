@@ -104,10 +104,9 @@ export default function RootLayout() {
         <Stack.Screen name="doctor/[id]" />
         <Stack.Screen name="booking/[doctorId]" />
         <Stack.Screen name="booking/confirm" />
-        <Stack.Screen name="booking/success" />
-        <Stack.Screen name="appointment/[id]" />
-        <Stack.Screen name="specialty/[slug]" />
-        <Stack.Screen name="queue/[doctorId]" />
+        <Stack.Screen name="family/index" />
+        <Stack.Screen name="records/index" />
+        <Stack.Screen name="medicave/index" />
       </Stack>
     </GestureHandlerRootView>
   );

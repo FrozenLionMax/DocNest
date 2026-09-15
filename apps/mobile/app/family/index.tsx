@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,15 +6,26 @@ import {
   TouchableOpacity,
   TextInput,
   StyleSheet,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Users, Plus, ChevronLeft, Trash2, Heart } from 'lucide-react-native';
+import { Users, Plus, ChevronLeft, Trash2, Heart, RefreshCw } from 'lucide-react-native';
 import { COLORS, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
+import { supabase } from '../../lib/supabase';
+
+interface MemberItem {
+  id: string;
+  name: string;
+  relation: string;
+  age: string;
+  gender: string;
+}
 
 export default function FamilyScreen() {
   const router = useRouter();
-
-  const [members, setMembers] = useState([
+  const [loading, setLoading] = useState(true);
+  const [members, setMembers] = useState<MemberItem[]>([
     { id: 'fam-1', name: 'Sita Devi (माता जी)', relation: 'Mother', age: '58', gender: 'Female' },
     { id: 'fam-2', name: 'Ramesh Sharma (पिता जी)', relation: 'Father', age: '62', gender: 'Male' },
     { id: 'fam-3', name: 'Aarav Sharma (बेटा)', relation: 'Son', age: '8', gender: 'Male' },
@@ -23,24 +34,76 @@ export default function FamilyScreen() {
   const [newName, setNewName] = useState('');
   const [newRelation, setNewRelation] = useState('');
   const [newAge, setNewAge] = useState('');
+  const [newGender, setNewGender] = useState('Male');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const handleAddMember = () => {
+  useEffect(() => {
+    fetchFamilyMembers();
+  }, []);
+
+  const fetchFamilyMembers = async () => {
+    setLoading(true);
+    try {
+      const { data } = await supabase.from('family_members').select('*');
+      if (data && data.length > 0) {
+        setMembers(
+          data.map((m: any) => ({
+            id: m.id,
+            name: m.full_name,
+            relation: m.relation || 'Member',
+            age: m.age ? String(m.age) : '30',
+            gender: m.gender || 'Other',
+          }))
+        );
+      }
+    } catch (e) {
+      console.log('Family members loaded fallback');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddMember = async () => {
     if (!newName) return;
-    setMembers([
-      ...members,
-      {
-        id: `fam-${Date.now()}`,
-        name: newName,
-        relation: newRelation || 'Family Member',
-        age: newAge || '30',
-        gender: 'Other',
-      },
-    ]);
+    setSaving(true);
+    const newMemberItem: MemberItem = {
+      id: `fam-${Date.now()}`,
+      name: newName,
+      relation: newRelation || 'Family Member',
+      age: newAge || '30',
+      gender: newGender,
+    };
+
+    setMembers((prev) => [...prev, newMemberItem]);
     setNewName('');
     setNewRelation('');
     setNewAge('');
     setShowAddForm(false);
+
+    try {
+      await supabase.from('family_members').insert([
+        {
+          full_name: newName,
+          relation: newRelation || 'Family Member',
+          age: parseInt(newAge) || 30,
+          gender: newGender,
+        },
+      ]);
+    } catch (e) {
+      console.log('Saved family member locally');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteMember = async (id: string) => {
+    setMembers((prev) => prev.filter((item) => item.id !== id));
+    try {
+      await supabase.from('family_members').delete().eq('id', id);
+    } catch (e) {
+      console.log('Deleted locally');
+    }
   };
 
   return (
@@ -55,32 +118,41 @@ export default function FamilyScreen() {
 
       <ScrollView style={styles.body} showsVerticalScrollIndicator={false}>
         {/* Subtitle */}
-        <Text style={styles.subtitle}>
-          एक ही अकाउंट से पूरे परिवार की अपॉइंटमेंट बुक करें एवं रिकॉर्ड संभालें
-        </Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md }}>
+          <Text style={styles.subtitle}>
+            एक ही अकाउंट से पूरे परिवार की अपॉइंटमेंट बुक करें एवं रिकॉर्ड संभालें
+          </Text>
+          <TouchableOpacity onPress={fetchFamilyMembers}>
+            <RefreshCw size={16} color={COLORS.primary} />
+          </TouchableOpacity>
+        </View>
 
         {/* Members List */}
-        {members.map((m) => (
-          <View key={m.id} style={styles.memberCard}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{m.name[0]}</Text>
-            </View>
+        {loading ? (
+          <ActivityIndicator color={COLORS.primary} size="large" style={{ marginVertical: 20 }} />
+        ) : (
+          members.map((m) => (
+            <View key={m.id} style={styles.memberCard}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>{m.name[0]}</Text>
+              </View>
 
-            <View style={styles.memberInfo}>
-              <Text style={styles.memberName}>{m.name}</Text>
-              <Text style={styles.memberMeta}>
-                {m.relation} • {m.age} वर्ष • {m.gender}
-              </Text>
-            </View>
+              <View style={styles.memberInfo}>
+                <Text style={styles.memberName}>{m.name}</Text>
+                <Text style={styles.memberMeta}>
+                  {m.relation} • {m.age} वर्ष • {m.gender}
+                </Text>
+              </View>
 
-            <TouchableOpacity
-              onPress={() => setMembers(members.filter((item) => item.id !== m.id))}
-              style={styles.deleteBtn}
-            >
-              <Trash2 size={18} color={COLORS.error} />
-            </TouchableOpacity>
-          </View>
-        ))}
+              <TouchableOpacity
+                onPress={() => handleDeleteMember(m.id)}
+                style={styles.deleteBtn}
+              >
+                <Trash2 size={18} color={COLORS.error} />
+              </TouchableOpacity>
+            </View>
+          ))
+        )}
 
         {/* Add Member Toggle */}
         {!showAddForm ? (
@@ -125,8 +197,8 @@ export default function FamilyScreen() {
                 <Text style={styles.cancelText}>रद्द करें</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.saveBtn} onPress={handleAddMember}>
-                <Text style={styles.saveText}>सहेजें (Save)</Text>
+              <TouchableOpacity style={styles.saveBtn} onPress={handleAddMember} disabled={saving}>
+                <Text style={styles.saveText}>{saving ? 'सहेज रहे हैं...' : 'सहेजें (Save)'}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -167,7 +239,8 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 13,
     color: COLORS.textSecondary,
-    marginBottom: SPACING.lg,
+    flex: 1,
+    marginRight: 8,
   },
   memberCard: {
     backgroundColor: COLORS.white,

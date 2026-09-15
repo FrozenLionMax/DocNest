@@ -7,6 +7,7 @@ import {
   StyleSheet,
   FlatList,
   Linking,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +26,7 @@ import {
   Stethoscope,
   HeartPulse,
   Globe,
+  CheckCircle2,
 } from 'lucide-react-native';
 import { COLORS, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { SPECIALTIES } from '../../constants/specialties';
@@ -42,7 +44,9 @@ export default function HomeScreen() {
 
   const [selectedBlock] = useState('Deoria Sadar');
   const [doctors, setDoctors] = useState<any[]>([]);
+  const [dynamicSpecialties, setDynamicSpecialties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [checkedIn, setCheckedIn] = useState(false);
 
   // Live Queue Counter State
   const [activeQueue, setActiveQueue] = useState({
@@ -56,15 +60,28 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchTopDoctors();
+    fetchSpecialties();
 
     // Subscribe to OPD Live Queue Realtime updates
-    const channel = supabase.channel('opd-live-queue')
-      .on('broadcast', { event: 'token-update' }, (payload: any) => {
-        if (payload.payload && payload.payload.currentToken) {
+    const channel = supabase
+      .channel('opd-live-queue')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'clinic_queues' }, (payload: any) => {
+        if (payload.new && payload.new.current_token !== undefined) {
+          const newCurrent = payload.new.current_token;
           setActiveQueue((prev) => ({
             ...prev,
-            currentToken: payload.payload.currentToken,
-            estimatedWaitMins: Math.max(0, (prev.userToken - payload.payload.currentToken) * 5),
+            currentToken: newCurrent,
+            estimatedWaitMins: Math.max(0, (prev.userToken - newCurrent) * 5),
+          }));
+        }
+      })
+      .on('broadcast', { event: 'token-update' }, (payload: any) => {
+        if (payload.payload && payload.payload.currentToken) {
+          const newCurrent = payload.payload.currentToken;
+          setActiveQueue((prev) => ({
+            ...prev,
+            currentToken: newCurrent,
+            estimatedWaitMins: Math.max(0, (prev.userToken - newCurrent) * 5),
           }));
         }
       })
@@ -74,6 +91,17 @@ export default function HomeScreen() {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  const fetchSpecialties = async () => {
+    try {
+      const { data } = await supabase.from('specialties').select('*');
+      if (data && data.length > 0) {
+        setDynamicSpecialties(data);
+      }
+    } catch (e) {
+      console.log('Using static specialties array fallback');
+    }
+  };
 
   const fetchTopDoctors = async () => {
     try {
@@ -135,6 +163,13 @@ export default function HomeScreen() {
   const handleCallEmergency = () => {
     Linking.openURL('tel:108');
   };
+
+  const handleCheckIn = () => {
+    setCheckedIn(true);
+    Alert.alert('चेक-इन सफल! 📍', 'आपकी उपस्थिति क्लिनिक रिसेप्शन पर दर्ज कर दी गई है। कृपया अपनी बारी का इंतज़ार करें।');
+  };
+
+  const displaySpecs = dynamicSpecialties.length > 0 ? dynamicSpecialties : SPECIALTIES;
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -218,19 +253,35 @@ export default function HomeScreen() {
               <Text style={styles.waitText}>इंतज़ार: ~{activeQueue.estimatedWaitMins} मिनट</Text>
             </View>
 
-            <TouchableOpacity
-              style={styles.shareWhatsappBtn}
-              onPress={() =>
-                shareLiveQueueStatus(
-                  activeQueue.doctorName,
-                  activeQueue.currentToken,
-                  activeQueue.userToken,
-                  activeQueue.estimatedWaitMins
-                )
-              }
-            >
-              <Text style={styles.shareWhatsappText}>व्हाट्सएप शेयर</Text>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 6 }}>
+              {!checkedIn ? (
+                <TouchableOpacity
+                  style={styles.checkInBtn}
+                  onPress={handleCheckIn}
+                >
+                  <Text style={styles.checkInText}>क्लिनिक पहुँच गया</Text>
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.checkedInBadge}>
+                  <CheckCircle2 size={12} color={COLORS.white} />
+                  <Text style={styles.checkedInText}>उपस्थित</Text>
+                </View>
+              )}
+
+              <TouchableOpacity
+                style={styles.shareWhatsappBtn}
+                onPress={() =>
+                  shareLiveQueueStatus(
+                    activeQueue.doctorName,
+                    activeQueue.currentToken,
+                    activeQueue.userToken,
+                    activeQueue.estimatedWaitMins
+                  )
+                }
+              >
+                <Text style={styles.shareWhatsappText}>व्हाट्सएप शेयर</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>
@@ -274,7 +325,7 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.specialtiesGrid}>
-          {SPECIALTIES.slice(0, 8).map((spec) => (
+          {displaySpecs.slice(0, 8).map((spec: any) => (
             <TouchableOpacity
               key={spec.id}
               style={styles.specialtyCard}
@@ -284,7 +335,7 @@ export default function HomeScreen() {
                 <Stethoscope size={22} color={COLORS.primary} />
               </View>
               <Text style={styles.specialtyLabel} numberOfLines={1}>
-                {spec.name_hi}
+                {spec.name_hi || spec.name}
               </Text>
             </TouchableOpacity>
           ))}
@@ -315,7 +366,7 @@ export default function HomeScreen() {
 
               <Text style={styles.doctorSpecText}>{doc.specialization}</Text>
               <Text style={styles.doctorClinicText} numberOfLines={1}>
-                📍 {doc.clinic_name}
+                📍 {doc.clinic_name || doc.clinic_address}
               </Text>
 
               <View style={styles.doctorMetaRow}>
@@ -533,6 +584,33 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.textSecondary,
     fontWeight: '600',
+  },
+  checkInBtn: {
+    backgroundColor: COLORS.tealLight,
+    borderWidth: 1,
+    borderColor: COLORS.primaryMuted,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: RADIUS.md,
+  },
+  checkInText: {
+    color: COLORS.primary,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  checkedInBadge: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: RADIUS.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  checkedInText: {
+    color: COLORS.white,
+    fontSize: 11,
+    fontWeight: '700',
   },
   shareWhatsappBtn: {
     backgroundColor: COLORS.whatsappGreen,

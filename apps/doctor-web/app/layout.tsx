@@ -1,4 +1,6 @@
 import React from 'react';
+import './globals.css';
+import { LanguageProvider } from '../components/LanguageContext';
 
 export const metadata = {
   title: 'DocNest Doctor Portal — Deoria',
@@ -11,16 +13,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="hi">
+    <html lang="en">
       <head>
-        <script src="https://cdn.tailwindcss.com"></script>
         <link
           href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="bg-slate-50 text-slate-900 font-['Plus_Jakarta_Sans',sans-serif] antialiased">
-        {children}
+      <body className="bg-slate-50 text-slate-900 antialiased">
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

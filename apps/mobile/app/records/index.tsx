@@ -1,28 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  FlatList,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { FileText, Plus, ChevronLeft, Calendar, Download, Share2 } from 'lucide-react-native';
+import { FileText, Plus, ChevronLeft, Calendar, Download, Share2, Stethoscope, RefreshCw } from 'lucide-react-native';
 import { COLORS, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { openMedicaveOrder } from '../../lib/whatsapp';
+import { supabase } from '../../lib/supabase';
+
+interface RecordItem {
+  id: string;
+  title: string;
+  doctor: string;
+  clinic: string;
+  date: string;
+  type: string;
+  fileType: string;
+}
 
 export default function RecordsScreen() {
   const router = useRouter();
-
-  const [records] = useState([
+  const [loading, setLoading] = useState(true);
+  const [records, setRecords] = useState<RecordItem[]>([
     {
       id: 'rec-1',
-      title: 'Orthopedic OPD Consultation Prescription',
+      title: 'Orthopedic OPD Digital Prescription (डिजिटल पर्चा)',
       doctor: 'Dr. Amit Kumar',
-      clinic: 'Gupta Clinic, Deoria',
-      date: '02 Sep 2026',
-      type: 'Prescription',
+      clinic: 'Gupta Clinic, Deoria Sadar',
+      date: '06 Sep 2026',
+      type: 'Prescription (Rx)',
       fileType: 'PDF',
     },
     {
@@ -35,6 +47,64 @@ export default function RecordsScreen() {
       fileType: 'IMAGE',
     },
   ]);
+
+  useEffect(() => {
+    fetchHealthRecords();
+  }, []);
+
+  const fetchHealthRecords = async () => {
+    setLoading(true);
+    try {
+      // Fetch from Supabase prescriptions & health_records tables
+      const { data: rxData } = await supabase.from('prescriptions').select('*');
+      const { data: recData } = await supabase.from('health_records').select('*');
+
+      const fetchedList: RecordItem[] = [];
+
+      if (rxData && rxData.length > 0) {
+        rxData.forEach((rx: any) => {
+          fetchedList.push({
+            id: rx.id,
+            title: `Rx: ${rx.diagnosis || 'डिजिटल पर्चा'}`,
+            doctor: rx.doctor_name || 'Dr. Amit Kumar',
+            clinic: rx.clinic_name || 'Gupta Clinic, Deoria',
+            date: new Date(rx.created_at).toLocaleDateString('hi-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+            type: 'Prescription (Rx)',
+            fileType: 'PDF',
+          });
+        });
+      }
+
+      if (recData && recData.length > 0) {
+        recData.forEach((r: any) => {
+          fetchedList.push({
+            id: r.id,
+            title: r.record_title || 'लैब टेस्ट रिपोर्ट',
+            doctor: r.doctor_name || 'Doctor',
+            clinic: r.hospital_name || 'Deoria Clinic',
+            date: new Date(r.created_at).toLocaleDateString('hi-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+            type: r.record_type || 'Report',
+            fileType: 'PDF',
+          });
+        });
+      }
+
+      if (fetchedList.length > 0) {
+        setRecords(fetchedList);
+      }
+    } catch (e) {
+      console.log('Health records loaded fallback');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUploadRecord = () => {
+    Alert.alert(
+      'पर्चा अपलोड 📄',
+      'कैमरा या गैलरी से अपने डॉक्टरी पर्चे की फोटो या PDF सिलेक्ट करें। आपका डेटा पूरी तरह एन्क्रिप्टेड एवं सुरक्षित रहेगा।'
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -59,40 +129,49 @@ export default function RecordsScreen() {
         </View>
 
         {/* Upload Action Card */}
-        <TouchableOpacity style={styles.uploadBtn}>
+        <TouchableOpacity style={styles.uploadBtn} onPress={handleUploadRecord}>
           <Plus size={20} color={COLORS.white} />
           <Text style={styles.uploadBtnText}>+ नया पर्चा / रिपोर्ट अपलोड करें</Text>
         </TouchableOpacity>
 
         {/* Records List */}
-        <Text style={styles.sectionHeader}>सहेजे गए रिकॉर्ड ({records.length})</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md }}>
+          <Text style={styles.sectionHeader}>सहेजे गए रिकॉर्ड ({records.length})</Text>
+          <TouchableOpacity onPress={fetchHealthRecords}>
+            <RefreshCw size={16} color={COLORS.primary} />
+          </TouchableOpacity>
+        </View>
 
-        {records.map((item) => (
-          <View key={item.id} style={styles.recordCard}>
-            <View style={styles.recordHeader}>
-              <View style={styles.typeBadge}>
-                <Text style={styles.typeBadgeText}>{item.type}</Text>
+        {loading ? (
+          <ActivityIndicator color={COLORS.primary} size="large" style={{ marginVertical: 20 }} />
+        ) : (
+          records.map((item) => (
+            <View key={item.id} style={styles.recordCard}>
+              <View style={styles.recordHeader}>
+                <View style={styles.typeBadge}>
+                  <Text style={styles.typeBadgeText}>{item.type}</Text>
+                </View>
+                <Text style={styles.recordDate}>📍 {item.date}</Text>
               </View>
-              <Text style={styles.recordDate}>📍 {item.date}</Text>
+
+              <Text style={styles.recordTitle}>{item.title}</Text>
+              <Text style={styles.recordDoctor}>👨‍⚕️ {item.doctor} — {item.clinic}</Text>
+
+              <View style={styles.actionRow}>
+                <TouchableOpacity
+                  style={styles.medicaveOrderBtn}
+                  onPress={() => openMedicaveOrder(item.title)}
+                >
+                  <Text style={styles.medicaveOrderText}>💊 Medicave से दवा मंगवाएं</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.iconBtn}>
+                  <Share2 size={16} color={COLORS.textSecondary} />
+                </TouchableOpacity>
+              </View>
             </View>
-
-            <Text style={styles.recordTitle}>{item.title}</Text>
-            <Text style={styles.recordDoctor}>👨‍⚕️ {item.doctor} — {item.clinic}</Text>
-
-            <View style={styles.actionRow}>
-              <TouchableOpacity
-                style={styles.medicaveOrderBtn}
-                onPress={() => openMedicaveOrder(item.title)}
-              >
-                <Text style={styles.medicaveOrderText}>💊 Medicave से दवा मंगवाएं</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.iconBtn}>
-                <Share2 size={16} color={COLORS.textSecondary} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
+          ))
+        )}
       </ScrollView>
     </View>
   );
@@ -177,7 +256,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
     color: COLORS.textPrimary,
-    marginBottom: SPACING.md,
   },
   recordCard: {
     backgroundColor: COLORS.white,

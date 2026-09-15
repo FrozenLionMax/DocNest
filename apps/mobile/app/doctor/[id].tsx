@@ -7,6 +7,9 @@ import {
   StyleSheet,
   ActivityIndicator,
   Linking,
+  Modal,
+  TextInput,
+  Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -21,11 +24,22 @@ import {
   Calendar,
   ChevronRight,
   Phone,
+  Plus,
+  X,
+  CheckCircle2,
 } from 'lucide-react-native';
 import { COLORS, SPACING, RADIUS, SHADOWS } from '../../constants/theme';
 import { contactDoctorWhatsApp } from '../../lib/whatsapp';
 import { supabase } from '../../lib/supabase';
 import { useBookingStore } from '../../store/bookingStore';
+
+interface ReviewItem {
+  id: string;
+  patient_name: string;
+  rating: number;
+  comment: string;
+  date: string;
+}
 
 export default function DoctorDetailScreen() {
   const router = useRouter();
@@ -35,15 +49,27 @@ export default function DoctorDetailScreen() {
 
   const [doctor, setDoctorData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState<ReviewItem[]>([
+    { id: 'rev-1', patient_name: 'Rahul Sharma', rating: 5, comment: 'डॉक्टर साहब का व्यवहार बहुत अच्छा है। जोड़ दर्द में तुरंत आराम मिला।', date: '01 Sep 2026' },
+    { id: 'rev-2', patient_name: 'Priya Singh', rating: 5, comment: 'Very professional clinic and live queue system saved our time!', date: '25 Aug 2026' },
+  ]);
+
+  // Review Modal State
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewName, setReviewName] = useState('');
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     fetchDoctorDetails();
+    fetchReviews();
   }, [id]);
 
   const fetchDoctorDetails = async () => {
     try {
       if (!id) return;
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from('doctors')
         .select('*')
         .eq('id', id as string)
@@ -52,7 +78,6 @@ export default function DoctorDetailScreen() {
       if (data) {
         setDoctorData(data);
       } else {
-        // Fallback mock doctor details for Deoria
         setDoctorData({
           id: id || '1',
           full_name: 'Dr. Amit Kumar',
@@ -73,6 +98,66 @@ export default function DoctorDetailScreen() {
       console.warn('Fetch doctor detail error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      if (!id) return;
+      const { data } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('doctor_id', id as string)
+        .order('created_at', { ascending: false });
+
+      if (data && data.length > 0) {
+        setReviews(
+          data.map((r: any) => ({
+            id: r.id,
+            patient_name: r.patient_name || 'Anonymous Patient',
+            rating: r.rating || 5,
+            comment: r.comment || '',
+            date: new Date(r.created_at).toLocaleDateString('hi-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
+          }))
+        );
+      }
+    } catch (e) {
+      console.log('Reviews loaded fallback');
+    }
+  };
+
+  const handleAddReview = async () => {
+    if (!reviewName || !reviewComment) {
+      Alert.alert('अधूरी जानकारी', 'कृपया नाम और अनुभव विवरण लिखें');
+      return;
+    }
+    setSubmittingReview(true);
+    const newRev: ReviewItem = {
+      id: `rev-${Date.now()}`,
+      patient_name: reviewName,
+      rating: reviewRating,
+      comment: reviewComment,
+      date: 'Just now',
+    };
+
+    setReviews((prev) => [newRev, ...prev]);
+    setShowReviewModal(false);
+
+    try {
+      await supabase.from('reviews').insert([
+        {
+          doctor_id: id || '1',
+          patient_name: reviewName,
+          rating: reviewRating,
+          comment: reviewComment,
+        },
+      ]);
+    } catch (e) {
+      console.log('Saved review locally');
+    } finally {
+      setSubmittingReview(false);
+      setReviewName('');
+      setReviewComment('');
     }
   };
 
@@ -147,7 +232,7 @@ export default function DoctorDetailScreen() {
             <View style={styles.statBox}>
               <Star size={18} color="#FFD700" fill="#FFD700" />
               <Text style={styles.statVal}>{doctor?.avg_rating || 4.8} ★</Text>
-              <Text style={styles.statLabel}>{doctor?.total_reviews || 100}+ रेटिंग</Text>
+              <Text style={styles.statLabel}>{reviews.length}+ रेटिंग</Text>
             </View>
 
             <View style={styles.statDivider} />
@@ -179,6 +264,31 @@ export default function DoctorDetailScreen() {
           <Text style={styles.bioText}>{doctor?.bio}</Text>
         </View>
 
+        {/* REVIEWS SECTION */}
+        <View style={styles.card}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md }}>
+            <Text style={styles.sectionHeading}>⭐ मरीज रेटिंग एवं फीडबैक ({reviews.length})</Text>
+            <TouchableOpacity style={styles.addReviewBtn} onPress={() => setShowReviewModal(true)}>
+              <Plus size={14} color={COLORS.white} />
+              <Text style={styles.addReviewBtnText}>रिव्यू दें</Text>
+            </TouchableOpacity>
+          </View>
+
+          {reviews.map((rev) => (
+            <View key={rev.id} style={styles.reviewCard}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                <Text style={styles.reviewPatientName}>{rev.patient_name}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                  <Star size={12} color="#FFD700" fill="#FFD700" />
+                  <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.textPrimary }}>{rev.rating}.0</Text>
+                </View>
+              </View>
+              <Text style={styles.reviewComment}>{rev.comment}</Text>
+              <Text style={styles.reviewDate}>{rev.date}</Text>
+            </View>
+          ))}
+        </View>
+
         {/* Contact Doctor Option */}
         <TouchableOpacity
           style={styles.whatsappCard}
@@ -205,6 +315,49 @@ export default function DoctorDetailScreen() {
           <Text style={styles.bookButtonText}>अपॉइंटमेंट बुक करें</Text>
         </TouchableOpacity>
       </View>
+
+      {/* WRITE REVIEW MODAL */}
+      <Modal visible={showReviewModal} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalCard}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md }}>
+              <Text style={{ fontSize: 16, fontWeight: '800', color: COLORS.textPrimary }}>डॉक्टर को रिव्यू दें</Text>
+              <TouchableOpacity onPress={() => setShowReviewModal(false)}>
+                <X size={20} color={COLORS.textMuted} />
+              </TouchableOpacity>
+            </View>
+
+            <TextInput
+              placeholder="आपका नाम (Your Name)"
+              value={reviewName}
+              onChangeText={setReviewName}
+              style={styles.modalInput}
+            />
+
+            <Text style={{ fontSize: 12, fontWeight: '700', color: COLORS.textSecondary, marginBottom: 6 }}>स्टार रेटिंग (Rating):</Text>
+            <View style={{ flexDirection: 'row', gap: 10, marginBottom: SPACING.md }}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <TouchableOpacity key={star} onPress={() => setReviewRating(star)}>
+                  <Star size={28} color={star <= reviewRating ? '#FFD700' : '#D1D5DB'} fill={star <= reviewRating ? '#FFD700' : 'transparent'} />
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <TextInput
+              placeholder="अपना अनुभव लिखें (उदा. इलाज से बहुत संतुष्ट हैं)..."
+              value={reviewComment}
+              onChangeText={setReviewComment}
+              multiline
+              numberOfLines={3}
+              style={[styles.modalInput, { height: 80, textAlignVertical: 'top' }]}
+            />
+
+            <TouchableOpacity style={styles.submitReviewBtn} onPress={handleAddReview} disabled={submittingReview}>
+              <Text style={{ color: COLORS.white, fontWeight: '700', fontSize: 14 }}>रिव्यू सबमिट करें (Submit)</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -335,13 +488,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     color: COLORS.textPrimary,
-    marginBottom: SPACING.sm,
   },
   clinicName: {
     fontSize: 16,
     fontWeight: '700',
     color: COLORS.primary,
     marginBottom: 4,
+    marginTop: 4,
   },
   locationRow: {
     flexDirection: 'row',
@@ -369,6 +522,42 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textSecondary,
     lineHeight: 22,
+    marginTop: 4,
+  },
+  addReviewBtn: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: RADIUS.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  addReviewBtnText: {
+    color: COLORS.white,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  reviewCard: {
+    backgroundColor: COLORS.backgroundSecondary,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
+    marginBottom: SPACING.xs,
+  },
+  reviewPatientName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.textPrimary,
+  },
+  reviewComment: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+    marginTop: 2,
+  },
+  reviewDate: {
+    fontSize: 10,
+    color: COLORS.textMuted,
+    marginTop: 4,
   },
   whatsappCard: {
     backgroundColor: COLORS.white,
@@ -431,5 +620,32 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 15,
     fontWeight: '700',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    padding: SPACING.lg,
+  },
+  modalCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.lg,
+  },
+  modalInput: {
+    backgroundColor: COLORS.backgroundSecondary,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    fontSize: 14,
+    marginBottom: SPACING.md,
+  },
+  submitReviewBtn: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: 12,
+    borderRadius: RADIUS.lg,
+    alignItems: 'center',
   },
 });

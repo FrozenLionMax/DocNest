@@ -9,16 +9,15 @@ const LANGUAGE_KEY = 'docnest_language';
 
 /**
  * i18n setup for DocNest.
- * Default language: Hindi (hi) — for Deoria users.
- * Supports: Hindi (hi) and English (en).
+ * Default language: English (en) as primary, with Hindi (hi) option.
  */
 i18n.use(initReactI18next).init({
   resources: {
-    hi: { translation: hi },
     en: { translation: en },
+    hi: { translation: hi },
   },
-  lng: 'hi', // Default to Hindi
-  fallbackLng: 'en',
+  lng: 'en', // Default to English as primary
+  fallbackLng: 'hi',
   interpolation: {
     escapeValue: false,
   },
@@ -47,7 +46,7 @@ export async function changeLanguage(lang: 'hi' | 'en'): Promise<void> {
 
 /** Get current language */
 export function getCurrentLanguage(): 'hi' | 'en' {
-  return (i18n.language as 'hi' | 'en') || 'hi';
+  return (i18n.language as 'hi' | 'en') || 'en';
 }
 
 export default i18n;
