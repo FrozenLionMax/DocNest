@@ -60,11 +60,11 @@ export function LanguageTogglePill() {
     <button
       type="button"
       onClick={toggleLang}
-      className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-extrabold flex items-center space-x-1.5 transition"
-      title="Switch Language"
+      className="bg-gradient-to-r from-emerald-500/20 via-teal-500/20 to-emerald-500/20 hover:from-emerald-500/30 hover:to-teal-500/30 border border-emerald-500/40 text-emerald-300 hover:text-white px-3.5 py-1.5 rounded-full text-xs font-black flex items-center space-x-2 transition active:scale-95 shadow-lg shadow-emerald-950/40 cursor-pointer"
+      title="Switch Language / भाषा बदलें"
     >
-      <Globe className="w-3.5 h-3.5 text-emerald-400" />
-      <span>{lang === 'en' ? 'ENG' : 'हिंदी'}</span>
+      <Globe className="w-4 h-4 text-emerald-400 animate-pulse" />
+      <span>{lang === 'en' ? '🌐 ENG' : '🌐 हिंदी (Hindi)'}</span>
     </button>
   );
 }

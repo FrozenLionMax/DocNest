@@ -27,8 +27,30 @@ export default function DoctorTvPage() {
     return () => clearInterval(timer);
   }, []);
 
-  // Realtime Supabase Sync & Acoustic Chime Sound Effect
+  // Initial Fetch & Realtime Supabase Sync with Acoustic Chime Sound Effect
   useEffect(() => {
+    async function fetchInitialState() {
+      try {
+        const doctorId = 'doc-001';
+        const { data } = await supabase.from('clinic_queues').select('*').eq('doctor_id', doctorId).single();
+        if (data) {
+          if (data.current_token !== undefined) setCurrentToken(data.current_token);
+          if (data.status === 'paused') {
+            setEmergency({
+              active: true,
+              reason: data.pause_reason || 'Urgent ICU Emergency Call / आपातकालीन रोक',
+              delay: '30 mins',
+            });
+          } else {
+            setEmergency(null);
+          }
+        }
+      } catch (e) {
+        console.log('TV initial state fetch warning:', e);
+      }
+    }
+    fetchInitialState();
+
     const playChimeRing = () => {
       if (!voiceEnabled || typeof window === 'undefined') return;
       try {
@@ -55,10 +77,10 @@ export default function DoctorTvPage() {
           setCurrentToken(payload.new.current_token);
           playChimeRing();
         }
-        if (payload.new?.status === 'paused' && payload.new?.pause_reason) {
+        if (payload.new?.status === 'paused') {
           setEmergency({
             active: true,
-            reason: payload.new.pause_reason,
+            reason: payload.new.pause_reason || 'Urgent ICU Emergency Call / आपातकालीन रोक',
             delay: '30 mins',
           });
           playChimeRing();

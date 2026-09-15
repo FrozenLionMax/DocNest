@@ -26,25 +26,106 @@ interface MedicineSuggestion {
 }
 
 const MEDICINE_DATABASE: MedicineSuggestion[] = [
-  { name: 'Tab. Dolo 650mg (Paracetamol)', category: 'Analgesic / Fever', defaultDosage: '1-0-1', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
-  { name: 'Tab. Paracetamol 500mg', category: 'Fever / Pain', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
-  { name: 'Tab. Pantocid 40mg (Pantoprazole)', category: 'Antacid / Gastric', defaultDosage: '1-0-0', defaultDuration: '7 Days', defaultTiming: 'Empty Stomach (खाली पेट)' },
-  { name: 'Tab. Pan-D (Pantoprazole + Domperidone)', category: 'Gastric & Acidity', defaultDosage: '1-0-0', defaultDuration: '7 Days', defaultTiming: 'Empty Stomach (खाली पेट)' },
-  { name: 'Tab. Augmentin 625mg (Amoxicillin + Clavulanate)', category: 'Antibiotic', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
-  { name: 'Tab. Azithral 500mg (Azithromycin)', category: 'Antibiotic', defaultDosage: '1-0-0', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
-  { name: 'Tab. Combiflam (Ibuprofen + Paracetamol)', category: 'Pain Relief / Anti-inflammatory', defaultDosage: '1-0-1', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
-  { name: 'Tab. Zerodol-SP (Aceclofenac + Serratiopeptidase)', category: 'Pain & Swelling', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
-  { name: 'Tab. Montair-LC (Montelukast + Levocetirizine)', category: 'Anti-allergic / Asthma', defaultDosage: '0-0-1', defaultDuration: '10 Days', defaultTiming: 'At Bedtime (रात में सोते समय)' },
-  { name: 'Tab. Allegra 120mg (Fexofenadine)', category: 'Anti-histamine / Allergy', defaultDosage: '0-0-1', defaultDuration: '7 Days', defaultTiming: 'After Food (खाने के बाद)' },
-  { name: 'Tab. Taxim-O 200mg (Cefixime)', category: 'Antibiotic', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
-  { name: 'Cap. Omez 20mg (Omeprazole)', category: 'Antacid', defaultDosage: '1-0-0', defaultDuration: '7 Days', defaultTiming: 'Empty Stomach (खाली पेट)' },
+  // ANALGESIC & ANTI-INFLAMMATORY (Fever, Pain & Swelling)
+  { name: 'Tab. Dolo 650mg (Paracetamol / Acetaminophen)', category: 'Analgesic / Fever', defaultDosage: '1-0-1', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Paracetamol 500mg (IP/BP/USP)', category: 'Fever & Mild Pain', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Calpol 500mg (Paracetamol)', category: 'Fever & Body Ache', defaultDosage: '1-0-1', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Combiflam (Ibuprofen 400mg + Paracetamol 325mg)', category: 'Pain & Swelling', defaultDosage: '1-0-1', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Zerodol-SP (Aceclofenac 100mg + Serratiopeptidase 15mg + Paracetamol)', category: 'Severe Pain & Swelling', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Zerodol-P (Aceclofenac 100mg + Paracetamol 325mg)', category: 'Joint & Muscle Pain', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Meftal-Spas (Dicyclomine 20mg + Mefenamic Acid 250mg)', category: 'Abdominal Spasm & Period Pain', defaultDosage: '1-0-1 (SOS)', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Voveran-SR 100mg (Diclofenac Sodium)', category: 'Ortho & Joint Pain', defaultDosage: '0-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Naprosyn 500mg (Naproxen)', category: 'Migraine & Joint Pain', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Brufen 400mg (Ibuprofen)', category: 'Pain & Inflammation', defaultDosage: '1-0-1', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Ultracet (Tramadol 37.5mg + Paracetamol 325mg)', category: 'Severe Post-Op / Trauma Pain', defaultDosage: '1-0-1', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Gel Volini / Voveran Ointment (Diclofenac Gel)', category: 'Topical Pain Relief Gel', defaultDosage: 'Apply 2-3 Times', defaultDuration: '7 Days', defaultTiming: 'External Use (बाहरी उपयोग)' },
+
+  // ANTIBIOTICS & ANTIBACTERIALS (Global & Domestic)
+  { name: 'Tab. Augmentin 625mg (Amoxicillin 500mg + Clavulanic Acid 125mg)', category: 'Broad Spectrum Antibiotic', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Clavam 625mg (Amoxicillin + Clavulanate)', category: 'Antibiotic', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Azithral 500mg (Azithromycin)', category: 'Chest Infection / URTI Antibiotic', defaultDosage: '1-0-0', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Azee 250mg / 500mg (Azithromycin)', category: 'Respiratory Antibiotic', defaultDosage: '1-0-0', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Taxim-O 200mg (Cefixime)', category: 'Urinary & ENT Antibiotic', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Ceftum 500mg (Cefuroxime Axetil)', category: 'Cephalosporin Antibiotic', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Ciplox 500mg (Ciprofloxacin)', category: 'Fluoroquinolone Antibiotic', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Zenflox-OZ (Ofloxacin 200mg + Ornidazole 500mg)', category: 'Diarrhea & Gastro Infection', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Norflox-TZ (Norfloxacin 400mg + Tinidazole 600mg)', category: 'Loose Motions & Stomach Infection', defaultDosage: '1-0-1', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Flagyl 400mg (Metronidazole)', category: 'Amoebic & Anaerobic Infection', defaultDosage: '1-1-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Cap. Doxy-1 LDR (Doxycycline 100mg + Lactic Acid Bacillus)', category: 'Tetracycline Antibiotic', defaultDosage: '1-0-1', defaultDuration: '7 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Bactrim DS (Sulfamethoxazole + Trimethoprim)', category: 'UTI & Skin Infection Antibiotic', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Cap. Amoxil 500mg (Amoxicillin Trihydrate)', category: 'Penicillin Antibiotic', defaultDosage: '1-1-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+
+  // ANTACIDS, PPIs & GASTROINTESTINAL
+  { name: 'Tab. Pantocid 40mg (Pantoprazole)', category: 'PPI / Hyperacidity', defaultDosage: '1-0-0', defaultDuration: '7 Days', defaultTiming: 'Empty Stomach (खाली पेट)' },
+  { name: 'Tab. Pan-D (Pantoprazole 40mg + Domperidone 30mg SR)', category: 'Gastric & Nausea Relief', defaultDosage: '1-0-0', defaultDuration: '7 Days', defaultTiming: 'Empty Stomach (खाली पेट)' },
+  { name: 'Cap. Omez 20mg (Omeprazole)', category: 'Antacid / Heartburn', defaultDosage: '1-0-0', defaultDuration: '7 Days', defaultTiming: 'Empty Stomach (खाली पेट)' },
+  { name: 'Cap. Omez-D (Omeprazole + Domperidone)', category: 'Acidity & Reflux', defaultDosage: '1-0-0', defaultDuration: '7 Days', defaultTiming: 'Empty Stomach (खाली पेट)' },
+  { name: 'Tab. Rabekind-DSR (Rabeprazole 20mg + Domperidone 30mg)', category: 'GERD & Acidity', defaultDosage: '1-0-0', defaultDuration: '7 Days', defaultTiming: 'Empty Stomach (खाली पेट)' },
+  { name: 'Tab. Aciloc 150mg (Ranitidine HCL)', category: 'H2 Blocker / Acidity', defaultDosage: '1-0-1', defaultDuration: '7 Days', defaultTiming: 'Before Meals (खाने से पहले)' },
+  { name: 'Syr. Gelusil MPS Antacid (Aluminium + Magnesium + Simethicone)', category: 'Antacid & Gas Relief Liquid', defaultDosage: '2 tsp (10ml)', defaultDuration: '7 Days', defaultTiming: 'After Meals (खाने के बाद)' },
+  { name: 'Syr. Mucaine Gel (Oxetacaine + Aluminium Hydroxide)', category: 'Stomach Ulcer & Burning Relief', defaultDosage: '2 tsp (10ml)', defaultDuration: '5 Days', defaultTiming: 'Before Meals (खाने से पहले)' },
+  { name: 'Syr. Cremaffin Plus (Liquid Paraffin + Milk of Magnesia)', category: 'Laxative / Constipation Relief', defaultDosage: '15ml Bedtime', defaultDuration: '5 Days', defaultTiming: 'At Bedtime (रात में खाते समय)' },
+  { name: 'Tab. Emeset 4mg (Ondansetron HCL)', category: 'Anti-vomiting / Nausea', defaultDosage: '1-0-0 (SOS)', defaultDuration: '3 Days', defaultTiming: 'Before Food (खाने से पहले)' },
+  { name: 'Tab. Perinorm 10mg (Metoclopramide)', category: 'Anti-nausea & Motility', defaultDosage: '1-0-0 (SOS)', defaultDuration: '3 Days', defaultTiming: 'Before Food (खाने से पहले)' },
+  { name: 'Tab. Eldoper / Imodium (Loperamide 2mg)', category: 'Anti-diarrheal', defaultDosage: '1-0-1 (SOS)', defaultDuration: '2 Days', defaultTiming: 'After Food (खाने के बाद)' },
+
+  // ANTIHYPERTENSIVE & CARDIAC (BP, Heart, Cholesterol)
   { name: 'Tab. Telmikind 40mg (Telmisartan)', category: 'Anti-hypertensive (BP)', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'Morning (सुबह)' },
-  { name: 'Tab. Glycomet 500mg (Metformin)', category: 'Anti-diabetic', defaultDosage: '1-0-1', defaultDuration: '30 Days', defaultTiming: 'With Meals (खाने के साथ)' },
-  { name: 'Cap. Shelcal 500 (Calcium + Vit D3)', category: 'Calcium Supplement', defaultDosage: '0-0-1', defaultDuration: '30 Days', defaultTiming: 'After Food (खाने के बाद)' },
-  { name: 'Cap. Becosules Z', category: 'Multivitamin B-Complex', defaultDosage: '0-0-1', defaultDuration: '15 Days', defaultTiming: 'After Food (खाने के बाद)' },
-  { name: 'Tab. Emeset 4mg (Ondansetron)', category: 'Anti-vomiting', defaultDosage: '1-0-0 (SOS)', defaultDuration: '3 Days', defaultTiming: 'Before Food (खाने से पहले)' },
-  { name: 'Syr. Grilinctus-BM Syrup', category: 'Cough Syrup', defaultDosage: '2 tsp (10ml)', defaultDuration: '5 Days', defaultTiming: 'Thrice Daily (दिन में 3 बार)' },
-  { name: 'Syr. Gelusil MPS Antacid', category: 'Antacid Syrup', defaultDosage: '2 tsp (10ml)', defaultDuration: '7 Days', defaultTiming: 'After Meals (खाने के बाद)' },
+  { name: 'Tab. Telma 40mg / 80mg (Telmisartan)', category: 'BP Control', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'Morning (सुबह)' },
+  { name: 'Tab. Telma-H (Telmisartan 40mg + Hydrochlorothiazide 12.5mg)', category: 'BP & Diuretic', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'Morning (सुबह)' },
+  { name: 'Tab. Amlokind 5mg / Amlodipine 5mg', category: 'Calcium Channel Blocker (BP)', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'Morning (सुबह)' },
+  { name: 'Tab. Cilacar 10mg (Cilnidipine)', category: 'BP Control', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'Morning (सुबह)' },
+  { name: 'Tab. Concor 5mg (Bisoprolol Fumarate)', category: 'Beta Blocker / Pulse Control', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'Morning (सुबह)' },
+  { name: 'Tab. Atorva 10mg / 20mg (Atorvastatin)', category: 'Cholesterol / Statin', defaultDosage: '0-0-1', defaultDuration: '30 Days', defaultTiming: 'Night (रात में)' },
+  { name: 'Tab. Rosuvas 10mg (Rosuvastatin)', category: 'Statin / Cholesterol', defaultDosage: '0-0-1', defaultDuration: '30 Days', defaultTiming: 'Night (रात में)' },
+  { name: 'Tab. Ecosprin 75mg / 150mg (Aspirin)', category: 'Blood Thinner / Antiplatelet', defaultDosage: '0-1-0', defaultDuration: '30 Days', defaultTiming: 'After Lunch (दोपहर भोजन के बाद)' },
+  { name: 'Tab. Clopitab 75mg (Clopidogrel)', category: 'Antiplatelet Blood Thinner', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'After Food (खाने के बाद)' },
+
+  // ANTIDIABETIC (Blood Sugar Control)
+  { name: 'Tab. Glycomet 500mg / 1000mg (Metformin SR)', category: 'Anti-diabetic (Sugar)', defaultDosage: '1-0-1', defaultDuration: '30 Days', defaultTiming: 'With Meals (खाने के साथ)' },
+  { name: 'Tab. Janumet 50/500mg (Sitagliptin + Metformin)', category: 'DPP-4 Inhibitor + Metformin', defaultDosage: '1-0-1', defaultDuration: '30 Days', defaultTiming: 'With Meals (खाने के साथ)' },
+  { name: 'Tab. Amaryl 1mg / 2mg (Glimepiride)', category: 'Sulfonylurea / Sugar', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'Before Breakfast (नाश्ते से पहले)' },
+  { name: 'Tab. Forxiga 10mg (Dapagliflozin)', category: 'SGLT2 Inhibitor / Sugar & Kidney', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'Morning (सुबह)' },
+  { name: 'Tab. Galvus Met 50/500mg (Vildagliptin + Metformin)', category: 'Diabetes Combination', defaultDosage: '1-0-1', defaultDuration: '30 Days', defaultTiming: 'With Meals (खाने के साथ)' },
+  { name: 'Tab. Teneligliptin 20mg', category: 'Diabetes Control', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'Before Food (खाने से पहले)' },
+
+  // RESPIRATORY, ASTHMA & ALLERGY
+  { name: 'Tab. Montair-LC (Montelukast 10mg + Levocetirizine 5mg)', category: 'Allergic Rhinitis & Asthma', defaultDosage: '0-0-1', defaultDuration: '10 Days', defaultTiming: 'At Bedtime (रात में सोते समय)' },
+  { name: 'Tab. Allegra 120mg / 180mg (Fexofenadine HCL)', category: 'Non-drowsy Antihistamine', defaultDosage: '0-0-1', defaultDuration: '7 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Ceticip 10mg (Cetirizine HCL)', category: 'Anti-allergic / Cold', defaultDosage: '0-0-1', defaultDuration: '5 Days', defaultTiming: 'At Bedtime (रात में)' },
+  { name: 'Inhaler Asthalin 100mcg (Salbutamol / Albuterol)', category: 'Bronchodilator SOS Inhaler', defaultDosage: '2 Puffs SOS', defaultDuration: '30 Days', defaultTiming: 'When Short of Breath' },
+  { name: 'Inhaler Foracort 200 (Budesonide 200mcg + Formoterol 6mcg)', category: 'Asthma / COPD Maintenance Inhaler', defaultDosage: '2 Puffs 1-0-1', defaultDuration: '30 Days', defaultTiming: 'Rinse Mouth After Use' },
+  { name: 'Syr. Ascoril-LS (Levosalbutamol + Ambroxol + Guaiphenesin)', category: 'Wet Cough Syrup', defaultDosage: '2 tsp (10ml)', defaultDuration: '5 Days', defaultTiming: 'Thrice Daily (दिन में 3 बार)' },
+  { name: 'Syr. Grilinctus-BM / Grilinctus Non-drowsy', category: 'Dry Cough Syrup', defaultDosage: '2 tsp (10ml)', defaultDuration: '5 Days', defaultTiming: 'Thrice Daily (दिन में 3 बार)' },
+  { name: 'Budecort 1mg Respules (Budesonide Nebuliser Suspension)', category: 'Nebulisation Steroid', defaultDosage: '1 Respule 1-0-1', defaultDuration: '3 Days', defaultTiming: 'Via Nebuliser' },
+
+  // VITAMINS, MINERALS & NUTRITIONAL SUPPLEMENTS
+  { name: 'Cap. Shelcal 500 (Calcium Carbonate 500mg + Vit D3 250 IU)', category: 'Bone & Calcium Supplement', defaultDosage: '0-0-1', defaultDuration: '30 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Cap. Becosules Z (Vitamin B-Complex + Vitamin C + Zinc)', category: 'Multivitamin & Mouth Ulcer', defaultDosage: '0-0-1', defaultDuration: '15 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Neurobion Forte (Vitamin B1, B2, B3, B5, B6, B12)', category: 'Nerve Health & Tingling', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Cap. Evion 400mg (Vitamin E / Tocopheryl Acetate)', category: 'Antioxidant & Skin Health', defaultDosage: '0-0-1', defaultDuration: '30 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Feronia-XT (Ferrous Ascorbate + Folic Acid + Zinc)', category: 'Iron & Anemia Supplement', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Sachet Tayo 60K / Calcirol 60,000 IU (Cholecalciferol / Vit D3)', category: 'High Dose Vitamin D3', defaultDosage: '1 Sachet / Week', defaultDuration: '8 Weeks', defaultTiming: 'With Warm Milk' },
+  { name: 'Tab. Zincovit (Multivitamin + Multimineral + Grape Seed)', category: 'Immunity & Energy', defaultDosage: '0-0-1', defaultDuration: '30 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Limcee 500mg (Vitamin C / Ascorbic Acid)', category: 'Chewable Vitamin C', defaultDosage: '1-0-0', defaultDuration: '15 Days', defaultTiming: 'Chewable (चबाकर खाएं)' },
+
+  // CNS, PSYCHIATRY & NEUROLOGY
+  { name: 'Tab. Nexito 10mg (Escitalopram Oxalate)', category: 'Anti-anxiety / Antidepressant', defaultDosage: '0-0-1', defaultDuration: '30 Days', defaultTiming: 'Night (रात में)' },
+  { name: 'Tab. Clonafit 0.5mg / Zapiz 0.5mg (Clonazepam)', category: 'Anxiolytic / Sleep Aid', defaultDosage: '0-0-1', defaultDuration: '10 Days', defaultTiming: 'At Bedtime (रात में सोते समय)' },
+  { name: 'Tab. Gabapin-NT 100 (Gabapentin 100mg + Nortriptyline 10mg)', category: 'Neuropathic Nerve Pain Relief', defaultDosage: '0-0-1', defaultDuration: '15 Days', defaultTiming: 'At Bedtime (रात में सोते समय)' },
+  { name: 'Tab. Pregabalin 75mg (Lyrica)', category: 'Nerve Pain & Fibromyalgia', defaultDosage: '0-0-1', defaultDuration: '15 Days', defaultTiming: 'At Bedtime (रात में सोते समय)' },
+
+  // DERMATOLOGY & ANTIFUNGALS
+  { name: 'Cap. Itrasys 100mg / 200mg (Itraconazole)', category: 'Systemic Antifungal', defaultDosage: '1-0-1', defaultDuration: '14 Days', defaultTiming: 'After Heavy Meals' },
+  { name: 'Tab. Terbinaforce 250mg (Terbinafine HCL)', category: 'Ringworm & Nail Antifungal', defaultDosage: '1-0-0', defaultDuration: '14 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Cream Candid-B (Clotrimazole + Beclomethasone)', category: 'Topical Antifungal & Anti-itch', defaultDosage: 'Apply 1-0-1', defaultDuration: '7 Days', defaultTiming: 'External Use (बाहरी उपयोग)' },
+  { name: 'Lotion Caladryl (Calamine + Diphenhydramine)', category: 'Soothing Anti-itch Lotion', defaultDosage: 'Apply Twice Daily', defaultDuration: '7 Days', defaultTiming: 'External Use (बाहरी उपयोग)' },
+
+  // OPHTHALMIC, ENT & THYROID
+  { name: 'Eye Drops Ciplox (Ciprofloxacin 0.3%)', category: 'Antibacterial Eye/Ear Drops', defaultDosage: '2 Drops 1-1-1', defaultDuration: '5 Days', defaultTiming: 'In Affected Eye/Ear' },
+  { name: 'Eye Drops Refresh Tears (Carboxymethylcellulose 0.5%)', category: 'Lubricating Eye Drops for Dry Eyes', defaultDosage: '2 Drops 1-1-1', defaultDuration: '30 Days', defaultTiming: 'Both Eyes' },
+  { name: 'Nasal Spray Otrivin (Xylometazoline HCL 0.1%)', category: 'Nasal Decongestant Spray', defaultDosage: '2 Sprays 1-0-1', defaultDuration: '3 Days', defaultTiming: 'In Each Nostril' },
+  { name: 'Tab. Thyronorm 25mcg / 50mcg / 100mcg (Levothyroxine Sodium)', category: 'Thyroid Hormone Replacement', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'Early Morning Empty Stomach' }
 ];
 
 const COMMON_ILLNESS_TEMPLATES = [
@@ -146,6 +227,28 @@ export default function DigitalPrescriptionPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // AI Shorthand Keystroke Expander Parser
+  const checkShorthandRx = (query: string) => {
+    const q = query.toLowerCase().trim();
+    const map: Record<string, { name: string; dosage: string; duration: string; timing: string }> = {
+      'd 650': { name: 'Tab. Dolo 650mg (Paracetamol / Acetaminophen)', dosage: '1-0-1', duration: '3 Days', timing: 'After Food (खाने के बाद)' },
+      'd650': { name: 'Tab. Dolo 650mg (Paracetamol / Acetaminophen)', dosage: '1-0-1', duration: '3 Days', timing: 'After Food (खाने के बाद)' },
+      'p 40': { name: 'Tab. Pantocid 40mg (Pantoprazole)', dosage: '1-0-0', duration: '7 Days', timing: 'Empty Stomach (खाली पेट)' },
+      'p40': { name: 'Tab. Pantocid 40mg (Pantoprazole)', dosage: '1-0-0', duration: '7 Days', timing: 'Empty Stomach (खाली पेट)' },
+      'pan d': { name: 'Tab. Pan-D (Pantoprazole 40mg + Domperidone 30mg)', dosage: '1-0-0', duration: '7 Days', timing: 'Empty Stomach (खाली पेट)' },
+      'aug 625': { name: 'Tab. Augmentin 625mg (Amoxicillin 500mg + Clavulanic Acid 125mg)', dosage: '1-0-1', duration: '5 Days', timing: 'After Food (खाने के बाद)' },
+      'azi 500': { name: 'Tab. Azithral 500mg (Azithromycin)', dosage: '1-0-0', duration: '3 Days', timing: 'After Food (खाने के बाद)' },
+      'comb': { name: 'Tab. Combiflam (Ibuprofen 400mg + Paracetamol 325mg)', dosage: '1-0-1', duration: '3 Days', timing: 'After Food (खाने के बाद)' },
+      'zero sp': { name: 'Tab. Zerodol-SP (Aceclofenac + Serratiopeptidase)', dosage: '1-0-1', duration: '5 Days', timing: 'After Food (खाने के बाद)' },
+      'mont': { name: 'Tab. Montair-LC (Montelukast 10mg + Levocetirizine 5mg)', dosage: '0-0-1', duration: '10 Days', timing: 'At Bedtime (रात में सोते समय)' },
+      'tel 40': { name: 'Tab. Telmikind 40mg (Telmisartan)', dosage: '1-0-0', duration: '30 Days', timing: 'Morning (सुबह)' },
+      'gly 500': { name: 'Tab. Glycomet 500mg (Metformin SR)', dosage: '1-0-1', duration: '30 Days', timing: 'With Meals (खाने के साथ)' },
+      'shel 500': { name: 'Cap. Shelcal 500 (Calcium + Vit D3)', dosage: '0-0-1', duration: '30 Days', timing: 'After Food (खाने के बाद)' },
+      'bec': { name: 'Cap. Becosules Z (B-Complex + Vit C + Zinc)', dosage: '0-0-1', duration: '15 Days', timing: 'After Food (खाने के बाद)' },
+    };
+    return map[q] || null;
+  };
+
   const applyTemplate = (tpl: typeof COMMON_ILLNESS_TEMPLATES[0]) => {
     setDiagnosis(tpl.diagnosis);
     setAdvice(tpl.advice);
@@ -154,6 +257,20 @@ export default function DigitalPrescriptionPage() {
 
   const handleMedNameChange = (val: string) => {
     setNewMed((prev) => ({ ...prev, name: val }));
+    
+    // Check if shorthand matched
+    const shorthandMatch = checkShorthandRx(val);
+    if (shorthandMatch) {
+      setNewMed({
+        name: shorthandMatch.name,
+        dosage: shorthandMatch.dosage,
+        duration: shorthandMatch.duration,
+        timing: shorthandMatch.timing,
+      });
+      setShowSuggestions(false);
+      return;
+    }
+
     if (val.trim().length > 0) {
       const matches = MEDICINE_DATABASE.filter((m) =>
         m.name.toLowerCase().includes(val.toLowerCase()) ||

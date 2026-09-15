@@ -166,6 +166,18 @@ export default function UnifiedLoginPage() {
           </div>
         </div>
 
+        {/* Patient App Portal Direct Link */}
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={() => router.push('/patient')}
+            className="w-full bg-slate-800/80 hover:bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:text-emerald-300 font-bold py-3 rounded-xl text-xs flex items-center justify-center space-x-2 transition"
+          >
+            <span>📱 Open Patient App & AI Sahayak (मरीजों के लिए)</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+
         <p className="text-center text-[10px] text-slate-600 pt-2">DocNest Healthcare Platform © 2026</p>
       </div>
     </div>
