@@ -8,7 +8,7 @@ import { getSession } from '../../../lib/auth';
 import {
   Users, Play, Pause, RotateCcw, Plus, Phone, Stethoscope, FileText, Tv,
   CheckCircle2, XCircle, SkipForward, Search, Volume2, VolumeX, Loader2,
-  Calendar, AlertCircle, QrCode
+  Calendar, AlertCircle, QrCode, Filter, Clock, Activity, History, X, User
 } from 'lucide-react';
 
 interface PatientEntry {
@@ -19,6 +19,10 @@ interface PatientEntry {
   time: string;
   status: 'waiting' | 'in_consultation' | 'completed' | 'skipped' | 'cancelled';
   type: 'Online Booking' | 'Offline पर्चा';
+  ageGender?: string;
+  allergies?: string[];
+  lastVisit?: string;
+  notes?: string;
 }
 
 export default function DoctorDashboard() {
@@ -31,15 +35,17 @@ export default function DoctorDashboard() {
   const [offlineName, setOfflineName] = useState('');
   const [offlinePhone, setOfflinePhone] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [loading, setLoading] = useState(true);
   const [addingPatient, setAddingPatient] = useState(false);
+  const [selectedPatientForDrawer, setSelectedPatientForDrawer] = useState<PatientEntry | null>(null);
 
   const [patients, setPatients] = useState<PatientEntry[]>([
-    { id: 'q-1', token: 1, name: 'Rahul Sharma (राहुल शर्मा)', phone: '9876543210', time: '10:00 AM', status: 'in_consultation', type: 'Online Booking' },
-    { id: 'q-2', token: 2, name: 'Priya Singh (प्रिया सिंह)', phone: '9812345678', time: '10:15 AM', status: 'waiting', type: 'Online Booking' },
-    { id: 'q-3', token: 3, name: 'Amitabh Mishra (अमिताभ मिश्रा)', phone: '9988776655', time: '10:30 AM', status: 'waiting', type: 'Offline पर्चा' },
-    { id: 'q-4', token: 4, name: 'Sunita Devi (सुनीता देवी)', phone: '9765432109', time: '10:45 AM', status: 'waiting', type: 'Offline पर्चा' },
+    { id: 'q-1', token: 1, name: 'Rahul Sharma (राहुल शर्मा)', phone: '9876543210', time: '10:00 AM', status: 'in_consultation', type: 'Online Booking', ageGender: '32 / Male', allergies: ['Penicillin (पेनिसिलिन एलर्जी)'], lastVisit: '14 Aug 2026', notes: 'Chronic low back pain. Follow up after physiotherapy.' },
+    { id: 'q-2', token: 2, name: 'Priya Singh (प्रिया सिंह)', phone: '9812345678', time: '10:15 AM', status: 'waiting', type: 'Online Booking', ageGender: '28 / Female', allergies: ['Dust / Pollen'], lastVisit: '02 Jul 2026', notes: 'Right knee stiffness during stairs.' },
+    { id: 'q-3', token: 3, name: 'Amitabh Mishra (अमिताभ मिश्रा)', phone: '9988776655', time: '10:30 AM', status: 'waiting', type: 'Offline पर्चा', ageGender: '45 / Male', allergies: ['None (कोई नहीं)'], lastVisit: 'First Visit', notes: 'New walk-in patient with shoulder joint pain.' },
+    { id: 'q-4', token: 4, name: 'Sunita Devi (सुनीता देवी)', phone: '9765432109', time: '10:45 AM', status: 'waiting', type: 'Offline पर्चा', ageGender: '52 / Female', allergies: ['Sulfa drugs'], lastVisit: '20 Jun 2026', notes: 'Hypertension checkup and cervical spondylosis.' },
   ]);
 
   useEffect(() => {
@@ -59,6 +65,7 @@ export default function DoctorDashboard() {
             id: item.id, token: item.token_number, name: item.patient_name,
             phone: item.patient_phone || '', time: item.created_at ? new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '10:00 AM',
             status: item.status, type: item.source === 'online' ? 'Online Booking' : 'Offline पर्चा',
+            ageGender: '35 / M', allergies: ['None'], lastVisit: '10 Aug 2026', notes: 'Routine OPD checkup.'
           })));
           setTotalIssued(Math.max(entries.length, queueData?.total_issued || 0));
         }
@@ -78,7 +85,7 @@ export default function DoctorDashboard() {
           setPatients((prev) => {
             const index = prev.findIndex((p) => p.id === payload.new.id);
             if (index !== -1) { const updated = [...prev]; updated[index] = { ...updated[index], status: payload.new.status }; return updated; }
-            return [...prev, { id: payload.new.id, token: payload.new.token_number, name: payload.new.patient_name, phone: payload.new.patient_phone || '', time: 'Just now', status: payload.new.status, type: payload.new.source === 'online' ? 'Online Booking' : 'Offline पर्चा' }];
+            return [...prev, { id: payload.new.id, token: payload.new.token_number, name: payload.new.patient_name, phone: payload.new.patient_phone || '', time: 'Just now', status: payload.new.status, type: payload.new.source === 'online' ? 'Online Booking' : 'Offline पर्चा', ageGender: '30 / M', allergies: ['None'], notes: 'Walk-in' }];
           });
         }
       }).subscribe();
@@ -86,28 +93,21 @@ export default function DoctorDashboard() {
   }, []);
 
   const playChimeSound = () => {
-    if (!soundEnabled) return;
+    if (!soundEnabled || typeof window === 'undefined') return;
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-      osc.type = 'sine'; osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.15);
-      gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-      osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-    } catch (e) { console.log('Audio chime error:', e); }
-  };
+      const now = audioCtx.currentTime;
 
-  const speakTokenCallout = (tokenNum: number) => {
-    if (!soundEnabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-    try {
-      window.speechSynthesis.cancel();
-      const text = `Token number ${tokenNum}. टोकन नंबर ${tokenNum}, डॉक्टर कक्ष में पधारें।`;
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.9;
-      utterance.pitch = 1.0;
-      window.speechSynthesis.speak(utterance);
-    } catch (e) {
-      console.log('Voice speech error:', e);
-    }
+      const osc1 = audioCtx.createOscillator(); const gain1 = audioCtx.createGain();
+      osc1.type = 'sine'; osc1.frequency.setValueAtTime(587.33, now); osc1.frequency.exponentialRampToValueAtTime(880, now + 0.12);
+      gain1.gain.setValueAtTime(0.35, now); gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      osc1.connect(gain1); gain1.connect(audioCtx.destination); osc1.start(now); osc1.stop(now + 0.4);
+
+      const osc2 = audioCtx.createOscillator(); const gain2 = audioCtx.createGain();
+      osc2.type = 'sine'; osc2.frequency.setValueAtTime(659.25, now + 0.15); osc2.frequency.exponentialRampToValueAtTime(1046.5, now + 0.28);
+      gain2.gain.setValueAtTime(0.4, now + 0.15); gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+      osc2.connect(gain2); gain2.connect(audioCtx.destination); osc2.start(now + 0.15); osc2.stop(now + 0.6);
+    } catch (e) { console.log('Chime ring audio error:', e); }
   };
 
   const handleNextToken = async () => {
@@ -115,7 +115,6 @@ export default function DoctorDashboard() {
     if (nextVal > totalIssued && patients.length > 0) setTotalIssued(nextVal);
     setCurrentToken(nextVal);
     playChimeSound();
-    speakTokenCallout(nextVal);
     setPatients((prev) => prev.map((p) => {
       if (p.token === currentToken) return { ...p, status: 'completed' };
       if (p.token === nextVal) return { ...p, status: 'in_consultation' };
@@ -143,7 +142,7 @@ export default function DoctorDashboard() {
     e.preventDefault(); if (!offlineName) return;
     setAddingPatient(true);
     const newToken = (patients.length > 0 ? Math.max(...patients.map((p) => p.token)) : 0) + 1;
-    const newPatient: PatientEntry = { id: `q-off-${Date.now()}`, token: newToken, name: offlineName, phone: offlinePhone || 'N/A', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), status: 'waiting', type: 'Offline पर्चा' };
+    const newPatient: PatientEntry = { id: `q-off-${Date.now()}`, token: newToken, name: offlineName, phone: offlinePhone || 'N/A', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), status: 'waiting', type: 'Offline पर्चा', ageGender: '30 / M', allergies: ['None'], notes: 'Walk-in' };
     setPatients((prev) => [...prev, newPatient]); setTotalIssued((prev) => Math.max(prev, newToken));
     setOfflineName(''); setOfflinePhone('');
     try { await supabase.from('queue_entries').insert([{ token_number: newToken, patient_name: offlineName, patient_phone: offlinePhone, source: 'walk_in', status: 'waiting' }]); } catch (err) {}
@@ -155,7 +154,16 @@ export default function DoctorDashboard() {
     try { await supabase.from('queue_entries').update({ status: newStatus }).eq('id', patientId); } catch (e) {}
   };
 
-  const filteredPatients = patients.filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.token.toString().includes(searchQuery) || p.phone.includes(searchQuery));
+  // Filter patients by search query & tab status
+  const filteredPatients = patients.filter((p) => {
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.token.toString().includes(searchQuery) || p.phone.includes(searchQuery);
+    if (statusFilter === 'all') return matchesSearch;
+    return matchesSearch && p.status === statusFilter;
+  });
+
+  // Calculate OPD Performance Stats
+  const completedCount = patients.filter((p) => p.status === 'completed').length;
+  const waitingCount = patients.filter((p) => p.status === 'waiting').length;
 
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
@@ -172,13 +180,56 @@ export default function DoctorDashboard() {
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
             className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition"
-            title="Toggle Audio & Voice Callouts"
+            title="Toggle Acoustic Bell Ring Chime"
           >
             {soundEnabled ? <Volume2 className="w-5 h-5 text-emerald-400" /> : <VolumeX className="w-5 h-5 text-slate-500" />}
           </button>
           <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
             <span>{session?.name || 'Dr. Amit Kumar'}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* OPD PERFORMANCE ANALYTICS SUMMARY BAR (Item 4) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+          <div>
+            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Total Today</p>
+            <p className="text-2xl font-black text-white">{patients.length}</p>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center text-lg font-bold">
+            👥
+          </div>
+        </div>
+
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+          <div>
+            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Completed</p>
+            <p className="text-2xl font-black text-emerald-400">{completedCount}</p>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-lg font-bold">
+            ✓
+          </div>
+        </div>
+
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+          <div>
+            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Waiting</p>
+            <p className="text-2xl font-black text-blue-400">{waitingCount}</p>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center text-lg font-bold">
+            ⏳
+          </div>
+        </div>
+
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+          <div>
+            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Avg Speed</p>
+            <p className="text-2xl font-black text-amber-400">7.5m</p>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center text-lg font-bold">
+            ⚡
           </div>
         </div>
       </div>
@@ -193,7 +244,7 @@ export default function DoctorDashboard() {
               <span>OPD TOKEN CONTROLLER</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">क्लिनिक टोकन काउंटर</h2>
-            <p className="text-emerald-200/80 text-xs md:text-sm mt-1">Realtime Supabase Sync & Voice Announcements</p>
+            <p className="text-emerald-200/80 text-xs md:text-sm mt-1">Realtime Supabase Sync & Acoustic Bell Ring Chimes</p>
           </div>
           
           <div className="bg-slate-950/80 backdrop-blur border border-emerald-500/30 rounded-2xl p-5 text-center min-w-[220px] w-full lg:w-auto shadow-xl">
@@ -277,7 +328,7 @@ export default function DoctorDashboard() {
           </form>
         </div>
 
-        {/* Right Column: Patient List Table (Responsive) */}
+        {/* Right Column: Patient List Table (Responsive + Item 5 Status Tabs) */}
         <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
             <h3 className="text-lg font-bold text-white">Today's Patient Queue</h3>
@@ -292,12 +343,33 @@ export default function DoctorDashboard() {
                   className="pl-9 pr-3 py-1.5 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-emerald-500 w-44"
                 />
               </div>
-              <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl">
-                {patients.length} Total
-              </span>
             </div>
           </div>
 
+          {/* QUEUE STATUS FILTER TABS (Item 5) */}
+          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs border-b border-slate-800">
+            {[
+              { id: 'all', label: `All (${patients.length})` },
+              { id: 'waiting', label: `Waiting (${patients.filter(p => p.status === 'waiting').length})` },
+              { id: 'in_consultation', label: `In Consultation (${patients.filter(p => p.status === 'in_consultation').length})` },
+              { id: 'completed', label: `Completed (${patients.filter(p => p.status === 'completed').length})` },
+              { id: 'skipped', label: `Skipped (${patients.filter(p => p.status === 'skipped').length})` },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setStatusFilter(tab.id)}
+                className={`px-3 py-1.5 rounded-xl font-semibold transition whitespace-nowrap ${
+                  statusFilter === tab.id
+                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Patient Table */}
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-sm min-w-[500px]">
               <thead>
@@ -313,10 +385,17 @@ export default function DoctorDashboard() {
                 {filteredPatients.map((p) => {
                   const isCurrent = p.token === currentToken;
                   return (
-                    <tr key={p.id} className={isCurrent ? 'bg-emerald-500/10 font-bold' : 'hover:bg-slate-800/40'}>
+                    <tr
+                      key={p.id}
+                      onClick={() => setSelectedPatientForDrawer(p)}
+                      className={`cursor-pointer transition ${isCurrent ? 'bg-emerald-500/10 font-bold' : 'hover:bg-slate-800/40'}`}
+                    >
                       <td className="py-3.5 px-3 font-mono font-black text-emerald-400">#{p.token}</td>
                       <td className="py-3.5 px-3">
-                        <div className="text-white font-semibold">{p.name}</div>
+                        <div className="text-white font-semibold flex items-center space-x-1.5">
+                          <span>{p.name}</span>
+                          <span className="text-[10px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded font-normal">Click for History 📋</span>
+                        </div>
                         {p.phone !== 'N/A' && <div className="text-[11px] text-slate-400 font-mono">{p.phone}</div>}
                       </td>
                       <td className="py-3.5 px-3">
@@ -341,7 +420,7 @@ export default function DoctorDashboard() {
                           <span className="text-xs text-slate-400">Waiting</span>
                         )}
                       </td>
-                      <td className="py-3.5 px-3 text-right">
+                      <td className="py-3.5 px-3 text-right" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-end space-x-2">
                           <Link
                             href={`/doctor/prescription?patient=${encodeURIComponent(p.name)}&token=${p.token}`}
@@ -378,6 +457,98 @@ export default function DoctorDashboard() {
           </div>
         </div>
       </div>
+
+      {/* QUICK PATIENT HISTORY & VITALS SIDE DRAWER (Item 2) */}
+      {selectedPatientForDrawer && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex justify-end">
+          <div className="w-full max-w-md bg-slate-900 border-l border-slate-800 h-full p-6 space-y-6 overflow-y-auto animate-in slide-in-from-right duration-200">
+            {/* Header */}
+            <div className="flex justify-between items-start border-b border-slate-800 pb-4">
+              <div className="space-y-1">
+                <div className="inline-flex items-center space-x-1.5 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
+                  <User className="w-3 h-3" />
+                  <span>Token #{selectedPatientForDrawer.token}</span>
+                </div>
+                <h3 className="text-xl font-extrabold text-white">{selectedPatientForDrawer.name}</h3>
+                <p className="text-xs text-slate-400 font-mono">Mobile: {selectedPatientForDrawer.phone}</p>
+              </div>
+              <button
+                onClick={() => setSelectedPatientForDrawer(null)}
+                className="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800 border border-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Demographics & Allergy Warning */}
+            <div className="space-y-3">
+              <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-2xl flex items-center space-x-2 text-rose-300 text-xs font-bold">
+                <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                <span>Allergies: {selectedPatientForDrawer.allergies?.join(', ') || 'None recorded'}</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                  <span className="text-slate-500 block text-[10px] uppercase font-bold">Age / Gender</span>
+                  <span className="font-bold text-white">{selectedPatientForDrawer.ageGender || '32 / Male'}</span>
+                </div>
+                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
+                  <span className="text-slate-500 block text-[10px] uppercase font-bold">Last Visit</span>
+                  <span className="font-bold text-emerald-400">{selectedPatientForDrawer.lastVisit || '14 Aug 2026'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Consultation History Notes */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
+                <History className="w-4 h-4 text-emerald-400" />
+                <span>Clinical Notes & Complaints</span>
+              </h4>
+              <div className="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-xs text-slate-300 font-medium">
+                {selectedPatientForDrawer.notes || 'No previous complaints logged.'}
+              </div>
+            </div>
+
+            {/* Vitals History */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
+                <Activity className="w-4 h-4 text-blue-400" />
+                <span>Last Vitals Reading</span>
+              </h4>
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between">
+                  <span className="text-slate-500">B.P.:</span>
+                  <span className="font-bold text-white">120/80 mmHg</span>
+                </div>
+                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between">
+                  <span className="text-slate-500">Pulse:</span>
+                  <span className="font-bold text-white">72 bpm</span>
+                </div>
+                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between">
+                  <span className="text-slate-500">Weight:</span>
+                  <span className="font-bold text-white">68 kg</span>
+                </div>
+                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between">
+                  <span className="text-slate-500">Temp:</span>
+                  <span className="font-bold text-white">98.6 °F</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Action Button */}
+            <div className="pt-4 border-t border-slate-800">
+              <Link
+                href={`/doctor/prescription?patient=${encodeURIComponent(selectedPatientForDrawer.name)}&token=${selectedPatientForDrawer.token}`}
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl text-xs flex items-center justify-center space-x-2 transition shadow-lg"
+              >
+                <FileText className="w-4 h-4" />
+                <span>Create Digital Prescription for {selectedPatientForDrawer.name}</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

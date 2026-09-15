@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { getSession } from '../../../lib/auth';
 import {
   Printer, Plus, Trash2, Save, Download, Stethoscope,
-  User, Calendar, Pill, CheckCircle2, FileText, ArrowLeft, Search, Check
+  User, Calendar, Pill, CheckCircle2, FileText, ArrowLeft, Search, Check, Sparkles, Zap, MessageSquare, Clock
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -45,9 +45,52 @@ const MEDICINE_DATABASE: MedicineSuggestion[] = [
   { name: 'Tab. Emeset 4mg (Ondansetron)', category: 'Anti-vomiting', defaultDosage: '1-0-0 (SOS)', defaultDuration: '3 Days', defaultTiming: 'Before Food (खाने से पहले)' },
   { name: 'Syr. Grilinctus-BM Syrup', category: 'Cough Syrup', defaultDosage: '2 tsp (10ml)', defaultDuration: '5 Days', defaultTiming: 'Thrice Daily (दिन में 3 बार)' },
   { name: 'Syr. Gelusil MPS Antacid', category: 'Antacid Syrup', defaultDosage: '2 tsp (10ml)', defaultDuration: '7 Days', defaultTiming: 'After Meals (खाने के बाद)' },
-  { name: 'Cap. Canditral 100mg (Itraconazole)', category: 'Anti-fungal', defaultDosage: '0-0-1', defaultDuration: '14 Days', defaultTiming: 'After Meals' },
-  { name: 'Tab. Levoquin 500mg (Levofloxacin)', category: 'Antibiotic', defaultDosage: '1-0-0', defaultDuration: '5 Days', defaultTiming: 'After Food' },
-  { name: 'Inj. Neurobion Forte', category: 'Vitamin B12 Injection', defaultDosage: '1 Ampoule', defaultDuration: 'Alternate Days', defaultTiming: 'IM Injection' },
+];
+
+const COMMON_ILLNESS_TEMPLATES = [
+  {
+    id: 'fever',
+    label: '🌡️ Fever / Viral Cold',
+    diagnosis: 'Viral Fever & Body Ache (बुखार व शरीर दर्द)',
+    advice: '1. 3 दिनों तक पर्याप्त पानी पिएं व आराम करें।\n2. ताजा व सुपाच्य भोजन लें।\n3. 3 दिन बाद पुनः दिखाएं।',
+    medicines: [
+      { id: 't-1', name: 'Tab. Dolo 650mg (Paracetamol)', dosage: '1-0-1', duration: '3 Days', timing: 'After Food (खाने के बाद)' },
+      { id: 't-2', name: 'Tab. Pantocid 40mg (Pantoprazole)', dosage: '1-0-0', duration: '5 Days', timing: 'Empty Stomach (खाली पेट)' },
+      { id: 't-3', name: 'Tab. Allegra 120mg (Fexofenadine)', dosage: '0-0-1', duration: '5 Days', timing: 'After Food (खाने के बाद)' },
+    ]
+  },
+  {
+    id: 'ortho',
+    label: '🦴 Joint / Back Pain',
+    diagnosis: 'Acute Lumbar Strain & Joint Stiffness (कमर व जोड़ों में दर्द)',
+    advice: '1. 5 दिनों तक वजन न उठाएं व गर्म पानी की सिकाई करें।\n2. नरम गद्दे पर सोएं।\n3. 5 दिन बाद परामर्श लें।',
+    medicines: [
+      { id: 't-4', name: 'Tab. Zerodol-SP (Aceclofenac + Serratiopeptidase)', dosage: '1-0-1', duration: '5 Days', timing: 'After Food (खाने के बाद)' },
+      { id: 't-5', name: 'Tab. Pan-D (Pantoprazole + Domperidone)', dosage: '1-0-0', duration: '7 Days', timing: 'Empty Stomach (खाली पेट)' },
+      { id: 't-6', name: 'Cap. Shelcal 500 (Calcium + Vit D3)', dosage: '0-0-1', duration: '30 Days', timing: 'After Food (खाने के बाद)' },
+    ]
+  },
+  {
+    id: 'acidity',
+    label: '🧪 Acidity & Gastritis',
+    diagnosis: 'GERD & Hyperacidity (पेट में जलन व गैस)',
+    advice: '1. मिर्च-मसाले व तले भोजन से परहेज करें।\n2. सुबह खाली पेट गुनगुना पानी पिएं।',
+    medicines: [
+      { id: 't-7', name: 'Tab. Pan-D (Pantoprazole + Domperidone)', dosage: '1-0-0', duration: '7 Days', timing: 'Empty Stomach (खाली पेट)' },
+      { id: 't-8', name: 'Syr. Gelusil MPS Antacid', dosage: '2 tsp (10ml)', duration: '7 Days', timing: 'After Meals (खाने के बाद)' },
+    ]
+  },
+  {
+    id: 'cough',
+    label: '🫁 Cough & Allergy',
+    diagnosis: 'Upper Respiratory Tract Infection / URTI (खांसी व जुकाम)',
+    advice: '1. ठंडे पानी व आइसक्रीम से परहेज करें।\n2. दिन में 2 बार नमक के पानी से गरारे करें।',
+    medicines: [
+      { id: 't-9', name: 'Tab. Azithral 500mg (Azithromycin)', dosage: '1-0-0', duration: '3 Days', timing: 'After Food (खाने के बाद)' },
+      { id: 't-10', name: 'Tab. Montair-LC (Montelukast + Levocetirizine)', dosage: '0-0-1', duration: '7 Days', timing: 'At Bedtime (रात में सोते समय)' },
+      { id: 't-11', name: 'Syr. Grilinctus-BM Syrup', dosage: '2 tsp (10ml)', duration: '5 Days', timing: 'Thrice Daily (दिन में 3 बार)' },
+    ]
+  },
 ];
 
 export default function DigitalPrescriptionPage() {
@@ -60,8 +103,12 @@ export default function DigitalPrescriptionPage() {
   const [tokenNumber] = useState(searchParams.get('token') || '1');
   const [vitals, setVitals] = useState({ bp: '120/80 mmHg', pulse: '72 bpm', weight: '68 kg', temp: '98.6 °F' });
   const [diagnosis, setDiagnosis] = useState('Acute Lumbar Strain / LBA (कमर दर्द व जकड़न)');
-  const [advice, setAdvice] = useState('1. 5 दिनों तक भारी वजन न उठाएं।\n2. गर्म पानी से सुबह-शाम सिकाई करें।\n3. दर्द होने पर बेड रेस्ट लें व 5 दिन बाद परामर्श लें।');
+  const [advice, setAdvice] = useState('1. 5 दिनों तक भारी वजन न उठाएं।\n2. गर्म पानी से सुबह-शाम सिकाई करें।\n3. दर्द होने पर बेड रेस्ट लें।');
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  // Item 1: Interactive Follow-up Date Scheduler
+  const [followUpDays, setFollowUpDays] = useState<number>(5);
+  const [followUpDateStr, setFollowUpDateStr] = useState<string>('');
 
   const [medicines, setMedicines] = useState<RxMedicine[]>([
     { id: 'm-1', name: 'Tab. Dolo 650mg (Paracetamol)', dosage: '1-0-1', duration: '5 Days', timing: 'After Food (खाने के बाद)' },
@@ -75,6 +122,19 @@ export default function DigitalPrescriptionPage() {
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
+  // Calculate follow-up return date
+  useEffect(() => {
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + followUpDays);
+    const formatted = targetDate.toLocaleDateString('en-IN', {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+    setFollowUpDateStr(formatted);
+  }, [followUpDays]);
+
   // Close suggestion dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -85,6 +145,12 @@ export default function DigitalPrescriptionPage() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const applyTemplate = (tpl: typeof COMMON_ILLNESS_TEMPLATES[0]) => {
+    setDiagnosis(tpl.diagnosis);
+    setAdvice(tpl.advice);
+    setMedicines(tpl.medicines);
+  };
 
   const handleMedNameChange = (val: string) => {
     setNewMed((prev) => ({ ...prev, name: val }));
@@ -126,10 +192,26 @@ export default function DigitalPrescriptionPage() {
     setMedicines((prev) => prev.filter((m) => m.id !== id));
   };
 
+  // Item 4: One-Click Direct PDF / Print File Download
   const handlePrintOrPDF = () => {
     if (typeof window !== 'undefined') {
+      const originalTitle = document.title;
+      document.title = `DocNest-Rx-Token${tokenNumber}-${patientName.replace(/\s+/g, '_')}`;
       window.print();
+      setTimeout(() => { document.title = originalTitle; }, 1000);
     }
+  };
+
+  // Item 2: 1-Click WhatsApp Rx Share Button
+  const handleShareWhatsApp = () => {
+    const docName = session?.name || 'Dr. Amit Kumar';
+    const clinic = session?.clinic || 'Gupta Clinic & Joint Care Center';
+    const message = `🏥 *${clinic}*\n👨‍⚕️ *${docName}*\n\nनमस्ते *${patientName}*,\nआपका डिजिटल पर्चा (Token #${tokenNumber}) तैयार है।\n\n📋 *निदान (Diagnosis):* ${diagnosis}\n💊 *दवाएं (${medicines.length}):*\n${medicines.map((m, i) => `${i + 1}. ${m.name} (${m.dosage}) - ${m.duration}`).join('\n')}\n\n📅 *पुनः परामर्श तिथि (Follow-up):* ${followUpDateStr}\n\nपर्चा ऑनलाइन देखें: https://docnest.in/rx/DN-2026-${tokenNumber}`;
+
+    const cleanPhone = patientPhone.replace(/\D/g, '');
+    const targetPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
+    const url = `https://wa.me/${targetPhone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
   };
 
   const handleSaveRx = () => {
@@ -167,7 +249,7 @@ export default function DigitalPrescriptionPage() {
       `}</style>
 
       {/* Top Action Bar (Hidden on Print) */}
-      <div className="print:hidden w-full max-w-4xl bg-slate-900 border border-slate-800 text-white p-4 rounded-2xl mb-6 flex flex-wrap items-center justify-between shadow-xl gap-4">
+      <div className="print:hidden w-full max-w-4xl bg-slate-900 border border-slate-800 text-white p-4 rounded-2xl mb-4 flex flex-wrap items-center justify-between shadow-xl gap-4">
         <div className="flex items-center space-x-3">
           <Link href="/doctor/dashboard" className="p-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl transition text-slate-300 border border-slate-700">
             <ArrowLeft className="w-5 h-5" />
@@ -181,21 +263,89 @@ export default function DigitalPrescriptionPage() {
           </div>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Item 2: WhatsApp Share Button */}
+          <button
+            onClick={handleShareWhatsApp}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs shadow flex items-center space-x-1.5 transition"
+            title="Share Prescription summary to patient via WhatsApp"
+          >
+            <MessageSquare className="w-4 h-4 fill-white text-emerald-600" />
+            <span>Send WhatsApp</span>
+          </button>
+
           <button
             onClick={handleSaveRx}
             className="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center space-x-2 transition"
           >
             <Save className="w-4 h-4" />
-            <span>{savedSuccess ? 'Saved ✓' : 'Save Rx Record'}</span>
+            <span>{savedSuccess ? 'Saved ✓' : 'Save Record'}</span>
           </button>
+
+          {/* Item 4: Direct PDF File Download & Print Button */}
           <button
             onClick={handlePrintOrPDF}
             className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black px-5 py-2.5 rounded-xl text-xs shadow-lg flex items-center space-x-2 transition active:scale-95"
           >
-            <Printer className="w-4 h-4 fill-slate-950" />
+            <Download className="w-4 h-4" />
             <span>Download Official PDF / Print</span>
           </button>
+        </div>
+      </div>
+
+      {/* 1-CLICK COMMON ILLNESS TEMPLATES BAR */}
+      <div className="print:hidden w-full max-w-4xl bg-slate-900/90 border border-slate-800 p-4 rounded-2xl mb-4 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-bold text-emerald-400 flex items-center space-x-1.5">
+            <Zap className="w-4 h-4" />
+            <span>1-Click Prescriptions for Common Illnesses</span>
+          </span>
+          <span className="text-[10px] text-slate-400">Auto-populates diagnosis, advice & Rx medicines</span>
+        </div>
+        <div className="flex flex-wrap gap-2 pt-1">
+          {COMMON_ILLNESS_TEMPLATES.map((tpl) => (
+            <button
+              key={tpl.id}
+              onClick={() => applyTemplate(tpl)}
+              className="bg-slate-800 hover:bg-emerald-500/15 hover:border-emerald-500/40 text-slate-200 border border-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5"
+            >
+              <span>{tpl.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ITEM 1: INTERACTIVE FOLLOW-UP DATE SCHEDULER BAR */}
+      <div className="print:hidden w-full max-w-4xl bg-slate-900/90 border border-slate-800 p-4 rounded-2xl mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center space-x-2">
+          <Calendar className="w-4 h-4 text-emerald-400" />
+          <span className="text-xs font-bold text-slate-200">Follow-Up Return Date (पुनः परामर्श तिथि):</span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {[
+            { days: 3, label: '3 Days' },
+            { days: 5, label: '5 Days' },
+            { days: 7, label: '7 Days' },
+            { days: 15, label: '15 Days' },
+            { days: 30, label: '1 Month' },
+          ].map((item) => (
+            <button
+              key={item.days}
+              onClick={() => setFollowUpDays(item.days)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                followUpDays === item.days
+                  ? 'bg-emerald-500 text-slate-950 shadow-md font-black'
+                  : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+
+          <span className="text-xs font-extrabold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-xl">
+            Return: {followUpDateStr}
+          </span>
         </div>
       </div>
 
@@ -439,6 +589,17 @@ export default function DigitalPrescriptionPage() {
               onChange={(e) => setAdvice(e.target.value)}
               className="w-full text-xs font-semibold text-slate-800 border border-slate-300 rounded-xl p-3 focus:outline-none focus:border-emerald-600 bg-slate-50/50"
             />
+          </div>
+
+          {/* ITEM 1: PRINTED FOLLOW-UP RETURN DATE STAMP */}
+          <div className="p-3.5 bg-emerald-50/80 border border-emerald-300 rounded-2xl flex items-center justify-between text-xs">
+            <div className="flex items-center space-x-2">
+              <Calendar className="w-4 h-4 text-emerald-800" />
+              <span className="font-extrabold text-slate-900">Next Follow-Up Return Date (पुनः परामर्श तिथि):</span>
+            </div>
+            <span className="font-black text-emerald-900 bg-emerald-200/80 px-3 py-1 rounded-xl text-sm">
+              {followUpDateStr}
+            </span>
           </div>
 
           {/* Official Footer Signature & Verification QR Stamp */}
