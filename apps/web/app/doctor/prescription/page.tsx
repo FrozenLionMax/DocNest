@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getSession } from '../../../lib/auth';
 import {
   Printer, Plus, Trash2, Save, Download, Stethoscope,
-  User, Calendar, Pill, CheckCircle2, FileText, ArrowLeft
+  User, Calendar, Pill, CheckCircle2, FileText, ArrowLeft, Search, Check
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -13,9 +13,42 @@ interface RxMedicine {
   id: string;
   name: string;
   dosage: string; // e.g. 1-0-1
-  duration: string; // e.g. 5 days
-  timing: string; // e.g. After Food (खाना खाने के बाद)
+  duration: string; // e.g. 5 Days
+  timing: string; // e.g. After Food (खाने के बाद)
 }
+
+interface MedicineSuggestion {
+  name: string;
+  category: string;
+  defaultDosage: string;
+  defaultDuration: string;
+  defaultTiming: string;
+}
+
+const MEDICINE_DATABASE: MedicineSuggestion[] = [
+  { name: 'Tab. Dolo 650mg (Paracetamol)', category: 'Analgesic / Fever', defaultDosage: '1-0-1', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Paracetamol 500mg', category: 'Fever / Pain', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Pantocid 40mg (Pantoprazole)', category: 'Antacid / Gastric', defaultDosage: '1-0-0', defaultDuration: '7 Days', defaultTiming: 'Empty Stomach (खाली पेट)' },
+  { name: 'Tab. Pan-D (Pantoprazole + Domperidone)', category: 'Gastric & Acidity', defaultDosage: '1-0-0', defaultDuration: '7 Days', defaultTiming: 'Empty Stomach (खाली पेट)' },
+  { name: 'Tab. Augmentin 625mg (Amoxicillin + Clavulanate)', category: 'Antibiotic', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Azithral 500mg (Azithromycin)', category: 'Antibiotic', defaultDosage: '1-0-0', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Combiflam (Ibuprofen + Paracetamol)', category: 'Pain Relief / Anti-inflammatory', defaultDosage: '1-0-1', defaultDuration: '3 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Zerodol-SP (Aceclofenac + Serratiopeptidase)', category: 'Pain & Swelling', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Montair-LC (Montelukast + Levocetirizine)', category: 'Anti-allergic / Asthma', defaultDosage: '0-0-1', defaultDuration: '10 Days', defaultTiming: 'At Bedtime (रात में सोते समय)' },
+  { name: 'Tab. Allegra 120mg (Fexofenadine)', category: 'Anti-histamine / Allergy', defaultDosage: '0-0-1', defaultDuration: '7 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Taxim-O 200mg (Cefixime)', category: 'Antibiotic', defaultDosage: '1-0-1', defaultDuration: '5 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Cap. Omez 20mg (Omeprazole)', category: 'Antacid', defaultDosage: '1-0-0', defaultDuration: '7 Days', defaultTiming: 'Empty Stomach (खाली पेट)' },
+  { name: 'Tab. Telmikind 40mg (Telmisartan)', category: 'Anti-hypertensive (BP)', defaultDosage: '1-0-0', defaultDuration: '30 Days', defaultTiming: 'Morning (सुबह)' },
+  { name: 'Tab. Glycomet 500mg (Metformin)', category: 'Anti-diabetic', defaultDosage: '1-0-1', defaultDuration: '30 Days', defaultTiming: 'With Meals (खाने के साथ)' },
+  { name: 'Cap. Shelcal 500 (Calcium + Vit D3)', category: 'Calcium Supplement', defaultDosage: '0-0-1', defaultDuration: '30 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Cap. Becosules Z', category: 'Multivitamin B-Complex', defaultDosage: '0-0-1', defaultDuration: '15 Days', defaultTiming: 'After Food (खाने के बाद)' },
+  { name: 'Tab. Emeset 4mg (Ondansetron)', category: 'Anti-vomiting', defaultDosage: '1-0-0 (SOS)', defaultDuration: '3 Days', defaultTiming: 'Before Food (खाने से पहले)' },
+  { name: 'Syr. Grilinctus-BM Syrup', category: 'Cough Syrup', defaultDosage: '2 tsp (10ml)', defaultDuration: '5 Days', defaultTiming: 'Thrice Daily (दिन में 3 बार)' },
+  { name: 'Syr. Gelusil MPS Antacid', category: 'Antacid Syrup', defaultDosage: '2 tsp (10ml)', defaultDuration: '7 Days', defaultTiming: 'After Meals (खाने के बाद)' },
+  { name: 'Cap. Canditral 100mg (Itraconazole)', category: 'Anti-fungal', defaultDosage: '0-0-1', defaultDuration: '14 Days', defaultTiming: 'After Meals' },
+  { name: 'Tab. Levoquin 500mg (Levofloxacin)', category: 'Antibiotic', defaultDosage: '1-0-0', defaultDuration: '5 Days', defaultTiming: 'After Food' },
+  { name: 'Inj. Neurobion Forte', category: 'Vitamin B12 Injection', defaultDosage: '1 Ampoule', defaultDuration: 'Alternate Days', defaultTiming: 'IM Injection' },
+];
 
 export default function DigitalPrescriptionPage() {
   const searchParams = useSearchParams();
@@ -24,19 +57,59 @@ export default function DigitalPrescriptionPage() {
   const [patientName, setPatientName] = useState(searchParams.get('patient') || 'Rahul Sharma');
   const [patientAgeGender, setPatientAgeGender] = useState('32 / Male');
   const [patientPhone, setPatientPhone] = useState('9876543210');
-  const [tokenNumber, setTokenNumber] = useState(searchParams.get('token') || '1');
-  const [vitals, setVitals] = useState({ bp: '120/80', pulse: '72 bpm', weight: '68 kg', temp: '98.6 °F' });
-  const [diagnosis, setDiagnosis] = useState('Acute Lumbar Strain / LBA (कमर दर्द)');
-  const [advice, setAdvice] = useState('1. 5 दिनों तक वजन न उठाएं।\n2. गर्म पानी की सिकाई करें।\n3. Review after 5 days.');
+  const [tokenNumber] = useState(searchParams.get('token') || '1');
+  const [vitals, setVitals] = useState({ bp: '120/80 mmHg', pulse: '72 bpm', weight: '68 kg', temp: '98.6 °F' });
+  const [diagnosis, setDiagnosis] = useState('Acute Lumbar Strain / LBA (कमर दर्द व जकड़न)');
+  const [advice, setAdvice] = useState('1. 5 दिनों तक भारी वजन न उठाएं।\n2. गर्म पानी से सुबह-शाम सिकाई करें।\n3. दर्द होने पर बेड रेस्ट लें व 5 दिन बाद परामर्श लें।');
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   const [medicines, setMedicines] = useState<RxMedicine[]>([
-    { id: 'm-1', name: 'Tab. Paracetamol 650mg', dosage: '1-0-1', duration: '5 Days', timing: 'After Food (खाने के बाद)' },
-    { id: 'm-2', name: 'Tab. Pantoprazole 40mg', dosage: '1-0-0', duration: '7 Days', timing: 'Empty Stomach (खाली पेट)' },
-    { id: 'm-3', name: 'Cap. Calcium & Vit D3', dosage: '0-0-1', duration: '15 Days', timing: 'After Food' },
+    { id: 'm-1', name: 'Tab. Dolo 650mg (Paracetamol)', dosage: '1-0-1', duration: '5 Days', timing: 'After Food (खाने के बाद)' },
+    { id: 'm-2', name: 'Tab. Pantocid 40mg (Pantoprazole)', dosage: '1-0-0', duration: '7 Days', timing: 'Empty Stomach (खाली पेट)' },
+    { id: 'm-3', name: 'Tab. Zerodol-SP (Aceclofenac + Serratiopeptidase)', dosage: '1-0-1', duration: '5 Days', timing: 'After Food (खाने के बाद)' },
   ]);
 
-  const [newMed, setNewMed] = useState({ name: '', dosage: '1-0-1', duration: '5 Days', timing: 'After Food' });
+  const [newMed, setNewMed] = useState({ name: '', dosage: '1-0-1', duration: '5 Days', timing: 'After Food (खाने के बाद)' });
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<MedicineSuggestion[]>([]);
+
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  // Close suggestion dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleMedNameChange = (val: string) => {
+    setNewMed((prev) => ({ ...prev, name: val }));
+    if (val.trim().length > 0) {
+      const matches = MEDICINE_DATABASE.filter((m) =>
+        m.name.toLowerCase().includes(val.toLowerCase()) ||
+        m.category.toLowerCase().includes(val.toLowerCase())
+      );
+      setFilteredSuggestions(matches);
+      setShowSuggestions(true);
+    } else {
+      setFilteredSuggestions(MEDICINE_DATABASE);
+      setShowSuggestions(true);
+    }
+  };
+
+  const selectSuggestion = (s: MedicineSuggestion) => {
+    setNewMed({
+      name: s.name,
+      dosage: s.defaultDosage,
+      duration: s.defaultDuration,
+      timing: s.defaultTiming,
+    });
+    setShowSuggestions(false);
+  };
 
   const handleAddMedicine = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,14 +118,15 @@ export default function DigitalPrescriptionPage() {
       ...prev,
       { id: `med-${Date.now()}`, ...newMed }
     ]);
-    setNewMed({ name: '', dosage: '1-0-1', duration: '5 Days', timing: 'After Food' });
+    setNewMed({ name: '', dosage: '1-0-1', duration: '5 Days', timing: 'After Food (खाने के बाद)' });
+    setShowSuggestions(false);
   };
 
   const handleRemoveMedicine = (id: string) => {
     setMedicines((prev) => prev.filter((m) => m.id !== id));
   };
 
-  const handlePrint = () => {
+  const handlePrintOrPDF = () => {
     if (typeof window !== 'undefined') {
       window.print();
     }
@@ -64,152 +138,204 @@ export default function DigitalPrescriptionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 p-4 md:p-8 flex flex-col items-center">
-      {/* Action Header - Hidden when printing */}
-      <div className="print:hidden w-full max-w-4xl bg-slate-900 text-white p-4 rounded-2xl mb-6 flex flex-wrap items-center justify-between shadow-lg gap-4">
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 flex flex-col items-center">
+      {/* Dynamic CSS Print Styles for Genuine A4 Printable Output */}
+      <style jsx global>{`
+        @media print {
+          body {
+            background-color: #ffffff !important;
+            color: #0f172a !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .print\\:hidden {
+            display: none !important;
+          }
+          @page {
+            size: A4 portrait;
+            margin: 12mm 15mm;
+          }
+          .print-a4-container {
+            box-shadow: none !important;
+            border: none !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+        }
+      `}</style>
+
+      {/* Top Action Bar (Hidden on Print) */}
+      <div className="print:hidden w-full max-w-4xl bg-slate-900 border border-slate-800 text-white p-4 rounded-2xl mb-6 flex flex-wrap items-center justify-between shadow-xl gap-4">
         <div className="flex items-center space-x-3">
-          <Link href="/doctor/dashboard" className="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl transition text-slate-300">
+          <Link href="/doctor/dashboard" className="p-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl transition text-slate-300 border border-slate-700">
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
             <h1 className="text-lg font-bold flex items-center space-x-2">
               <FileText className="w-5 h-5 text-emerald-400" />
-              <span>Digital Rx Creator (डिजिटल पर्चा)</span>
+              <span>Digital Prescription Creator (डिजिटल पर्चा)</span>
             </h1>
-            <p className="text-xs text-slate-400">Token #{tokenNumber} — {patientName}</p>
+            <p className="text-xs text-slate-400">Token #{tokenNumber} • Patient: {patientName}</p>
           </div>
         </div>
 
         <div className="flex items-center space-x-3">
           <button
             onClick={handleSaveRx}
-            className="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 transition"
+            className="bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold flex items-center space-x-2 transition"
           >
             <Save className="w-4 h-4" />
-            <span>{savedSuccess ? 'Saved ✓' : 'Save Prescription'}</span>
+            <span>{savedSuccess ? 'Saved ✓' : 'Save Rx Record'}</span>
           </button>
           <button
-            onClick={handlePrint}
-            className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-extrabold px-5 py-2 rounded-xl text-xs shadow-md flex items-center space-x-2 transition"
+            onClick={handlePrintOrPDF}
+            className="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black px-5 py-2.5 rounded-xl text-xs shadow-lg flex items-center space-x-2 transition active:scale-95"
           >
             <Printer className="w-4 h-4 fill-slate-950" />
-            <span>Print / PDF (प्रिंट)</span>
+            <span>Download Official PDF / Print</span>
           </button>
         </div>
       </div>
 
-      {/* PRINTABLE RX SHEET CONTAINER */}
-      <div className="w-full max-w-4xl bg-white text-slate-900 rounded-2xl shadow-xl border border-slate-200 overflow-hidden print:shadow-none print:border-none print:rounded-none">
-        {/* Printable Header */}
-        <div className="p-8 bg-gradient-to-r from-emerald-900 to-slate-900 text-white print:bg-none print:text-slate-900 print:p-0 print:border-b-2 print:border-slate-800">
+      {/* GENUINE A4 RX SHEET CANVAS CONTAINER */}
+      <div className="print-a4-container w-full max-w-4xl bg-white text-slate-900 rounded-3xl shadow-2xl border border-slate-200 overflow-hidden text-sm">
+        
+        {/* Official Clinic Letterhead Header */}
+        <div className="p-6 md:p-8 bg-gradient-to-r from-emerald-900 via-slate-900 to-slate-950 text-white print:bg-none print:text-slate-900 print:border-b-2 print:border-emerald-800 print:p-0 print:pb-4">
           <div className="flex justify-between items-start">
-            <div className="space-y-1">
-              <div className="flex items-center space-x-2">
-                <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white text-2xl print:hidden">
+            <div className="space-y-1 max-w-md">
+              <div className="flex items-center space-x-3">
+                <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-emerald-950 print:hidden">
                   🩺
                 </div>
-                <h2 className="text-2xl font-black tracking-tight print:text-xl print:text-emerald-800">
-                  {session?.clinic || 'Gupta Clinic & Joint Care Center'}
-                </h2>
+                <div>
+                  <h2 className="text-2xl font-black tracking-tight text-white print:text-emerald-900 print:text-2xl">
+                    {session?.clinic || 'Gupta Clinic & Joint Care Center'}
+                  </h2>
+                  <p className="text-xs text-emerald-300 font-bold print:text-slate-700 uppercase tracking-wider">
+                    Advanced Orthopedic & Multi-Specialty OPD
+                  </p>
+                </div>
               </div>
-              <p className="text-xs text-emerald-200 print:text-slate-600 font-medium">
-                Deoria Sadar, Near Overbridge, Deoria, Uttar Pradesh • Contact: +91 98765 43210
+              <p className="text-xs text-slate-300 print:text-slate-600 pt-1">
+                Deoria Sadar, Near Railway Overbridge, Deoria (U.P.) • Emergency OPD: +91 98765 43210
               </p>
             </div>
-            <div className="text-right">
-              <h3 className="text-lg font-extrabold text-emerald-400 print:text-slate-900">
+
+            <div className="text-right space-y-0.5">
+              <h3 className="text-lg md:text-xl font-extrabold text-emerald-400 print:text-slate-900">
                 {session?.name || 'Dr. Amit Kumar'}
               </h3>
-              <p className="text-xs text-slate-300 print:text-slate-600">MS (Orthopedics) • Senior Consultant</p>
-              <p className="text-[11px] text-emerald-300 print:text-slate-500">Reg. No: UP-MED-84920</p>
+              <p className="text-xs font-bold text-slate-200 print:text-slate-700">M.B.B.S., M.S. (Orthopedics)</p>
+              <p className="text-[11px] text-emerald-300 print:text-emerald-800 font-semibold">Reg. No: UP-MED-84920</p>
+              <p className="text-[10px] text-slate-400 print:text-slate-500 font-medium">Senior Orthopedic Consultant</p>
             </div>
           </div>
         </div>
 
-        {/* Patient Bar */}
-        <div className="bg-slate-50 border-y border-slate-200 px-8 py-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-semibold print:px-0">
+        {/* Patient Demographics Banner */}
+        <div className="bg-slate-100/80 border-y border-slate-300 px-6 md:px-8 py-3.5 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
           <div>
-            <span className="text-slate-400 block uppercase text-[10px]">Patient Name</span>
+            <span className="text-slate-500 block text-[10px] font-bold uppercase tracking-wider">Patient Name</span>
             <input
               type="text"
               value={patientName}
               onChange={(e) => setPatientName(e.target.value)}
-              className="bg-transparent font-bold text-slate-900 border-b border-dashed border-slate-300 focus:outline-none focus:border-emerald-500 w-full"
+              className="bg-transparent font-black text-slate-900 text-sm focus:outline-none focus:border-emerald-600 w-full border-b border-dashed border-slate-400"
             />
           </div>
           <div>
-            <span className="text-slate-400 block uppercase text-[10px]">Age / Gender</span>
+            <span className="text-slate-500 block text-[10px] font-bold uppercase tracking-wider">Age / Gender</span>
             <input
               type="text"
               value={patientAgeGender}
               onChange={(e) => setPatientAgeGender(e.target.value)}
-              className="bg-transparent text-slate-800 border-b border-dashed border-slate-300 focus:outline-none focus:border-emerald-500 w-full"
+              className="bg-transparent font-bold text-slate-800 focus:outline-none focus:border-emerald-600 w-full border-b border-dashed border-slate-400"
             />
           </div>
           <div>
-            <span className="text-slate-400 block uppercase text-[10px]">Date & Token</span>
-            <span className="font-extrabold text-emerald-700">Token #{tokenNumber} • {new Date().toLocaleDateString()}</span>
+            <span className="text-slate-500 block text-[10px] font-bold uppercase tracking-wider">Date & Token</span>
+            <span className="font-extrabold text-emerald-800">Token #{tokenNumber} • {new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
           </div>
           <div>
-            <span className="text-slate-400 block uppercase text-[10px]">Mobile</span>
+            <span className="text-slate-500 block text-[10px] font-bold uppercase tracking-wider">Mobile Number</span>
             <input
               type="text"
               value={patientPhone}
               onChange={(e) => setPatientPhone(e.target.value)}
-              className="bg-transparent text-slate-800 border-b border-dashed border-slate-300 focus:outline-none focus:border-emerald-500 w-full font-mono"
+              className="bg-transparent font-bold text-slate-800 focus:outline-none focus:border-emerald-600 w-full font-mono border-b border-dashed border-slate-400"
             />
           </div>
         </div>
 
-        {/* Vitals & Diagnosis section */}
-        <div className="p-8 space-y-6">
-          {/* Vitals row */}
-          <div className="grid grid-cols-4 gap-4 p-3 bg-emerald-50/60 rounded-xl border border-emerald-100 text-xs">
-            <div><span className="text-slate-500">BP:</span> <input type="text" value={vitals.bp} onChange={(e) => setVitals({...vitals, bp: e.target.value})} className="bg-transparent font-bold w-16 focus:outline-none" /></div>
-            <div><span className="text-slate-500">Pulse:</span> <input type="text" value={vitals.pulse} onChange={(e) => setVitals({...vitals, pulse: e.target.value})} className="bg-transparent font-bold w-16 focus:outline-none" /></div>
-            <div><span className="text-slate-500">Weight:</span> <input type="text" value={vitals.weight} onChange={(e) => setVitals({...vitals, weight: e.target.value})} className="bg-transparent font-bold w-16 focus:outline-none" /></div>
-            <div><span className="text-slate-500">Temp:</span> <input type="text" value={vitals.temp} onChange={(e) => setVitals({...vitals, temp: e.target.value})} className="bg-transparent font-bold w-16 focus:outline-none" /></div>
+        {/* Prescription Main Content */}
+        <div className="p-6 md:p-8 space-y-6">
+          
+          {/* Patient Vitals Card */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-3.5 bg-emerald-50/80 rounded-2xl border border-emerald-200/80 text-xs font-medium">
+            <div>
+              <span className="text-slate-500 text-[11px]">B.P. (रक्तचाप):</span>{' '}
+              <input type="text" value={vitals.bp} onChange={(e) => setVitals({ ...vitals, bp: e.target.value })} className="bg-transparent font-extrabold text-slate-900 w-20 focus:outline-none" />
+            </div>
+            <div>
+              <span className="text-slate-500 text-[11px]">Pulse (नाड़ी):</span>{' '}
+              <input type="text" value={vitals.pulse} onChange={(e) => setVitals({ ...vitals, pulse: e.target.value })} className="bg-transparent font-extrabold text-slate-900 w-20 focus:outline-none" />
+            </div>
+            <div>
+              <span className="text-slate-500 text-[11px]">Weight (वजन):</span>{' '}
+              <input type="text" value={vitals.weight} onChange={(e) => setVitals({ ...vitals, weight: e.target.value })} className="bg-transparent font-extrabold text-slate-900 w-20 focus:outline-none" />
+            </div>
+            <div>
+              <span className="text-slate-500 text-[11px]">Temp (तापमान):</span>{' '}
+              <input type="text" value={vitals.temp} onChange={(e) => setVitals({ ...vitals, temp: e.target.value })} className="bg-transparent font-extrabold text-slate-900 w-20 focus:outline-none" />
+            </div>
           </div>
 
-          {/* Diagnosis */}
+          {/* Clinical Diagnosis */}
           <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Clinical Diagnosis (रोग लक्षण)</label>
+            <label className="block text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-1">Clinical Diagnosis (रोग व लक्षण)</label>
             <input
               type="text"
               value={diagnosis}
               onChange={(e) => setDiagnosis(e.target.value)}
-              className="w-full text-sm font-bold text-slate-900 border-b border-slate-200 py-1 focus:outline-none focus:border-emerald-500"
+              className="w-full font-bold text-slate-900 border-b-2 border-slate-300 py-1 focus:outline-none focus:border-emerald-600 text-sm"
             />
           </div>
 
-          {/* Rx Symbol */}
-          <div className="text-3xl font-serif font-black text-emerald-700">Rx</div>
+          {/* Rx Medical Symbol */}
+          <div className="flex items-center space-x-2">
+            <span className="text-4xl font-serif font-black text-emerald-800">Rx</span>
+            <span className="text-xs text-slate-400 font-semibold">Prescribed Medicines & Dosage Instructions</span>
+          </div>
 
-          {/* Medicines Table */}
-          <div>
-            <table className="w-full text-left border-collapse">
+          {/* Prescribed Medicines Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[500px]">
               <thead>
-                <tr className="border-b-2 border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  <th className="py-2">#</th>
-                  <th className="py-2">Medicine Name (दवा का नाम)</th>
-                  <th className="py-2">Dosage (खुराक)</th>
-                  <th className="py-2">Duration</th>
-                  <th className="py-2">Instructions</th>
-                  <th className="py-2 print:hidden text-right">Action</th>
+                <tr className="border-b-2 border-slate-800 text-xs font-black text-slate-600 uppercase tracking-wider bg-slate-50">
+                  <th className="py-2.5 px-3">#</th>
+                  <th className="py-2.5 px-3">Medicine Name (दवा का नाम)</th>
+                  <th className="py-2.5 px-3">Dosage (खुराक)</th>
+                  <th className="py-2.5 px-3">Duration</th>
+                  <th className="py-2.5 px-3">Instructions</th>
+                  <th className="py-2.5 px-3 print:hidden text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-sm">
+              <tbody className="divide-y divide-slate-200">
                 {medicines.map((m, idx) => (
-                  <tr key={m.id} className="hover:bg-slate-50/50">
-                    <td className="py-3 text-xs font-bold text-slate-400">{idx + 1}</td>
-                    <td className="py-3 font-bold text-slate-900">{m.name}</td>
-                    <td className="py-3 font-mono font-extrabold text-emerald-700">{m.dosage}</td>
-                    <td className="py-3 text-xs font-medium text-slate-600">{m.duration}</td>
-                    <td className="py-3 text-xs text-slate-600">{m.timing}</td>
-                    <td className="py-3 print:hidden text-right">
+                  <tr key={m.id} className="hover:bg-slate-50/80">
+                    <td className="py-3 px-3 text-xs font-extrabold text-slate-400">{idx + 1}</td>
+                    <td className="py-3 px-3 font-bold text-slate-900 text-sm">{m.name}</td>
+                    <td className="py-3 px-3 font-mono font-black text-emerald-800 text-sm">{m.dosage}</td>
+                    <td className="py-3 px-3 text-xs font-semibold text-slate-700">{m.duration}</td>
+                    <td className="py-3 px-3 text-xs text-slate-600">{m.timing}</td>
+                    <td className="py-3 px-3 print:hidden text-right">
                       <button
                         onClick={() => handleRemoveMedicine(m.id)}
-                        className="p-1 text-slate-400 hover:text-rose-600 transition rounded"
+                        className="p-1.5 text-slate-400 hover:text-rose-600 transition rounded-lg hover:bg-rose-50"
+                        title="Remove Medicine"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -218,65 +344,119 @@ export default function DigitalPrescriptionPage() {
                 ))}
               </tbody>
             </table>
+          </div>
 
-            {/* Quick Add Form - Hidden in print */}
-            <form onSubmit={handleAddMedicine} className="mt-4 print:hidden p-4 bg-slate-50 border border-dashed border-slate-300 rounded-xl grid grid-cols-1 md:grid-cols-5 gap-3">
-              <input
-                type="text"
-                placeholder="Medicine name (e.g. Tab. PCM 650)"
-                value={newMed.name}
-                onChange={(e) => setNewMed({ ...newMed, name: e.target.value })}
-                className="md:col-span-2 px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-500"
-              />
+          {/* Quick Add Medicine Bar with Auto-Complete Search Dropdown (Hidden on Print) */}
+          <div className="print:hidden p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-3 relative z-20">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-emerald-400 flex items-center space-x-1.5">
+                <Search className="w-4 h-4" />
+                <span>Search & Add Medicine (दवा की नई प्रविष्टि)</span>
+              </span>
+              <span className="text-[10px] text-slate-400">Type brand or generic name for instant suggestions</span>
+            </div>
+
+            <form onSubmit={handleAddMedicine} className="grid grid-cols-1 md:grid-cols-6 gap-3">
+              {/* Medicine Name Auto-Complete Input */}
+              <div className="md:col-span-3 relative" ref={searchContainerRef}>
+                <input
+                  type="text"
+                  placeholder="Type medicine (e.g. Dolo, Augmentin, Pantocid)..."
+                  value={newMed.name}
+                  onChange={(e) => handleMedNameChange(e.target.value)}
+                  onFocus={() => {
+                    setFilteredSuggestions(MEDICINE_DATABASE);
+                    setShowSuggestions(true);
+                  }}
+                  className="w-full px-3.5 py-2.5 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-emerald-500 font-semibold"
+                  required
+                />
+
+                {/* Auto-Complete Suggestions Dropdown */}
+                {showSuggestions && (
+                  <div className="absolute left-0 right-0 top-full mt-1.5 bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl max-h-60 overflow-y-auto z-50 divide-y divide-slate-800">
+                    <div className="p-2 bg-slate-950 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      Popular Medical Varieties & Dosage Formats
+                    </div>
+                    {filteredSuggestions.length > 0 ? (
+                      filteredSuggestions.map((s, i) => (
+                        <div
+                          key={i}
+                          onClick={() => selectSuggestion(s)}
+                          className="p-3 hover:bg-emerald-500/10 cursor-pointer transition flex items-center justify-between group"
+                        >
+                          <div>
+                            <p className="text-xs font-bold text-white group-hover:text-emerald-400">{s.name}</p>
+                            <p className="text-[10px] text-slate-400">{s.category} • Default: {s.defaultDosage} ({s.defaultTiming})</p>
+                          </div>
+                          <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-md">
+                            Select
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-3 text-xs text-slate-400">No pre-set match. Press enter to add custom medicine name.</div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Dosage Input */}
               <input
                 type="text"
                 placeholder="Dosage (1-0-1)"
                 value={newMed.dosage}
                 onChange={(e) => setNewMed({ ...newMed, dosage: e.target.value })}
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-500 font-mono"
+                className="px-3.5 py-2.5 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-emerald-500 font-mono"
               />
+
+              {/* Duration Input */}
               <input
                 type="text"
                 placeholder="Duration (5 Days)"
                 value={newMed.duration}
                 onChange={(e) => setNewMed({ ...newMed, duration: e.target.value })}
-                className="px-3 py-2 text-xs rounded-lg border border-slate-300 focus:outline-none focus:border-emerald-500"
+                className="px-3.5 py-2.5 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-emerald-500"
               />
+
+              {/* Add Button */}
               <button
                 type="submit"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs transition flex items-center justify-center space-x-1"
+                className="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center space-x-1 shadow"
               >
                 <Plus className="w-4 h-4" />
-                <span>Add Medicine</span>
+                <span>Add to Rx</span>
               </button>
             </form>
           </div>
 
-          {/* Advice / Instructions */}
-          <div className="pt-4 border-t border-slate-200">
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Doctor Advice & Remarks (सलाह)</label>
+          {/* Doctor Remarks & Instructions */}
+          <div className="pt-2">
+            <label className="block text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-1">Doctor Advice & Remarks (चिकित्सकीय सलाह व निर्देश)</label>
             <textarea
               rows={3}
               value={advice}
               onChange={(e) => setAdvice(e.target.value)}
-              className="w-full text-xs font-medium text-slate-800 border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-emerald-500"
+              className="w-full text-xs font-semibold text-slate-800 border border-slate-300 rounded-xl p-3 focus:outline-none focus:border-emerald-600 bg-slate-50/50"
             />
           </div>
 
-          {/* Footer Signature & Verification QR */}
-          <div className="pt-8 border-t-2 border-slate-800 flex justify-between items-end">
-            <div className="text-[10px] text-slate-400 space-y-1">
-              <p className="font-bold text-slate-600">DocNest Verified Digital Prescription</p>
-              <p>Scan QR code on mobile app to view digitally authenticated copy.</p>
-              <p className="font-mono">DocNest-Rx-ID: {`DN-2026-${tokenNumber}-9481`}</p>
+          {/* Official Footer Signature & Verification QR Stamp */}
+          <div className="pt-6 border-t-2 border-slate-900 flex justify-between items-end">
+            <div className="space-y-1 text-[10px] text-slate-500">
+              <p className="font-extrabold text-slate-700 uppercase tracking-wider">DocNest Authenticated Digital Prescription</p>
+              <p>Scan QR code using DocNest Patient Mobile App to verify authentic digital copy.</p>
+              <p className="font-mono text-emerald-900 font-bold">DocNest-Rx-ID: {`DN-2026-${tokenNumber}-9481`}</p>
             </div>
-            <div className="text-center">
-              <div className="font-serif italic text-lg font-bold text-emerald-900 border-b border-slate-400 pb-1 px-4">
+
+            <div className="text-center space-y-1">
+              <div className="font-serif italic text-lg font-bold text-emerald-900 border-b-2 border-slate-700 pb-1 px-6">
                 Dr. Amit Kumar
               </div>
-              <p className="text-[10px] font-bold text-slate-500 uppercase mt-1">Doctor Signature</p>
+              <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Authorized Doctor Signature</p>
             </div>
           </div>
+
         </div>
       </div>
     </div>
