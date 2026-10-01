@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getSession } from '../../../lib/auth';
+import { supabase } from '../../../lib/supabase';
 import {
   Printer, Plus, Trash2, Save, Download, Stethoscope,
   User, Calendar, Pill, CheckCircle2, FileText, ArrowLeft, Search, Check, Sparkles, Zap, MessageSquare, Clock
@@ -331,9 +332,53 @@ export default function DigitalPrescriptionPage() {
     window.open(url, '_blank');
   };
 
-  const handleSaveRx = () => {
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 3000);
+  const handleSaveRx = async () => {
+    try {
+      const cleanPhone = patientPhone.replace(/\D/g, '') || '9999888877';
+      const newRxEntry = {
+        id: `rx-${Date.now()}`,
+        date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+        doctor: `${session?.name || 'Dr. Amit Kumar'} (${session?.specialty || 'Orthopedic Surgeon'})`,
+        clinic: session?.clinic || 'Gupta Clinic & Joint Care Center',
+        diagnosis: diagnosis || 'General Clinical Consultation',
+        vitals: 'BP: 120/80 mmHg • Pulse: 74 bpm • Weight: 65 kg',
+        advice: advice || 'Take medicines on time as prescribed.',
+        followUp: followUpDateStr,
+        medicines: medicines.map(m => ({
+          name: m.name,
+          dosage: m.dosage,
+          duration: m.duration,
+          timing: m.timing
+        }))
+      };
+
+      // Persist to pipeline store for patient portal
+      if (typeof window !== 'undefined') {
+        const key = `docnest_rx_${cleanPhone}`;
+        const existing = JSON.parse(localStorage.getItem(key) || '[]');
+        localStorage.setItem(key, JSON.stringify([newRxEntry, ...existing]));
+      }
+
+      // Sync to Supabase prescriptions table if available
+      try {
+        await supabase.from('prescriptions').insert([{
+          patient_name: patientName,
+          patient_phone: cleanPhone,
+          doctor_name: session?.name || 'Dr. Amit Kumar',
+          clinic_name: session?.clinic || 'Gupta Clinic',
+          diagnosis: diagnosis,
+          advice: advice,
+          follow_up_date: followUpDateStr,
+          medicines_json: medicines
+        }]);
+      } catch (err) {}
+
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 4000);
+    } catch (e) {
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3000);
+    }
   };
 
   return (

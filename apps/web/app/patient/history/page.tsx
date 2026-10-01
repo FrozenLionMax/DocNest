@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { getSession } from '../../../lib/auth';
 import {
   ChevronLeft,
   FileText,
@@ -15,16 +16,19 @@ import {
   Activity,
   Stethoscope,
   Settings,
-  Printer
+  Printer,
+  Sparkles
 } from 'lucide-react';
 import { LanguageTogglePill } from '../../../components/LanguageContext';
 
 export default function PatientHistoryPage() {
   const [expandedVisitId, setExpandedVisitId] = useState<string | null>('v-1');
+  const session = getSession();
+  const phone = session?.phone || '9999888877';
 
   const patientProfile = {
-    name: 'Rahul Sharma (राहुल शर्मा)',
-    phone: '9999888877',
+    name: session?.name || 'Rahul Sharma (राहुल शर्मा)',
+    phone: phone,
     age: '32',
     gender: 'Male',
     bloodGroup: 'B+',
@@ -32,7 +36,7 @@ export default function PatientHistoryPage() {
     chronicConditions: ['Type-2 Diabetes (Controlled)', 'Occasional Lumbar Sprain'],
   };
 
-  const visits = [
+  const initialVisits = [
     {
       id: 'v-1',
       date: '24 Sep 2026',
@@ -64,6 +68,24 @@ export default function PatientHistoryPage() {
       ],
     },
   ];
+
+  const [visits, setVisits] = useState(initialVisits);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const cleanPhone = phone.replace(/\D/g, '');
+      const savedRx = localStorage.getItem(`docnest_rx_${cleanPhone}`);
+      if (savedRx) {
+        try {
+          const parsed = JSON.parse(savedRx);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setVisits([...parsed, ...initialVisits]);
+            setExpandedVisitId(parsed[0].id);
+          }
+        } catch (e) {}
+      }
+    }
+  }, [phone]);
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] pb-24 md:pb-12">

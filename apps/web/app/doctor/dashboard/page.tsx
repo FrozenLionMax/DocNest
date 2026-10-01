@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../../lib/supabase';
 import { getSession } from '../../../lib/auth';
+import { DOCTORS_DIRECTORY, DoctorProfile } from '../../../lib/doctors-data';
 import {
   Users, Play, Pause, RotateCcw, Plus, Phone, Stethoscope, FileText, Tv,
   CheckCircle2, XCircle, SkipForward, Search, Volume2, VolumeX, Loader2,
-  Calendar, AlertCircle, QrCode, Filter, Clock, Activity, History, X, User
+  Calendar, AlertCircle, QrCode, Filter, Clock, Activity, History, X, User, ChevronDown
 } from 'lucide-react';
 
 interface PatientEntry {
@@ -28,6 +29,10 @@ interface PatientEntry {
 export default function DoctorDashboard() {
   const router = useRouter();
   const session = getSession();
+
+  // Multi-Doctor & Dynamic Clinic Queue Management
+  const [selectedDoctorId, setSelectedDoctorId] = useState<string>(session?.id || 'doc-001');
+  const currentDoctorProfile = DOCTORS_DIRECTORY.find(d => d.id === selectedDoctorId) || DOCTORS_DIRECTORY[0];
 
   const [currentToken, setCurrentToken] = useState(1);
   const [totalIssued, setTotalIssued] = useState(0);
@@ -52,7 +57,7 @@ export default function DoctorDashboard() {
     async function loadQueueData() {
       setLoading(true);
       try {
-        const doctorId = session?.id || 'doc-001';
+        const doctorId = selectedDoctorId;
         const { data: queueData } = await supabase.from('clinic_queues').select('*').eq('doctor_id', doctorId).single();
         if (queueData) {
           setCurrentToken(queueData.current_token || 1);
@@ -168,12 +173,35 @@ export default function DoctorDashboard() {
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
       {/* Top Header Bar */}
-      <div className="flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-        <div>
-          <h1 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center space-x-2">
-            <span>OPD Live Queue Controller</span>
-          </h1>
-          <p className="text-xs text-slate-400 font-medium mt-0.5">{session?.clinic || 'Gupta Clinic & Joint Care Center — Deoria'}</p>
+      <div className="flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl">
+        <div className="flex-1 min-w-[280px]">
+          <div className="flex items-center space-x-2">
+            <h1 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center space-x-2">
+              <span>OPD Live Queue Controller</span>
+            </h1>
+            <span className="text-[10px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-bold">
+              Dynamic OPD
+            </span>
+          </div>
+          
+          {/* Dynamic Doctor & Clinic Switcher */}
+          <div className="mt-2 relative max-w-md">
+            <select
+              value={selectedDoctorId}
+              onChange={(e) => {
+                setSelectedDoctorId(e.target.value);
+                setCurrentToken(1);
+              }}
+              className="w-full appearance-none bg-slate-800/90 border border-slate-700 hover:border-emerald-500 text-white font-bold text-xs rounded-xl pl-3 pr-8 py-2 focus:outline-none transition cursor-pointer shadow-inner"
+            >
+              {DOCTORS_DIRECTORY.map((doc) => (
+                <option key={doc.id} value={doc.id} className="bg-slate-900 text-white py-1">
+                  {doc.name} ({doc.specialty}) — {doc.clinicName}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-2.5 pointer-events-none" />
+          </div>
         </div>
 
         <div className="flex items-center space-x-3">
@@ -186,7 +214,7 @@ export default function DoctorDashboard() {
           </button>
           <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-2">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>{session?.name || 'Dr. Amit Kumar'}</span>
+            <span>{currentDoctorProfile.name}</span>
           </div>
         </div>
       </div>
