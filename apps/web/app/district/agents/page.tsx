@@ -54,25 +54,25 @@ export default function DistrictAgentsHierarchyPage() {
             <Users className="w-7 h-7 text-rose-400" />
             <span>District Operational Hierarchy Tree</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-0.5">District Collector (Apex) ➔ Block Coordinators ➔ Village Field Agents</p>
+          <p className="text-xs text-slate-400 mt-0.5">District Operations Lead (MD/CEO) ➔ Block Coordinators ➔ Village Field Agents</p>
         </div>
 
         <span className="text-xs font-mono font-bold text-rose-300 bg-rose-500/10 border border-rose-500/30 px-3.5 py-1.5 rounded-full">
-          3-Tier Administrative Link
+          3-Tier Management Link
         </span>
       </div>
 
       {/* Visual Hierarchy Tree */}
       <div className="space-y-6">
-        {/* Level 1: DC Apex */}
+        {/* Level 1: District Lead / MD */}
         <div className="bg-gradient-to-r from-rose-950 via-slate-900 to-rose-950 border-2 border-rose-500/50 p-6 rounded-3xl shadow-2xl flex items-center space-x-4">
           <div className="w-14 h-14 rounded-2xl bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-3xl">
             🏛️
           </div>
           <div>
-            <span className="text-xs font-black text-rose-400 uppercase tracking-widest block">Level 1: District Apex Head</span>
-            <h2 className="text-xl font-black text-white">Collector Office Deoria (District Magistrate / DC)</h2>
-            <p className="text-xs text-slate-300">Oversees entire public health appointment logistics & revenue audit</p>
+            <span className="text-xs font-black text-rose-400 uppercase tracking-widest block">Level 1: District Operations Lead (Company MD / CEO)</span>
+            <h2 className="text-xl font-black text-white">DocNest District Headquarter — Deoria</h2>
+            <p className="text-xs text-slate-300">Oversees entire regional healthcare appointment network, revenue audit & quality control</p>
           </div>
         </div>
 

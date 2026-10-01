@@ -33,18 +33,18 @@ export default function DistrictDashboardPage() {
       <div className="flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
         <div>
           <div className="inline-flex items-center space-x-2 bg-rose-500/15 text-rose-300 border border-rose-500/30 px-3 py-1 rounded-full text-xs font-bold mb-2">
-            <span>🏛️ DISTRICT COLLECTORATE HQ / जिला मुख्यालय</span>
+            <span>🏛️ DISTRICT OPERATIONS HEAD / जिला मुख्य समन्वयक (MD / Lead)</span>
           </div>
           <h1 className="text-xl md:text-2xl font-black text-white tracking-tight">
-            {districtName} District Healthcare Administration & Revenue Center
+            {districtName} District Healthcare Operations & Revenue Oversight
           </h1>
           <p className="text-xs text-slate-400 mt-0.5">
-            Apex Oversight Dashboard • Realtime monitoring of all 3 Blocks, 24 Village Agents, and Registered Clinics
+            Company Leadership Hub • Direct oversight across 3 Blocks, 24 Village Agents, and Partner Clinics
           </p>
         </div>
 
         <div className="bg-rose-500/10 border border-rose-500/30 text-rose-300 px-4 py-2 rounded-2xl text-xs font-mono font-bold flex items-center space-x-2">
-          <span>District Live Audit Active</span>
+          <span>District Operations Active</span>
           <ShieldCheck className="w-4 h-4 text-rose-400" />
         </div>
       </div>
@@ -97,7 +97,7 @@ export default function DistrictDashboardPage() {
         <div className="bg-gradient-to-r from-emerald-950/60 to-slate-900 border border-emerald-500/30 p-4.5 rounded-2xl flex items-center space-x-3 text-xs text-emerald-200">
           <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
           <p>
-            <strong>Payment Reconciliation:</strong> ₹40,500 successfully released to doctor escrow accounts for today's morning OPD slots.
+            <strong>Payment Reconciliation:</strong> ₹40,500 successfully released to doctor accounts for today's morning OPD slots.
           </p>
         </div>
       </div>
