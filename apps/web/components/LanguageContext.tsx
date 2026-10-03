@@ -106,8 +106,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <LanguageContext.Provider value={{ lang, toggleLang, setLang, t }}>
-      {/* Hidden container for Google Translate Element */}
-      <div id="google_translate_element" style={{ display: 'none', position: 'absolute', top: '-9999px' }} />
       {children}
     </LanguageContext.Provider>
   );

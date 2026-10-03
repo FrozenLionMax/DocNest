@@ -9,6 +9,7 @@ import {
   User, Calendar, Pill, CheckCircle2, FileText, ArrowLeft, Search, Check, Sparkles, Zap, MessageSquare, Clock
 } from 'lucide-react';
 import Link from 'next/link';
+import NavControls from '../../../components/NavControls';
 
 interface RxMedicine {
   id: string;
@@ -175,9 +176,13 @@ const COMMON_ILLNESS_TEMPLATES = [
   },
 ];
 
-export default function DigitalPrescriptionPage() {
+function PrescriptionContent() {
   const searchParams = useSearchParams();
-  const session = getSession();
+  const [session, setSession] = useState<any>(null);
+
+  useEffect(() => {
+    setSession(getSession());
+  }, []);
 
   const [patientName, setPatientName] = useState(searchParams.get('patient') || 'Rahul Sharma');
   const [patientAgeGender, setPatientAgeGender] = useState('32 / Male');
@@ -413,9 +418,7 @@ export default function DigitalPrescriptionPage() {
       {/* Top Action Bar (Hidden on Print) */}
       <div className="print:hidden w-full max-w-4xl bg-slate-900 border border-slate-800 text-white p-4 rounded-2xl mb-4 flex flex-wrap items-center justify-between shadow-xl gap-4">
         <div className="flex items-center space-x-3">
-          <Link href="/doctor/dashboard" className="p-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl transition text-slate-300 border border-slate-700">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
+          <NavControls fallbackBackUrl="/doctor/dashboard" showHome={true} showLogout={false} />
           <div>
             <h1 className="text-lg font-bold flex items-center space-x-2">
               <FileText className="w-5 h-5 text-emerald-400" />
@@ -783,5 +786,13 @@ export default function DigitalPrescriptionPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DigitalPrescriptionPage() {
+  return (
+    <React.Suspense fallback={<div className="min-h-screen bg-[#0c1219] p-8 text-center text-slate-400">Loading prescription builder...</div>}>
+      <PrescriptionContent />
+    </React.Suspense>
   );
 }

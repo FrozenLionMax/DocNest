@@ -25,6 +25,8 @@ import {
 } from 'lucide-react';
 import { LanguageTogglePill } from '../../components/LanguageContext';
 import { ThemeTogglePill } from '../../components/ThemeContext';
+import DocNestLogo from '../../components/DocNestLogo';
+import NavControls from '../../components/NavControls';
 
 export default function PatientHomePage() {
   const router = useRouter();
@@ -55,32 +57,18 @@ export default function PatientHomePage() {
   return (
     <div className="min-h-screen bg-mesh-dark text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] pb-24 md:pb-12">
       {/* Top Header with ColorHunt Accents */}
-      <header className="sticky top-0 z-40 bg-[#0c1219]/80 backdrop-blur-2xl border-b border-[rgba(196,225,230,0.12)] px-4 md:px-8 py-3.5 flex items-center justify-between shadow-xl">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-[#8dbcc7] to-[#5a939f] rounded-2xl flex items-center justify-center text-[#0c1219] text-xl font-black shadow-lg shadow-[#8dbcc7]/20 border border-[rgba(235,255,216,0.3)]">
-            🏥
-          </div>
-          <div>
-            <span className="text-base font-black text-white tracking-tight flex items-center space-x-1.5">
-              <span>DocNest</span>
-              <span className="text-[10px] bg-[#8dbcc7]/15 text-[#c4e1e6] border border-[#8dbcc7]/30 px-2 py-0.5 rounded-full font-bold">
-                Patient Portal
-              </span>
-            </span>
-            <p className="text-[11px] text-[#a4ccd9]/70">Deoria District Healthcare Network</p>
-          </div>
+      <header className="sticky top-0 z-40 bg-[#0c1219]/80 backdrop-blur-2xl border-b border-[rgba(196,225,230,0.12)] px-4 md:px-8 py-3.5 flex flex-wrap items-center justify-between shadow-xl gap-3">
+        <div className="flex items-center space-x-4">
+          <Link href="/patient" className="hover:opacity-95 transition">
+            <DocNestLogo size="md" subtitle="Patient Portal • Deoria Network" />
+          </Link>
+          <NavControls fallbackBackUrl="/" showHome={false} showLogout={false} />
         </div>
 
         <div className="flex items-center space-x-2.5">
           <ThemeTogglePill />
           <LanguageTogglePill />
-          <button
-            onClick={handleLogout}
-            className="p-2 text-slate-400 hover:text-rose-400 bg-[#141e28] hover:bg-[#1c2a38] rounded-xl transition border border-[rgba(196,225,230,0.1)] active:scale-95"
-            title="Logout"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+          <NavControls showHome={false} showLogout={true} />
         </div>
       </header>
 
@@ -125,34 +113,36 @@ export default function PatientHomePage() {
           </div>
         </section>
 
-        {/* Quick Stats Row: Lighter Surface Elevation */}
+        {/* Quick Stats Row: Sweet Ceramic Tint Cards */}
         <section className="grid grid-cols-3 gap-3 md:gap-4">
-          <div className="glass-panel rounded-2xl p-4 text-center">
-            <span className="text-[10px] font-black text-[#a4ccd9] uppercase tracking-widest block">Upcoming</span>
-            <span className="text-2xl md:text-3xl font-black tabular-numbers text-[#ebffd8] my-1 block">1</span>
-            <span className="text-[10px] text-slate-400 font-medium">Token #14 (Today)</span>
+          <div className="bg-gradient-to-br from-sky-50/90 to-white dark:from-sky-950/40 dark:to-[#141e28] border border-sky-100/90 dark:border-sky-900/40 rounded-3xl p-4.5 text-center shadow-sm hover:shadow-md transition">
+            <span className="text-[11px] font-extrabold text-sky-900/70 dark:text-sky-300 uppercase tracking-wider block">Upcoming</span>
+            <span className="text-3xl font-black tabular-numbers text-sky-950 dark:text-sky-400 my-1 block">1</span>
+            <span className="text-[11px] text-slate-500 font-medium">Token #14 (Today)</span>
           </div>
-          <div className="glass-panel rounded-2xl p-4 text-center">
-            <span className="text-[10px] font-black text-[#a4ccd9] uppercase tracking-widest block">Total Visits</span>
-            <span className="text-2xl md:text-3xl font-black tabular-numbers text-[#8dbcc7] my-1 block">4</span>
-            <span className="text-[10px] text-slate-400 font-medium">Past Checkups</span>
+          <div className="bg-gradient-to-br from-emerald-50/90 to-white dark:from-emerald-950/40 dark:to-[#141e28] border border-emerald-100/90 dark:border-emerald-900/40 rounded-3xl p-4.5 text-center shadow-sm hover:shadow-md transition">
+            <span className="text-[11px] font-extrabold text-emerald-900/70 dark:text-emerald-300 uppercase tracking-wider block">Total Visits</span>
+            <span className="text-3xl font-black tabular-numbers text-emerald-950 dark:text-emerald-400 my-1 block">4</span>
+            <span className="text-[11px] text-slate-500 font-medium">Past Checkups</span>
           </div>
-          <div className="glass-panel rounded-2xl p-4 text-center">
-            <span className="text-[10px] font-black text-[#a4ccd9] uppercase tracking-widest block">Digital Rx</span>
-            <span className="text-2xl md:text-3xl font-black tabular-numbers text-[#c4e1e6] my-1 block">3</span>
-            <span className="text-[10px] text-slate-400 font-medium">Prescriptions</span>
+          <div className="bg-gradient-to-br from-purple-50/90 to-white dark:from-purple-950/40 dark:to-[#141e28] border border-purple-100/90 dark:border-purple-900/40 rounded-3xl p-4.5 text-center shadow-sm hover:shadow-md transition">
+            <span className="text-[11px] font-extrabold text-purple-900/70 dark:text-purple-300 uppercase tracking-wider block">Digital Rx</span>
+            <span className="text-3xl font-black tabular-numbers text-purple-950 dark:text-purple-400 my-1 block">3</span>
+            <span className="text-[11px] text-slate-500 font-medium">Prescriptions</span>
           </div>
         </section>
 
-        {/* Active Live Token Card with ColorHunt Accent Palette */}
-        <section className="glass-panel rounded-3xl p-6 md:p-7 space-y-4 relative overflow-hidden">
-          <div className="flex items-center justify-between border-b border-[rgba(196,225,230,0.12)] pb-3.5">
+        {/* Active Live Token Card with Sweet Accent Palette */}
+        <section className="bg-white dark:bg-[#141e28] rounded-3xl p-6 md:p-7 space-y-4 relative overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3.5">
             <div className="flex items-center space-x-2.5">
-              <Calendar className="w-5 h-5 text-[#8dbcc7]" />
-              <h2 className="text-base font-black text-white">Next Upcoming Consultation (आगामी परामर्श)</h2>
+              <div className="w-8 h-8 rounded-xl bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-300 flex items-center justify-center">
+                <Calendar className="w-4 h-4" />
+              </div>
+              <h2 className="text-base font-black text-slate-900 dark:text-white">Next Upcoming Consultation (आगामी परामर्श)</h2>
             </div>
-            <span className="bg-[#8dbcc7]/15 text-[#ebffd8] border border-[#8dbcc7]/35 px-3 py-1 rounded-full text-xs font-bold flex items-center space-x-1.5 shadow-sm">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#8dbcc7]" />
+            <span className="bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 px-3 py-1 rounded-full text-xs font-black flex items-center space-x-1.5 shadow-sm">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>Confirmed & Paid ✓</span>
             </span>
           </div>
@@ -160,40 +150,40 @@ export default function PatientHomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-center">
             <div className="md:col-span-2 space-y-2.5">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-lg font-black text-white">Dr. Amit Kumar</span>
-                <span className="text-xs text-[#8dbcc7] font-bold bg-[#141e28] px-2.5 py-0.5 rounded-lg border border-[#8dbcc7]/30">
+                <span className="text-lg font-black text-slate-900 dark:text-white">Dr. Amit Kumar</span>
+                <span className="text-xs text-teal-800 dark:text-teal-300 font-bold bg-teal-50 dark:bg-teal-950/60 px-2.5 py-0.5 rounded-lg border border-teal-200 dark:border-teal-800">
                   Orthopedic Surgeon
                 </span>
               </div>
-              <p className="text-xs text-slate-300 flex items-center space-x-1.5">
-                <MapPin className="w-3.5 h-3.5 text-[#a4ccd9] flex-shrink-0" />
+              <p className="text-xs text-slate-600 dark:text-slate-300 flex items-center space-x-1.5">
+                <MapPin className="w-3.5 h-3.5 text-teal-600 flex-shrink-0" />
                 <span>Gupta Clinic & Joint Care Center — Near Railway Overbridge, Deoria Sadar</span>
               </p>
-              <div className="flex flex-wrap gap-4 text-xs font-medium text-slate-400 pt-1">
-                <span>📅 Date: <strong className="text-white">Today, Morning Shift</strong></span>
-                <span>💳 Paid: <strong className="text-[#ebffd8] tabular-numbers">₹375 (Online UPI)</strong></span>
+              <div className="flex flex-wrap gap-4 text-xs font-medium text-slate-500 dark:text-slate-400 pt-1">
+                <span>📅 Date: <strong className="text-slate-900 dark:text-white font-bold">Today, Morning Shift</strong></span>
+                <span>💳 Paid: <strong className="text-emerald-700 dark:text-emerald-400 font-extrabold tabular-numbers">₹375 (Online UPI)</strong></span>
               </div>
             </div>
 
-            {/* Live Token Number with Glowing #8DBCC7 Ripple */}
-            <div className="bg-[#0c1219] border border-[rgba(196,225,230,0.15)] rounded-2xl p-4 text-center relative shadow-inner">
-              <span className="text-[10px] font-black text-[#a4ccd9] uppercase tracking-widest block">Your OPD Token</span>
+            {/* Live Token Number with Sweet Mint Badge */}
+            <div className="bg-slate-50 dark:bg-[#0c1219] border-2 border-teal-200/90 dark:border-teal-800 rounded-3xl p-5 text-center relative shadow-sm">
+              <span className="text-[10px] font-black text-teal-800 dark:text-teal-400 uppercase tracking-widest block">Your OPD Token</span>
               <div className="inline-block relative my-1">
-                <span className="text-4xl md:text-5xl font-black tabular-numbers text-[#ebffd8] block drop-shadow-[0_0_14px_rgba(141,188,199,0.45)]">
+                <span className="text-4xl md:text-5xl font-black font-mono tabular-numbers text-teal-700 dark:text-teal-400 block drop-shadow-sm">
                   #14
                 </span>
               </div>
-              <div className="flex items-center justify-center space-x-1.5 text-[11px] text-[#8dbcc7] font-semibold">
-                <span className="w-2 h-2 rounded-full bg-[#8dbcc7] opd-live-badge" />
+              <div className="flex items-center justify-center space-x-1.5 text-xs text-teal-800 dark:text-teal-300 font-bold">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>Live in Queue (~11:30 AM)</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-2 flex justify-end space-x-3 border-t border-[rgba(196,225,230,0.12)]">
+          <div className="pt-2 flex justify-end space-x-3 border-t border-slate-100 dark:border-slate-800">
             <Link
               href="/patient/appointments"
-              className="text-xs text-[#c4e1e6] hover:text-white font-bold px-4 py-2.5 rounded-xl glass-panel transition active:scale-95"
+              className="text-xs text-teal-800 dark:text-teal-300 hover:text-teal-900 font-bold px-4 py-2.5 rounded-xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200/80 dark:border-teal-800 transition active:scale-95"
             >
               View Full Details →
             </Link>

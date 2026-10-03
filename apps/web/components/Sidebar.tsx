@@ -25,7 +25,6 @@ import {
 } from 'lucide-react';
 import { DocNestUser, UserRole } from '../lib/auth';
 import { LanguageTogglePill } from './LanguageContext';
-import { ThemeTogglePill } from './ThemeContext';
 
 interface SidebarProps {
   user: DocNestUser;
@@ -140,19 +139,19 @@ export default function Sidebar({ user, onLogout, isOpenMobile = false, onCloseM
       )}
 
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-[#0c1219] border-r border-[rgba(196,225,230,0.14)] flex flex-col transform transition-transform duration-200 ease-in-out ${
+        className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-white dark:bg-[#0c1219] border-r border-slate-200/90 dark:border-teal-900/40 flex flex-col transform transition-transform duration-200 ease-in-out shadow-sm ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         {/* Brand Header */}
-        <div className={`p-5 bg-gradient-to-br ${roleColors[user.role] || 'from-[#6ea5b1] to-[#457984]'} flex items-center justify-between shadow-lg border-b border-[rgba(235,255,216,0.2)]`}>
+        <div className={`p-5 bg-gradient-to-br ${roleColors[user.role] || 'from-teal-600 to-emerald-700'} flex items-center justify-between shadow-md`}>
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center text-2xl shadow-inner">
+            <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center text-2xl shadow-inner border border-white/25">
               {roleIcons[user.role] || '🏥'}
             </div>
             <div>
               <h1 className="text-lg font-black text-white tracking-tight">DocNest</h1>
-              <p className="text-xs text-white/90 font-semibold">{roleLabels[user.role] || 'Portal'}</p>
+              <p className="text-xs text-white/90 font-bold">{roleLabels[user.role] || 'Portal'}</p>
             </div>
           </div>
           {onCloseMobile && (
@@ -166,14 +165,14 @@ export default function Sidebar({ user, onLogout, isOpenMobile = false, onCloseM
         </div>
 
         {/* User Info */}
-        <div className="px-4 py-4 border-b border-[rgba(196,225,230,0.1)] bg-[#141e28]/70">
+        <div className="px-4 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-[#141e28]/70">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-full bg-[#0c1219] flex items-center justify-center text-[#8dbcc7] font-black text-sm border border-[rgba(196,225,230,0.2)] shadow-sm">
+            <div className="w-9 h-9 rounded-2xl bg-teal-100 dark:bg-teal-900/60 flex items-center justify-center text-teal-800 dark:text-teal-300 font-black text-sm border border-teal-200 dark:border-teal-800 shadow-sm">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-white truncate">{user.name}</p>
-              <p className="text-[11px] text-[#a4ccd9]/70 truncate">
+              <p className="text-sm font-extrabold text-slate-900 dark:text-white truncate">{user.name}</p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">
                 {user.village ? `${user.village}, ` : ''}
                 {user.block ? `${user.block}, ` : ''}
                 {user.district || user.specialty || user.email || user.phone}
@@ -183,7 +182,7 @@ export default function Sidebar({ user, onLogout, isOpenMobile = false, onCloseM
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-3 space-y-1.5 overflow-y-auto">
           {links.map((link) => {
             const isActive = pathname === link.href || pathname?.startsWith(link.href + '/');
             return (
@@ -191,13 +190,13 @@ export default function Sidebar({ user, onLogout, isOpenMobile = false, onCloseM
                 key={link.href}
                 href={link.href}
                 onClick={onCloseMobile}
-                className={`flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition ${
+                className={`flex items-center space-x-3 px-3.5 py-2.5 rounded-2xl text-sm font-bold transition ${
                   isActive
-                    ? 'bg-[#8dbcc7]/15 text-[#ebffd8] border border-[#8dbcc7]/35 shadow-sm'
-                    : 'text-slate-400 hover:text-white hover:bg-[#141e28]/70'
+                    ? 'bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-950/60 dark:to-emerald-950/60 text-teal-900 dark:text-teal-200 border border-teal-200/90 dark:border-teal-800/40 shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                 }`}
               >
-                <link.icon className={`w-4 h-4 ${isActive ? 'text-[#8dbcc7]' : 'text-slate-500'}`} />
+                <link.icon className={`w-4 h-4 ${isActive ? 'text-teal-600 dark:text-teal-400' : 'text-slate-400 dark:text-slate-500'}`} />
                 <span>{link.label}</span>
               </Link>
             );
@@ -205,16 +204,13 @@ export default function Sidebar({ user, onLogout, isOpenMobile = false, onCloseM
         </nav>
 
         {/* Footer */}
-        <div className="p-3 border-t border-[rgba(196,225,230,0.1)] space-y-2 bg-[#141e28]/40">
-          <div className="flex items-center space-x-2">
-            <div className="flex-1">
-              <LanguageTogglePill />
-            </div>
-            <ThemeTogglePill />
+        <div className="p-3.5 border-t border-[rgba(196,225,230,0.12)] space-y-2 bg-[#141e28]/40">
+          <div>
+            <LanguageTogglePill />
           </div>
           <button
             onClick={onLogout}
-            className="w-full flex items-center space-x-2 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition"
+            className="w-full flex items-center space-x-2 px-3 py-2.5 rounded-2xl text-xs font-bold text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 transition cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
             <span>Logout</span>

@@ -14,7 +14,8 @@ const PRESET_REASONS = [
 ];
 
 export default function DoctorSchedulePage() {
-  const session = getSession();
+  const [session, setSession] = useState<any>(null);
+  useEffect(() => { setSession(getSession()); }, []);
 
   // Schedule States
   const [morningStart, setMorningStart] = useState('10:00');

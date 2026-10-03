@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DOCTORS_DIRECTORY, DoctorProfile } from '../../../lib/doctors-data';
 import { getSession } from '../../../lib/auth';
 import {
@@ -20,7 +20,8 @@ import {
 } from 'lucide-react';
 
 export default function AgentDashboardPage() {
-  const session = getSession();
+  const [session, setSession] = useState<any>(null);
+  useEffect(() => { setSession(getSession()); }, []);
 
   // Agent location context
   const agentDistrict = session?.district || 'Deoria';

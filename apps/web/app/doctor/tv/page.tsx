@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../../lib/supabase';
 import { Tv, Volume2, Clock, VolumeX, AlertTriangle, ShieldAlert } from 'lucide-react';
+import NavControls from '../../../components/NavControls';
 
 export default function DoctorTvPage() {
   const [currentToken, setCurrentToken] = useState(1);
@@ -120,12 +121,13 @@ export default function DoctorTvPage() {
       {/* TV Header */}
       <header className="flex flex-wrap justify-between items-center border-b border-slate-800 pb-6 relative z-10 gap-4">
         <div className="flex items-center space-x-4">
-          <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-700 text-white rounded-2xl flex items-center justify-center text-3xl shadow-lg shadow-emerald-950">
+          <NavControls fallbackBackUrl="/doctor/dashboard" showHome={true} showLogout={true} />
+          <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-700 text-white rounded-2xl flex items-center justify-center text-3xl shadow-lg shadow-emerald-950">
             🏥
           </div>
           <div>
-            <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">{clinicName}</h1>
-            <p className="text-emerald-400 font-semibold text-lg">{doctorName} — OPD Waiting Room Display</p>
+            <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">{clinicName}</h1>
+            <p className="text-emerald-400 font-semibold text-sm md:text-base">{doctorName} — OPD Waiting Room Display</p>
           </div>
         </div>
 

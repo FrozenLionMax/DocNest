@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Building2,
   Users,
@@ -30,7 +30,8 @@ interface VillageAgentItem {
 }
 
 export default function BlockDashboardPage() {
-  const session = getSession();
+  const [session, setSession] = useState<any>(null);
+  useEffect(() => { setSession(getSession()); }, []);
   const blockName = session?.block || 'Salempur';
 
   const [villageAgents, setVillageAgents] = useState<VillageAgentItem[]>([

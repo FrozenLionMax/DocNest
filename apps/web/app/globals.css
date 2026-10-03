@@ -35,12 +35,28 @@
   --border-light: rgba(164, 204, 217, 0.4);
 }
 
-/* Touch & viewport optimization */
+/* Touch & viewport optimization for all mobile devices */
+html {
+  scroll-behavior: smooth;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
 html, body {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   overscroll-behavior-y: none;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Prevent text overflow on small phone screens (320px - 414px) */
+@media (max-width: 640px) {
+  h1, h2, h3, h4, h5, h6 {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
 }
 
 /* 100% Complete Suppression of Google Translate Popups/Banners */
@@ -187,6 +203,124 @@ body {
   animation: opd-pulse-glow 2s infinite;
 }
 
+/* ==========================================================================
+   DOCNEST SIGNATURE EMBLEM ANIMATIONS & PRISM TEXTURES
+   ========================================================================== */
+@keyframes logo-breathe-glow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.75;
+    filter: drop-shadow(0 0 12px rgba(141, 188, 199, 0.45));
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+    filter: drop-shadow(0 0 24px rgba(235, 255, 216, 0.65));
+  }
+}
+
+@keyframes logo-shimmer-sweep {
+  0% {
+    transform: translateX(-150%) rotate(25deg);
+  }
+  100% {
+    transform: translateX(250%) rotate(25deg);
+  }
+}
+
+@keyframes logo-ecg-pulse {
+  0%, 100% {
+    stroke-dashoffset: 0;
+    opacity: 0.9;
+  }
+  50% {
+    stroke-dashoffset: 24;
+    opacity: 1;
+  }
+}
+
+.logo-breathe-aura {
+  animation: logo-breathe-glow 4s ease-in-out infinite;
+}
+
+.logo-shimmer-sheen {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(235, 255, 216, 0.28) 45%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(141, 188, 199, 0.28) 55%,
+    transparent 65%
+  );
+  animation: logo-shimmer-sweep 5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+.logo-ecg-path {
+  stroke-dasharray: 48;
+  animation: logo-ecg-pulse 3s linear infinite;
+}
+
+/* ==========================================================================
+   INTERACTIVE LOGIN & PLATFORM MICRO-ANIMATIONS (3, 4, 10, 11, 20)
+   ========================================================================== */
+@keyframes energy-halo-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 2px rgba(141, 188, 199, 0.45), 0 0 16px -2px rgba(141, 188, 199, 0.35);
+    border-color: #8dbcc7 !important;
+  }
+  50% {
+    box-shadow: 0 0 0 2px rgba(235, 255, 216, 0.65), 0 0 22px -2px rgba(235, 255, 216, 0.45);
+    border-color: #ebffd8 !important;
+  }
+}
+
+.input-energy-halo:focus-within {
+  animation: energy-halo-glow 2.5s ease-in-out infinite;
+}
+
+@keyframes chip-bounce-tap {
+  0% { transform: scale(1); }
+  35% { transform: scale(0.92); }
+  65% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+.animate-chip-bounce {
+  animation: chip-bounce-tap 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes eye-wink-animation {
+  0% { transform: scale(1) rotate(0deg); }
+  40% { transform: scale(1.25) rotate(12deg); }
+  80% { transform: scale(0.95) rotate(-6deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.animate-eye-wink {
+  animation: eye-wink-animation 0.4s ease-out;
+}
+
+@keyframes spark-radial {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-spark {
+  animation: spark-radial 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* Desaturated & WCAG Compliant Text Accent Classes */
 .text-ch-deep {
   color: #8dbcc7 !important;
@@ -202,412 +336,44 @@ body {
 }
 
 /* ==========================================================================
-   LIGHT MODE ARCHITECTURE & COLORHUNT INTEGRATION (#8DBCC7, #A4CCD9, #C4E1E6, #EBFFD8)
-   WCAG AAA Compliant Contrast & Ceramic Material Depth System
+   UNIFIED LUXURY HEALTHCARE PALETTE (#8DBCC7, #A4CCD9, #C4E1E6, #EBFFD8)
+   WCAG AAA 15.8:1+ Depth, Ceramic/Midnight Fusion with Crystal Contrast
    ========================================================================== */
 
-html.theme-light body {
-  background-color: #f4f9fa !important;
-  color: #0c1820 !important;
+body {
+  background-color: #0c1219 !important;
+  color: #f1f5f9 !important;
 }
 
-/* Base Canvas & Ceramic Mesh Background */
-html.theme-light .bg-mesh-dark {
-  background-color: #f4f9fa !important;
+/* Base Canvas & Oceanic Midnight Mesh */
+.bg-mesh-dark {
+  background-color: #0c1219;
   background-image: 
-    radial-gradient(ellipse at 85% 10%, rgba(164, 204, 217, 0.4), transparent 55%),
-    radial-gradient(ellipse at 15% 90%, rgba(235, 255, 216, 0.5), transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(196, 225, 230, 0.25), transparent 100%) !important;
+    radial-gradient(ellipse at 85% 10%, rgba(141, 188, 199, 0.14), transparent 55%),
+    radial-gradient(ellipse at 15% 90%, rgba(235, 255, 216, 0.08), transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(20, 30, 40, 0.65), transparent 100%);
 }
 
-/* Material Level 1 Elevation: Crisp Pure Ceramic White Cards */
-html.theme-light .glass-panel {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-color: rgba(164, 204, 217, 0.45) !important;
-  box-shadow: 
-    inset 0 1px 0 0 #ffffff,
-    0 8px 24px -4px rgba(141, 188, 199, 0.14) !important;
-  color: #0c1820 !important;
+/* High Contrast Input Fields */
+input, select, textarea {
+  color: #ffffff !important;
+  background-color: #141e28 !important;
+  border-color: rgba(196, 225, 230, 0.22) !important;
 }
 
-html.theme-light .glass-panel:hover {
+input:focus, select:focus, textarea:focus {
   border-color: #8dbcc7 !important;
-  box-shadow: 
-    inset 0 1px 0 0 #ffffff,
-    0 14px 32px -6px rgba(141, 188, 199, 0.22) !important;
+  box-shadow: 0 0 0 3px rgba(141, 188, 199, 0.25) !important;
 }
 
-/* Material Level 2 Elevation: Elevated Focus Cards, Heros & Modals */
-html.theme-light .glass-panel-elevated {
-  background: #ffffff !important;
-  border-color: rgba(164, 204, 217, 0.5) !important;
-  box-shadow: 
-    inset 0 1px 0 0 rgba(235, 255, 216, 0.6),
-    0 16px 36px -8px rgba(141, 188, 199, 0.2) !important;
-  color: #0c1820 !important;
-}
-
-/* Tactile Primary Button */
-html.theme-light .btn-primary-tactile {
-  background: linear-gradient(135deg, #649ca9 0%, #8dbcc7 60%, #a4ccd9 100%) !important;
-  color: #0c1219 !important;
-  border: 1px solid rgba(141, 188, 199, 0.6) !important;
-  box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.7),
-    0 6px 18px -3px rgba(141, 188, 199, 0.4) !important;
-}
-
-html.theme-light .btn-primary-tactile:hover {
-  background: linear-gradient(135deg, #59929f 0%, #7db1bd 60%, #98c4cf 100%) !important;
-  box-shadow: 
-    inset 0 1px 0 0 #ffffff,
-    0 10px 24px -4px rgba(141, 188, 199, 0.5) !important;
-}
-
-/* ==========================================================================
-   CONVERSION OF INLINE DARK SURFACES TO CLEAN CERAMIC LIGHT SURFACES
-   ========================================================================== */
-
-/* Level 0 / Inset Wells (#0c1219) -> Clean White with subtle sky border */
-html.theme-light [class*="bg-[#0c1219]"],
-html.theme-light .bg-\[\#0c1219\],
-html.theme-light .bg-\[\#0c1219\]\/95,
-html.theme-light .bg-\[\#0c1219\]\/90,
-html.theme-light .bg-\[\#0c1219\]\/85,
-html.theme-light .bg-\[\#0c1219\]\/80,
-html.theme-light .bg-\[\#0c1219\]\/70,
-html.theme-light .bg-\[\#0c1219\]\/60,
-html.theme-light .bg-\[\#0c1219\]\/50 {
-  background-color: #ffffff !important;
-  color: #0c1820 !important;
-  border-color: rgba(164, 204, 217, 0.42) !important;
-}
-
-/* Level 1 Cards & Backgrounds (#141e28) -> Soft Mineral Mist (#edf5f7) */
-html.theme-light [class*="bg-[#141e28]"],
-html.theme-light .bg-\[\#141e28\],
-html.theme-light .bg-\[\#141e28\]\/95,
-html.theme-light .bg-\[\#141e28\]\/90,
-html.theme-light .bg-\[\#141e28\]\/80,
-html.theme-light .bg-\[\#141e28\]\/70,
-html.theme-light .bg-\[\#141e28\]\/60,
-html.theme-light .bg-\[\#141e28\]\/50,
-html.theme-light .bg-\[\#141e28\]\/40 {
-  background-color: #edf5f7 !important;
-  color: #0c1820 !important;
-  border-color: rgba(164, 204, 217, 0.35) !important;
-}
-
-/* Level 2 Insets (#1c2a38) -> Frosted Ice (#e2eff2) */
-html.theme-light [class*="bg-[#1c2a38]"],
-html.theme-light .bg-\[\#1c2a38\],
-html.theme-light .bg-\[\#1c2a38\]\/90,
-html.theme-light .bg-\[\#1c2a38\]\/80,
-html.theme-light .bg-\[\#1c2a38\]\/70,
-html.theme-light .bg-\[\#1c2a38\]\/60 {
-  background-color: #e2eff2 !important;
-  color: #0c1820 !important;
-  border-color: rgba(164, 204, 217, 0.4) !important;
-}
-
-/* Slate Dark Backgrounds */
-html.theme-light .bg-slate-950,
-html.theme-light .bg-slate-950\/90,
-html.theme-light .bg-slate-950\/80,
-html.theme-light .bg-slate-950\/70 {
-  background-color: #f4f9fa !important;
-  color: #0c1820 !important;
-}
-
-html.theme-light .bg-slate-900,
-html.theme-light .bg-slate-900\/95,
-html.theme-light .bg-slate-900\/90,
-html.theme-light .bg-slate-900\/80,
-html.theme-light .bg-slate-900\/70,
-html.theme-light .bg-slate-900\/60,
-html.theme-light .bg-slate-900\/40 {
-  background-color: #ffffff !important;
-  border-color: rgba(164, 204, 217, 0.35) !important;
-  color: #0c1820 !important;
-}
-
-html.theme-light .bg-slate-800,
-html.theme-light .bg-slate-800\/90,
-html.theme-light .bg-slate-800\/80,
-html.theme-light .bg-slate-800\/70,
-html.theme-light .bg-slate-800\/60 {
-  background-color: #edf5f7 !important;
-  border-color: rgba(164, 204, 217, 0.4) !important;
-  color: #0c1820 !important;
-}
-
-/* Borders */
-html.theme-light [class*="border-[rgba(196,225,230"],
-html.theme-light .border-slate-800,
-html.theme-light .border-slate-800\/80,
-html.theme-light .border-slate-800\/90,
-html.theme-light .border-slate-700 {
-  border-color: rgba(164, 204, 217, 0.38) !important;
-}
-
-html.theme-light [class*="border-[#8dbcc7]"] {
-  border-color: rgba(141, 188, 199, 0.55) !important;
-}
-
-/* ==========================================================================
-   COLORHUNT PALETTE TEXT CONTRAST OVERRIDES FOR LIGHT MODE (WCAG AAA >= 7:1)
-   ========================================================================== */
-
-/* #EBFFD8 (Light Mint Highlight): Becomes Deep Forest Pine/Emerald in Light Mode */
-html.theme-light [class*="text-[#ebffd8]"],
-html.theme-light .text-\[\#ebffd8\],
-html.theme-light .text-ch-highlight {
-  color: #0e5b53 !important; /* Contrast: 7.8:1 against white */
-}
-
-/* #8DBCC7 (Deep Cyan): Becomes Rich Ocean Cyan in Light Mode */
-html.theme-light [class*="text-[#8dbcc7]"],
-html.theme-light .text-\[\#8dbcc7\],
-html.theme-light .text-ch-deep {
-  color: #156170 !important; /* Contrast: 5.6:1 against white */
-}
-
-/* #A4CCD9 (Sky): Becomes Deep Slate Cyan in Light Mode */
-html.theme-light [class*="text-[#a4ccd9]"],
-html.theme-light .text-\[\#a4ccd9\],
-html.theme-light .text-ch-mid {
-  color: #1f5968 !important; /* Contrast: 6.2:1 against white */
-}
-
-/* #C4E1E6 (Soft Glacial): Becomes Deep Mineral Slate in Light Mode */
-html.theme-light [class*="text-[#c4e1e6]"],
-html.theme-light .text-\[\#c4e1e6\],
-html.theme-light .text-ch-soft {
-  color: #255866 !important; /* Contrast: 6.8:1 against white */
-}
-
-/* ==========================================================================
-   TEXT CONTRAST HIERARCHY (EXCLUDING BUTTONS & GRADIENTS)
-   ========================================================================== */
-
-/* Dark charcoal on light cards & surfaces */
-html.theme-light h1,
-html.theme-light h2,
-html.theme-light h3,
-html.theme-light h4,
-html.theme-light h5,
-html.theme-light h6 {
-  color: #0c1820;
-}
-
-html.theme-light .text-white {
-  color: #0c1820;
-}
-
-html.theme-light .text-slate-100,
-html.theme-light .text-slate-200 {
-  color: #142430 !important;
-}
-
-html.theme-light .text-slate-300 {
-  color: #243a48 !important;
-}
-
-html.theme-light .text-slate-400 {
-  color: #476579 !important;
-}
-
-html.theme-light .text-slate-500 {
+input::placeholder, textarea::placeholder {
   color: #64748b !important;
 }
 
-/* CRITICAL PRESERVATION: Buttons, Badges, and Saturated Gradients KEEP WHITE TEXT */
-html.theme-light button.text-white,
-html.theme-light a.text-white,
-html.theme-light button .text-white,
-html.theme-light [class*="bg-emerald-"] .text-white,
-html.theme-light [class*="bg-emerald-"] h1,
-html.theme-light [class*="bg-emerald-"] p,
-html.theme-light [class*="bg-emerald-"] span,
-html.theme-light [class*="bg-rose-"] .text-white,
-html.theme-light [class*="bg-blue-"] .text-white,
-html.theme-light [class*="bg-purple-"] .text-white,
-html.theme-light [class*="from-emerald"] .text-white,
-html.theme-light [class*="from-emerald"] h1,
-html.theme-light [class*="from-emerald"] p,
-html.theme-light [class*="from-emerald"] span,
-html.theme-light [class*="from-blue"] .text-white,
-html.theme-light [class*="from-blue"] h1,
-html.theme-light [class*="from-purple"] .text-white,
-html.theme-light [class*="from-purple"] h1,
-html.theme-light [class*="from-amber"] .text-white,
-html.theme-light [class*="from-rose"] .text-white,
-html.theme-light [class*="from-cyan"] .text-white,
-html.theme-light [class*="from-teal"] .text-white,
-html.theme-light [class*="from-"] .text-white,
-html.theme-light [class*="from-"] h1,
-html.theme-light [class*="from-"] p.text-white\/90,
-html.theme-light [class*="from-"] p.text-white\/70,
-html.theme-light button[class*="bg-emerald-"],
-html.theme-light button[class*="bg-rose-"],
-html.theme-light button[class*="bg-blue-"],
-html.theme-light button[class*="bg-purple-"] {
+/* Clean Form Options */
+option {
+  background-color: #141e28 !important;
   color: #ffffff !important;
 }
 
-/* ColorHunt Accent Badges & Chips */
-html.theme-light [class*="bg-[#8dbcc7]/"] {
-  background-color: #dcedf2 !important;
-  border-color: rgba(141, 188, 199, 0.5) !important;
-}
-
-html.theme-light [class*="bg-[#ebffd8]/"] {
-  background-color: #e5f6dc !important;
-  border-color: rgba(135, 196, 120, 0.45) !important;
-}
-
-html.theme-light [class*="bg-[#a4ccd9]/"] {
-  background-color: #e3eff3 !important;
-  border-color: rgba(164, 204, 217, 0.5) !important;
-}
-
-/* ==========================================================================
-   COMPONENT-LEVEL REFINEMENTS
-   ========================================================================== */
-
-/* 1. Navigation Sidebar */
-html.theme-light aside {
-  background-color: #ffffff !important;
-  border-right: 1px solid rgba(164, 204, 217, 0.35) !important;
-  box-shadow: 4px 0 20px -4px rgba(141, 188, 199, 0.12) !important;
-}
-
-html.theme-light aside .text-slate-400 {
-  color: #475569 !important;
-}
-
-html.theme-light aside .bg-\[\#141e28\]\/70,
-html.theme-light aside .bg-\[\#141e28\]\/40 {
-  background-color: #f0f7f9 !important;
-  border-color: rgba(164, 204, 217, 0.3) !important;
-}
-
-html.theme-light aside .bg-\[\#0c1219\] {
-  background-color: #dbeef2 !important;
-  border-color: rgba(141, 188, 199, 0.45) !important;
-}
-
-html.theme-light aside nav a {
-  color: #475569 !important;
-}
-
-html.theme-light aside nav a:hover {
-  background-color: #eef6f8 !important;
-  color: #0c1820 !important;
-}
-
-html.theme-light aside nav a[class*="bg-[#8dbcc7]/"] {
-  background-color: #def0f4 !important;
-  color: #0b544d !important;
-  border-color: #8dbcc7 !important;
-  font-weight: 700 !important;
-}
-
-html.theme-light aside nav a[class*="bg-[#8dbcc7]/"] svg {
-  color: #156170 !important;
-}
-
-/* 2. Form Inputs, Selects & Textareas */
-html.theme-light input,
-html.theme-light select,
-html.theme-light textarea {
-  background-color: #ffffff !important;
-  color: #0c1820 !important;
-  border-color: rgba(141, 188, 199, 0.45) !important;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04) !important;
-}
-
-html.theme-light input::placeholder,
-html.theme-light textarea::placeholder {
-  color: #64748b !important;
-}
-
-html.theme-light input:focus,
-html.theme-light select:focus,
-html.theme-light textarea:focus {
-  border-color: #17606e !important;
-  box-shadow: 0 0 0 3px rgba(141, 188, 199, 0.28) !important;
-}
-
-html.theme-light option {
-  background-color: #ffffff !important;
-  color: #0c1820 !important;
-}
-
-/* 3. Sticky Headers & Top Bars */
-html.theme-light header.sticky,
-html.theme-light header[class*="sticky"] {
-  background-color: rgba(255, 255, 255, 0.92) !important;
-  border-bottom: 1px solid rgba(164, 204, 217, 0.35) !important;
-  box-shadow: 0 4px 20px -4px rgba(141, 188, 199, 0.12) !important;
-}
-
-/* 4. Mobile Bottom Navigation */
-html.theme-light nav[class*="fixed"][class*="bottom-"] {
-  background-color: rgba(255, 255, 255, 0.96) !important;
-  border: 1px solid rgba(164, 204, 217, 0.45) !important;
-  box-shadow: 0 12px 32px rgba(141, 188, 199, 0.25) !important;
-}
-
-/* 5. Modals, Drawers & Overlays */
-html.theme-light .fixed.inset-0[class*="bg-"] {
-  background-color: rgba(12, 18, 25, 0.45) !important;
-  backdrop-filter: blur(8px) !important;
-  -webkit-backdrop-filter: blur(8px) !important;
-}
-
-html.theme-light .fixed [class*="bg-[#141e28]"],
-html.theme-light .fixed [class*="bg-slate-900"] {
-  background-color: #ffffff !important;
-  color: #0c1820 !important;
-  border-color: rgba(164, 204, 217, 0.5) !important;
-  box-shadow: 0 25px 50px -12px rgba(12, 24, 32, 0.25) !important;
-}
-
-/* 6. Tables & Data Grids */
-html.theme-light table {
-  color: #142430 !important;
-}
-
-html.theme-light table th {
-  color: #475569 !important;
-  border-bottom: 1px solid rgba(164, 204, 217, 0.35) !important;
-  background-color: rgba(237, 245, 247, 0.5) !important;
-}
-
-html.theme-light table td {
-  border-bottom: 1px solid rgba(164, 204, 217, 0.22) !important;
-  color: #142430 !important;
-}
-
-html.theme-light table tbody tr:hover {
-  background-color: #f0f7f9 !important;
-}
-
-/* 7. Theme & Language Toggle Pills */
-html.theme-light button[title*="Dark"] {
-  background-color: #edf5f7 !important;
-  border-color: rgba(141, 188, 199, 0.5) !important;
-  color: #156170 !important;
-}
-
-html.theme-light button[title*="Language"] {
-  background: #e7f7f3 !important;
-  border-color: rgba(16, 185, 129, 0.45) !important;
-  color: #0c6152 !important;
-}
-
-html.theme-light button[title*="Language"] svg {
-  color: #0c6152 !important;
-}
 

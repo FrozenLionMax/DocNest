@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { LanguageTogglePill } from '../../../components/LanguageContext';
 import { ThemeTogglePill } from '../../../components/ThemeContext';
+import NavControls from '../../../components/NavControls';
 
 const SPECIALTY_CHIPS = [
   { id: 'all', label: 'All Specialties' },
@@ -60,14 +61,9 @@ export default function FindDoctorsPage() {
   return (
     <div className="min-h-screen bg-mesh-dark text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] pb-24 md:pb-12">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#0c1219]/85 backdrop-blur-2xl border-b border-[rgba(196,225,230,0.14)] px-4 md:px-8 py-3.5 flex items-center justify-between shadow-xl">
+      <header className="sticky top-0 z-40 bg-[#0c1219]/85 backdrop-blur-2xl border-b border-[rgba(196,225,230,0.14)] px-4 md:px-8 py-3.5 flex flex-wrap items-center justify-between shadow-xl gap-3">
         <div className="flex items-center space-x-3">
-          <Link
-            href="/patient"
-            className="p-2 text-slate-400 hover:text-white bg-[#141e28] hover:bg-[#1c2a38] rounded-xl transition border border-[rgba(196,225,230,0.12)] active:scale-95"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </Link>
+          <NavControls fallbackBackUrl="/patient" showHome={true} showLogout={false} />
           <div>
             <h1 className="text-base font-black text-white tracking-tight flex items-center space-x-2">
               <span>Find Verified Doctors</span>
@@ -80,6 +76,7 @@ export default function FindDoctorsPage() {
         <div className="flex items-center space-x-2.5">
           <ThemeTogglePill />
           <LanguageTogglePill />
+          <NavControls showHome={false} showLogout={true} />
         </div>
       </header>
 
@@ -94,40 +91,43 @@ export default function FindDoctorsPage() {
               placeholder="Search doctors by name, specialty (e.g. Ortho, Cardio) or location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#0c1219]/80 border border-[rgba(196,225,230,0.18)] text-white rounded-2xl pl-12 pr-10 py-3.5 text-sm focus:outline-none focus:border-[#8dbcc7] transition shadow-inner placeholder:text-slate-400 font-medium"
+              className="w-full bg-white dark:bg-[#0c1219] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl pl-12 pr-10 py-3.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition shadow-sm placeholder:text-slate-400 font-medium"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3.5 top-3.5 text-slate-400 hover:text-white"
+                className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-700 dark:hover:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
             )}
           </div>
 
-          {/* Specialty Filter Chips Row */}
-          <div className="flex items-center space-x-2 overflow-x-auto pb-1 scrollbar-none">
-            {SPECIALTY_CHIPS.map((chip) => (
-              <button
-                key={chip.id}
-                onClick={() => setSelectedSpecialty(chip.id)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition active:scale-95 flex items-center space-x-1.5 ${
-                  selectedSpecialty === chip.id
-                    ? 'btn-primary-tactile text-[#0c1219] font-black'
-                    : 'glass-panel text-slate-300 hover:text-[#ebffd8] hover:border-[#8dbcc7]/40'
-                }`}
-              >
-                <span>{chip.label}</span>
-              </button>
-            ))}
+          {/* Specialty Filter Glass Morphic Capsules (Item #5) */}
+          <div className="flex items-center space-x-2.5 overflow-x-auto pb-1 scrollbar-none pt-1">
+            {SPECIALTY_CHIPS.map((chip) => {
+              const isSelected = selectedSpecialty === chip.id;
+              return (
+                <button
+                  key={chip.id}
+                  onClick={() => setSelectedSpecialty(chip.id)}
+                  className={`px-4 py-2.5 rounded-2xl text-xs font-black whitespace-nowrap transition-all duration-200 active:scale-95 flex items-center space-x-2 cursor-pointer border ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-[#8dbcc7] to-[#ebffd8] text-[#0c1219] shadow-lg shadow-[#8dbcc7]/20 border-white/30 ring-2 ring-[#8dbcc7]/40 font-black'
+                      : 'bg-[#141e28]/80 hover:bg-[#1f2f3f] text-[#c4e1e6] hover:text-white border-[rgba(196,225,230,0.16)] hover:border-[#8dbcc7]/40'
+                  }`}
+                >
+                  <span>{chip.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Results Counter */}
         <div className="flex items-center justify-between px-2">
-          <p className="text-xs text-slate-400 font-semibold">
-            Showing <span className="text-[#8dbcc7] font-bold tabular-numbers">{filteredDoctors.length}</span> verified specialists in Deoria District
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">
+            Showing <span className="text-teal-700 dark:text-teal-400 font-black tabular-numbers">{filteredDoctors.length}</span> verified specialists in Deoria District
           </p>
         </div>
 
@@ -136,24 +136,24 @@ export default function FindDoctorsPage() {
           {filteredDoctors.map((doc) => (
             <div
               key={doc.id}
-              className="glass-panel rounded-3xl p-6 transition-all duration-300 flex flex-col justify-between space-y-5 group relative overflow-hidden"
+              className="bg-white dark:bg-[#141e28] rounded-3xl p-6 transition-all duration-300 flex flex-col justify-between space-y-5 group relative overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md"
             >
               <div className="space-y-4 relative z-10">
                 {/* Doctor Avatar + Details */}
                 <div className="flex items-start space-x-3.5">
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${doc.bgGradient} flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-black/40 border border-white/20 flex-shrink-0 group-hover:scale-105 transition`}>
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${doc.bgGradient} flex items-center justify-center text-white text-2xl font-black shadow-md flex-shrink-0 group-hover:scale-105 transition`}>
                     {doc.photoInitial}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-black text-white group-hover:text-[#8dbcc7] transition truncate">
+                    <h3 className="text-base font-black text-slate-900 dark:text-white group-hover:text-teal-700 dark:group-hover:text-teal-400 transition truncate">
                       {doc.name}
                     </h3>
-                    <p className="text-xs font-bold text-[#8dbcc7] truncate">{doc.specialty}</p>
-                    <p className="text-[11px] text-[#a4ccd9]/70 font-medium truncate">{doc.qualifications}</p>
+                    <p className="text-xs font-bold text-teal-700 dark:text-teal-400 truncate">{doc.specialty}</p>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium truncate">{doc.qualifications}</p>
 
-                    <div className="flex items-center space-x-2 mt-1.5 text-xs text-slate-400 font-medium">
-                      <span className="flex items-center space-x-1 text-amber-300 font-bold bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
-                        <Star className="w-3.5 h-3.5 fill-amber-400" />
+                    <div className="flex items-center space-x-2 mt-1.5 text-xs text-slate-500 font-medium">
+                      <span className="flex items-center space-x-1 text-amber-800 dark:text-amber-300 font-bold bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-800">
+                        <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
                         <span className="tabular-numbers">{doc.rating}</span>
                       </span>
                       <span>•</span>
@@ -163,16 +163,16 @@ export default function FindDoctorsPage() {
                 </div>
 
                 {/* Clinic Info Inset Box */}
-                <div className="bg-[#0c1219]/70 border border-[rgba(196,225,230,0.12)] rounded-2xl p-3.5 space-y-2 text-xs shadow-inner">
-                  <div className="flex items-start space-x-2 text-slate-300">
-                    <Stethoscope className="w-4 h-4 text-[#8dbcc7] flex-shrink-0 mt-0.5" />
-                    <span className="font-semibold line-clamp-1">{doc.clinicName}</span>
+                <div className="bg-slate-50 dark:bg-[#0c1219] border border-slate-200/80 dark:border-slate-800 rounded-2xl p-3.5 space-y-2 text-xs">
+                  <div className="flex items-start space-x-2 text-slate-800 dark:text-slate-200">
+                    <Stethoscope className="w-4 h-4 text-teal-600 flex-shrink-0 mt-0.5" />
+                    <span className="font-bold line-clamp-1">{doc.clinicName}</span>
                   </div>
-                  <div className="flex items-start space-x-2 text-[#a4ccd9]/70 text-[11px]">
+                  <div className="flex items-start space-x-2 text-slate-500 dark:text-slate-400 text-[11px]">
                     <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5" />
                     <span className="line-clamp-2">{doc.clinicAddress}</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-[#a4ccd9]/70 text-[11px] pt-1 border-t border-[rgba(196,225,230,0.08)]">
+                  <div className="flex items-center space-x-2 text-slate-500 dark:text-slate-400 text-[11px] pt-1 border-t border-slate-200/60 dark:border-slate-800">
                     <Clock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                     <span>{doc.morningSlot} | {doc.eveningSlot}</span>
                   </div>
@@ -180,18 +180,18 @@ export default function FindDoctorsPage() {
               </div>
 
               {/* Bottom Row: Consultation Fee + Book Button */}
-              <div className="pt-2 flex items-center justify-between border-t border-[rgba(196,225,230,0.1)] gap-3 relative z-10">
+              <div className="pt-2 flex items-center justify-between border-t border-slate-100 dark:border-slate-800 gap-3 relative z-10">
                 <div>
-                  <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider block">OPD Fee</span>
-                  <div className="text-lg font-black text-white tabular-numbers flex items-baseline space-x-1">
+                  <span className="text-[10px] text-slate-500 uppercase font-black tracking-wider block">OPD Fee</span>
+                  <div className="text-lg font-black text-slate-900 dark:text-white tabular-numbers flex items-baseline space-x-1">
                     <span>₹{doc.consultationFee}</span>
-                    <span className="text-[10px] text-[#ebffd8] font-semibold">+₹{(doc.consultationFee * doc.platformCommission / 100).toFixed(0)} fee</span>
+                    <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">+₹{(doc.consultationFee * doc.platformCommission / 100).toFixed(0)} fee</span>
                   </div>
                 </div>
 
                 <Link
                   href={`/patient/book?doctor=${doc.id}`}
-                  className="btn-primary-tactile text-[#0c1219] font-black px-5 py-3 rounded-2xl text-xs flex items-center space-x-1.5 transition"
+                  className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-black px-5 py-3 rounded-2xl text-xs flex items-center space-x-1.5 transition shadow-sm hover:shadow-md"
                 >
                   <span>Book Now</span>
                   <ArrowRight className="w-3.5 h-3.5" />

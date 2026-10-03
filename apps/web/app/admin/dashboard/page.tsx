@@ -15,26 +15,107 @@ export default function AdminDashboardPage() {
         <p className="text-xs text-slate-400">Deoria Healthcare Platform — Central Management</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-1">
-          <p className="text-xs text-slate-400 font-medium">Total Registered Doctors</p>
-          <p className="text-3xl font-extrabold text-white">12</p>
-          <span className="text-[10px] text-emerald-400 font-semibold">● All Clinics Operational</span>
+      {/* Item #4: Apple Health-Style Glass Stat Rings & Metric Sparklines */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Registered Doctors */}
+        <div className="glass-panel-elevated rounded-3xl p-5 border border-[rgba(196,225,230,0.18)] space-y-3 relative overflow-hidden group hover:border-[#8dbcc7]/40 transition shadow-lg">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-[#a4ccd9] font-extrabold uppercase tracking-wider">Registered Doctors</span>
+            <div className="w-8 h-8 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-300">
+              <Stethoscope className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="flex items-baseline justify-between">
+            <p className="text-3xl font-black text-white font-mono">12</p>
+            <span className="text-[11px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/40 px-2 py-0.5 rounded-full">
+              +2 this week
+            </span>
+          </div>
+          {/* Progress Ring Bar & Subtext */}
+          <div className="space-y-1.5 pt-1">
+            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-teal-400 to-emerald-400 rounded-full" style={{ width: '92%' }} />
+            </div>
+            <p className="text-[10px] text-slate-400 font-semibold flex items-center justify-between">
+              <span>Operational Clinics</span>
+              <span className="text-[#ebffd8]">100% active</span>
+            </p>
+          </div>
         </div>
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-1">
-          <p className="text-xs text-slate-400 font-medium">Today's OPD Patients</p>
-          <p className="text-3xl font-extrabold text-emerald-400">248</p>
-          <span className="text-[10px] text-slate-400">Across 8 Specialties</span>
+
+        {/* Card 2: Today's OPD Patients */}
+        <div className="glass-panel-elevated rounded-3xl p-5 border border-[rgba(196,225,230,0.18)] space-y-3 relative overflow-hidden group hover:border-[#8dbcc7]/40 transition shadow-lg">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-[#a4ccd9] font-extrabold uppercase tracking-wider">Today&apos;s OPD Queue</span>
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-300">
+              <Users className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="flex items-baseline justify-between">
+            <p className="text-3xl font-black text-emerald-400 font-mono">248</p>
+            <span className="text-[11px] font-bold text-teal-300 bg-teal-950/60 border border-teal-800/40 px-2 py-0.5 rounded-full">
+              8 Specialties
+            </span>
+          </div>
+          <div className="space-y-1.5 pt-1">
+            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-emerald-400 to-[#ebffd8] rounded-full" style={{ width: '78%' }} />
+            </div>
+            <p className="text-[10px] text-slate-400 font-semibold flex items-center justify-between">
+              <span>Token Clearance Pace</span>
+              <span className="text-[#ebffd8]">~18 min avg</span>
+            </p>
+          </div>
         </div>
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-1">
-          <p className="text-xs text-slate-400 font-medium">Today's Gross Bookings</p>
-          <p className="text-3xl font-extrabold text-amber-400 font-mono">₹74,400</p>
-          <span className="text-[10px] text-amber-300 font-semibold">Razorpay Online + Field Cash</span>
+
+        {/* Card 3: Today's Gross Bookings */}
+        <div className="glass-panel-elevated rounded-3xl p-5 border border-[rgba(196,225,230,0.18)] space-y-3 relative overflow-hidden group hover:border-[#8dbcc7]/40 transition shadow-lg">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-[#a4ccd9] font-extrabold uppercase tracking-wider">Gross Booking</span>
+            <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-300">
+              <TrendingUp className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="flex items-baseline justify-between">
+            <p className="text-3xl font-black text-amber-300 font-mono">₹74,400</p>
+            <span className="text-[11px] font-bold text-amber-300 bg-amber-950/60 border border-amber-800/40 px-2 py-0.5 rounded-full">
+              +14.8%
+            </span>
+          </div>
+          <div className="space-y-1.5 pt-1">
+            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-amber-400 to-orange-400 rounded-full" style={{ width: '84%' }} />
+            </div>
+            <p className="text-[10px] text-slate-400 font-semibold flex items-center justify-between">
+              <span>Razorpay + Cash Field</span>
+              <span className="text-amber-200">Reconciled</span>
+            </p>
+          </div>
         </div>
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-1">
-          <p className="text-xs text-rose-400 font-medium font-bold">DocNest Platform Net (25%)</p>
-          <p className="text-3xl font-extrabold text-rose-400 font-mono">₹18,600</p>
-          <span className="text-[10px] text-slate-400">Direct Company Commission</span>
+
+        {/* Card 4: Platform Net Margin */}
+        <div className="glass-panel-elevated rounded-3xl p-5 border border-[rgba(196,225,230,0.18)] space-y-3 relative overflow-hidden group hover:border-[#8dbcc7]/40 transition shadow-lg">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] text-rose-300 font-extrabold uppercase tracking-wider">Platform Net (25%)</span>
+            <div className="w-8 h-8 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-300">
+              <BarChart3 className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="flex items-baseline justify-between">
+            <p className="text-3xl font-black text-rose-300 font-mono">₹18,600</p>
+            <span className="text-[11px] font-bold text-rose-300 bg-rose-950/60 border border-rose-800/40 px-2 py-0.5 rounded-full">
+              Company Net
+            </span>
+          </div>
+          <div className="space-y-1.5 pt-1">
+            <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-rose-400 to-pink-500 rounded-full" style={{ width: '65%' }} />
+            </div>
+            <p className="text-[10px] text-slate-400 font-semibold flex items-center justify-between">
+              <span>Settlement Scheduled</span>
+              <span className="text-rose-200">Daily T+1</span>
+            </p>
+          </div>
         </div>
       </div>
 

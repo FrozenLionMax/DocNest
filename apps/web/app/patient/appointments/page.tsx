@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { LanguageTogglePill } from '../../../components/LanguageContext';
 import { ThemeTogglePill } from '../../../components/ThemeContext';
+import NavControls from '../../../components/NavControls';
 
 interface PatientAppointment {
   id: string;
@@ -142,14 +143,9 @@ export default function MyAppointmentsPage() {
   return (
     <div className="min-h-screen bg-mesh-dark text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] pb-24 md:pb-12">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#0c1219]/85 backdrop-blur-2xl border-b border-[rgba(196,225,230,0.14)] px-4 md:px-8 py-3.5 flex items-center justify-between shadow-xl">
+      <header className="sticky top-0 z-40 bg-[#0c1219]/85 backdrop-blur-2xl border-b border-[rgba(196,225,230,0.14)] px-4 md:px-8 py-3.5 flex flex-wrap items-center justify-between shadow-xl gap-3">
         <div className="flex items-center space-x-3">
-          <Link
-            href="/patient"
-            className="p-2 text-slate-400 hover:text-white bg-[#141e28] hover:bg-[#1c2a38] rounded-xl transition border border-[rgba(196,225,230,0.12)] active:scale-95"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </Link>
+          <NavControls fallbackBackUrl="/patient" showHome={true} showLogout={false} />
           <div>
             <h1 className="text-base font-black text-white tracking-tight">My Doctor Appointments</h1>
             <p className="text-[11px] text-[#a4ccd9]/70">View bookings, OPD token status, reschedule & reviews</p>
@@ -159,29 +155,30 @@ export default function MyAppointmentsPage() {
         <div className="flex items-center space-x-2.5">
           <ThemeTogglePill />
           <LanguageTogglePill />
+          <NavControls showHome={false} showLogout={true} />
         </div>
       </header>
 
       {/* Main Body */}
       <main className="flex-1 max-w-4xl mx-auto w-full p-4 md:p-8 space-y-6">
         {/* Tab Switcher */}
-        <div className="flex items-center space-x-2 glass-panel p-1.5 rounded-2xl w-fit">
+        <div className="flex items-center space-x-2 bg-slate-100 dark:bg-[#141e28] p-1.5 rounded-2xl w-fit border border-slate-200/80 dark:border-slate-800">
           <button
             onClick={() => setActiveTab('upcoming')}
-            className={`px-5 py-2.5 rounded-xl text-xs font-black transition ${
+            className={`px-5 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
               activeTab === 'upcoming'
-                ? 'btn-primary-tactile text-[#0c1219]'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-teal-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             Upcoming Appointments ({upcomingAppointments.length})
           </button>
           <button
             onClick={() => setActiveTab('past')}
-            className={`px-5 py-2.5 rounded-xl text-xs font-black transition ${
+            className={`px-5 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer ${
               activeTab === 'past'
-                ? 'btn-primary-tactile text-[#0c1219]'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-teal-600 text-white shadow-md'
+                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             Past Consultations ({pastAppointments.length})
@@ -192,13 +189,13 @@ export default function MyAppointmentsPage() {
         {activeTab === 'upcoming' && (
           <div className="space-y-4">
             {upcomingAppointments.length === 0 ? (
-              <div className="glass-panel rounded-3xl p-12 text-center space-y-3">
-                <Calendar className="w-12 h-12 text-slate-600 mx-auto" />
-                <h3 className="text-base font-bold text-white">No Upcoming Appointments</h3>
-                <p className="text-xs text-slate-400">You don't have any pending doctor consultations.</p>
+              <div className="bg-white dark:bg-[#141e28] rounded-3xl p-12 text-center space-y-3 border border-slate-200/90 dark:border-slate-800 shadow-sm">
+                <Calendar className="w-12 h-12 text-slate-400 mx-auto" />
+                <h3 className="text-base font-black text-slate-900 dark:text-white">No Upcoming Appointments</h3>
+                <p className="text-xs text-slate-500">You don't have any pending doctor consultations.</p>
                 <Link
                   href="/patient/doctors"
-                  className="btn-primary-tactile inline-block text-[#0c1219] font-extrabold px-6 py-3 rounded-2xl text-xs transition"
+                  className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 inline-block text-white font-extrabold px-6 py-3 rounded-2xl text-xs transition shadow-md"
                 >
                   Book Doctor Now →
                 </Link>
@@ -207,44 +204,44 @@ export default function MyAppointmentsPage() {
               upcomingAppointments.map((apt) => (
                 <div
                   key={apt.id}
-                  className="glass-panel rounded-3xl p-6 space-y-4 relative overflow-hidden"
+                  className="bg-white dark:bg-[#141e28] rounded-3xl p-6 space-y-4 relative overflow-hidden border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
-                        <span className="text-xs font-mono font-black text-[#ebffd8] bg-[#8dbcc7]/15 border border-[#8dbcc7]/35 px-3 py-1 rounded-xl">
+                        <span className="text-xs font-mono font-black text-teal-800 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 border border-teal-200/80 dark:border-teal-800 px-3 py-1 rounded-xl">
                           OPD Token #{apt.token}
                         </span>
-                        <span className="text-xs font-bold text-[#a4ccd9]">{apt.date}</span>
+                        <span className="text-xs font-bold text-slate-500 dark:text-slate-400">{apt.date}</span>
                       </div>
-                      <h3 className="text-lg font-black text-white pt-1">{apt.doctorName}</h3>
-                      <p className="text-xs font-bold text-[#8dbcc7]">{apt.specialty}</p>
-                      <p className="text-xs text-slate-400 flex items-center space-x-1 pt-0.5">
-                        <MapPin className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
+                      <h3 className="text-lg font-black text-slate-900 dark:text-white pt-1">{apt.doctorName}</h3>
+                      <p className="text-xs font-bold text-teal-700 dark:text-teal-400">{apt.specialty}</p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center space-x-1 pt-0.5">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                         <span>{apt.clinicName} — {apt.address}</span>
                       </p>
                     </div>
 
                     <div className="text-right space-y-1">
-                      <span className="inline-flex items-center space-x-1 bg-[#8dbcc7]/15 text-[#ebffd8] border border-[#8dbcc7]/35 px-3 py-1 rounded-full text-xs font-bold">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#8dbcc7]" />
+                      <span className="inline-flex items-center space-x-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 px-3 py-1 rounded-full text-xs font-bold">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                         <span>Confirmed & Paid ✓</span>
                       </span>
-                      <p className="text-xs font-mono font-bold text-slate-200">Paid: ₹{apt.paidAmount}</p>
-                      <p className="text-[10px] text-slate-400">{apt.paymentMode}</p>
+                      <p className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200">Paid: ₹{apt.paidAmount}</p>
+                      <p className="text-[10px] text-slate-500">{apt.paymentMode}</p>
                     </div>
                   </div>
 
-                  <div className="bg-[#0c1219]/70 p-3.5 rounded-2xl border border-[rgba(196,225,230,0.12)] flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <div className="flex items-center space-x-2 text-slate-300">
-                      <Clock className="w-4 h-4 text-[#8dbcc7]" />
+                  <div className="bg-slate-50 dark:bg-[#0c1219] p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center space-x-2 text-slate-700 dark:text-slate-300 font-medium">
+                      <Clock className="w-4 h-4 text-teal-600" />
                       <span>{apt.slot}</span>
                     </div>
 
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => setRescheduleApt(apt)}
-                        className="text-xs text-[#8dbcc7] hover:text-white hover:bg-[#8dbcc7]/15 px-3 py-1.5 rounded-xl font-bold transition border border-[#8dbcc7]/35 flex items-center space-x-1"
+                        className="text-xs text-teal-800 dark:text-teal-300 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/60 px-3 py-1.5 rounded-xl font-bold transition border border-teal-200/80 dark:border-teal-800 flex items-center space-x-1 cursor-pointer"
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
                         <span>Reschedule Date</span>
@@ -252,7 +249,7 @@ export default function MyAppointmentsPage() {
 
                       <button
                         onClick={() => handleCancel(apt.id)}
-                        className="text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 px-3 py-1.5 rounded-xl font-bold transition border border-rose-500/20"
+                        className="text-xs text-rose-700 dark:text-rose-400 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 px-3 py-1.5 rounded-xl font-bold transition border border-rose-200 dark:border-rose-800 cursor-pointer"
                       >
                         Cancel & Refund
                       </button>

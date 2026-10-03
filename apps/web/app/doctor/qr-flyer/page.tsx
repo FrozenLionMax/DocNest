@@ -2,11 +2,13 @@
 
 import React from 'react';
 import { getSession } from '../../../lib/auth';
-import { Printer, QrCode, ArrowLeft, Smartphone, CheckCircle, ShieldCheck } from 'lucide-react';
+import { Printer, QrCode, Smartphone, CheckCircle, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
+import NavControls from '../../../components/NavControls';
 
 export default function QrFlyerPage() {
-  const session = getSession();
+  const [session, setSession] = React.useState<any>(null);
+  React.useEffect(() => { setSession(getSession()); }, []);
 
   const handlePrint = () => {
     if (typeof window !== 'undefined') {
@@ -17,11 +19,9 @@ export default function QrFlyerPage() {
   return (
     <div className="min-h-screen bg-slate-100 p-4 md:p-8 flex flex-col items-center">
       {/* Action Header - Hidden when printing */}
-      <div className="print:hidden w-full max-w-2xl bg-slate-900 text-white p-4 rounded-2xl mb-6 flex items-center justify-between shadow-lg">
+      <div className="print:hidden w-full max-w-2xl bg-slate-900 text-white p-4 rounded-2xl mb-6 flex flex-wrap items-center justify-between shadow-lg gap-3">
         <div className="flex items-center space-x-3">
-          <Link href="/doctor/dashboard" className="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl transition text-slate-300">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
+          <NavControls fallbackBackUrl="/doctor/dashboard" showHome={true} showLogout={false} />
           <div>
             <h1 className="text-lg font-bold flex items-center space-x-2">
               <QrCode className="w-5 h-5 text-emerald-400" />

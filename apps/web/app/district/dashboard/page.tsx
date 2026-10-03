@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Landmark,
   Building2,
@@ -18,7 +18,8 @@ import {
 import { getSession } from '../../../lib/auth';
 
 export default function DistrictDashboardPage() {
-  const session = getSession();
+  const [session, setSession] = useState<any>(null);
+  useEffect(() => { setSession(getSession()); }, []);
   const districtName = session?.district || 'Deoria';
 
   const blockPerformance = [

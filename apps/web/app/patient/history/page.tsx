@@ -21,10 +21,12 @@ import {
 } from 'lucide-react';
 import { LanguageTogglePill } from '../../../components/LanguageContext';
 import { ThemeTogglePill } from '../../../components/ThemeContext';
+import NavControls from '../../../components/NavControls';
 
 export default function PatientHistoryPage() {
   const [expandedVisitId, setExpandedVisitId] = useState<string | null>('v-1');
-  const session = getSession();
+  const [session, setSession] = useState<any>(null);
+  useEffect(() => { setSession(getSession()); }, []);
   const phone = session?.phone || '9999888877';
 
   const patientProfile = {
@@ -91,14 +93,9 @@ export default function PatientHistoryPage() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] pb-24 md:pb-12">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-xl border-b border-slate-800 px-4 md:px-8 py-3.5 flex items-center justify-between shadow-xl">
+      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-xl border-b border-slate-800 px-4 md:px-8 py-3.5 flex flex-wrap items-center justify-between shadow-xl gap-3">
         <div className="flex items-center space-x-3">
-          <Link
-            href="/patient"
-            className="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </Link>
+          <NavControls fallbackBackUrl="/patient" showHome={true} showLogout={false} />
           <div>
             <h1 className="text-base font-black text-white tracking-tight">Digital Medical History</h1>
             <p className="text-[11px] text-slate-400">Lifelong encrypted patient records tied to {patientProfile.phone}</p>
@@ -108,6 +105,7 @@ export default function PatientHistoryPage() {
         <div className="flex items-center space-x-2.5">
           <ThemeTogglePill />
           <LanguageTogglePill />
+          <NavControls showHome={false} showLogout={true} />
         </div>
       </header>
 
