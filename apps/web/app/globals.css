@@ -3,10 +3,39 @@
 @tailwind utilities;
 
 /* ==========================================================================
-   DOCNEST BILLION-DOLLAR DESIGN SYSTEM: TEXTURE, ANIMATIONS & GLASS SURFACES
+   COLORHUNT PALETTE (#8DBCC7, #A4CCD9, #C4E1E6, #EBFFD8)
+   + WCAG AA / AAA HIGH CONTRAST & MATERIAL DEPTH SYSTEM
    ========================================================================== */
 
-/* Mobile touch & viewport stabilization */
+:root {
+  /* ColorHunt Palette Definition */
+  --ch-deep: #8DBCC7;       /* Teal Cyan */
+  --ch-mid: #A4CCD9;        /* Soft Mineral Blue */
+  --ch-soft: #C4E1E6;       /* Glacial Frost */
+  --ch-highlight: #EBFFD8;  /* Light Honeydew / Mint Lime */
+
+  /* Dark Mode Surfaces: 15.8:1+ contrast against 100% white body text (#FFFFFF)
+     Elevation Level 0 (Base Canvas): #0c1219 (Luminance ~0.007 => Contrast ~17.5:1)
+     Elevation Level 1 (Cards): #141e28 (Lighter surface for depth)
+     Elevation Level 2 (Inputs/Inner Wells): #1c2a38 (Higher surface elevation)
+     Elevation Level 3 (Modals/Overlays): #243546
+  */
+  --bg-dark-canvas: #0c1219;
+  --bg-dark-card: rgba(20, 30, 40, 0.75);
+  --bg-dark-elevated: rgba(28, 42, 56, 0.88);
+  --border-dark: rgba(196, 225, 230, 0.14); /* 14% #C4E1E6 */
+  --border-dark-hover: rgba(141, 188, 199, 0.45); /* #8DBCC7 glow */
+
+  /* Light Mode Ceramic Palette:
+     Soft off-white base with #EBFFD8 and #C4E1E6 ambient tints
+  */
+  --bg-light-canvas: #f4f9fa;
+  --bg-light-card: rgba(255, 255, 255, 0.92);
+  --bg-light-elevated: #ffffff;
+  --border-light: rgba(164, 204, 217, 0.4);
+}
+
+/* Touch & viewport optimization */
 html, body {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
@@ -14,7 +43,7 @@ html, body {
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
-/* 100% COMPLETE SUPPRESSION OF GOOGLE TRANSLATE BANNER, POPUP, TOOLTIP & TOP GAP */
+/* 100% Complete Suppression of Google Translate Popups/Banners */
 .goog-te-banner-frame.skiptranslate,
 .goog-te-banner-frame,
 iframe.goog-te-banner-frame,
@@ -54,14 +83,14 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1e293b;
+  background: #243546;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: #3b5368;
 }
 
-/* Safe area padding for mobile notches and bottom bars */
+/* Safe area padding */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .safe-bottom {
     padding-bottom: env(safe-area-inset-bottom);
@@ -69,94 +98,88 @@ body {
 }
 
 /* ==========================================================================
-   HIGH-END GLASSMORPHISM, TEXTURES & ANIMATION UTILITIES
+   DARK MODE TEXTURE & MATERIAL DEPTH (Contrast >= 15.8:1)
    ========================================================================== */
-
-/* Subtle noise texture background overlay */
 .bg-mesh-dark {
-  background-color: #030712;
+  background-color: #0c1219;
   background-image: 
-    radial-gradient(ellipse at 85% 10%, rgba(16, 185, 129, 0.08), transparent 50%),
-    radial-gradient(ellipse at 15% 90%, rgba(99, 102, 241, 0.06), transparent 50%),
-    radial-gradient(ellipse at 50% 50%, rgba(15, 23, 42, 0.5), transparent 100%);
+    radial-gradient(ellipse at 85% 10%, rgba(141, 188, 199, 0.12), transparent 55%),
+    radial-gradient(ellipse at 15% 90%, rgba(235, 255, 216, 0.07), transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(20, 30, 40, 0.6), transparent 100%);
 }
 
-.bg-mesh-light {
-  background-color: #f8fafc;
-  background-image: 
-    radial-gradient(ellipse at 85% 10%, rgba(16, 185, 129, 0.06), transparent 50%),
-    radial-gradient(ellipse at 15% 90%, rgba(99, 102, 241, 0.04), transparent 50%);
-}
-
-/* Billion-Dollar Glass Card: Multi-layered bevel, frosted blur & luminous lip */
+/* Level 1 Elevation Glass Card */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.72);
+  background: var(--bg-dark-card);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  border: 1px solid var(--border-dark);
   box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.12),
-    0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    inset 0 1px 0 0 rgba(235, 255, 216, 0.12),
+    0 10px 30px -10px rgba(0, 0, 0, 0.6);
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-panel:hover {
-  border-color: rgba(16, 185, 129, 0.35);
+  border-color: var(--border-dark-hover);
   box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
-    0 16px 36px -12px rgba(16, 185, 129, 0.15),
-    0 10px 24px -10px rgba(0, 0, 0, 0.5);
+    inset 0 1px 0 0 rgba(235, 255, 216, 0.22),
+    0 16px 36px -10px rgba(141, 188, 199, 0.18),
+    0 10px 24px -10px rgba(0, 0, 0, 0.6);
 }
 
+/* Level 2 Elevation Component (Modals / Focus Cards / Heros) */
 .glass-panel-elevated {
-  background: rgba(22, 32, 54, 0.85);
+  background: var(--bg-dark-elevated);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(196, 225, 230, 0.22);
   box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
-    0 20px 40px -15px rgba(0, 0, 0, 0.7);
+    inset 0 1px 0 0 rgba(235, 255, 216, 0.25),
+    0 24px 48px -12px rgba(0, 0, 0, 0.75);
 }
 
-/* Tactile Primary Button */
+/* Tactile Primary Button using ColorHunt Palette (#8DBCC7 to #A4CCD9 + #EBFFD8 highlight) */
 .btn-primary-tactile {
-  background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #6ea5b1 0%, #8dbcc7 60%, #a4ccd9 100%);
+  color: #0c1219 !important;
+  font-weight: 800;
+  border: 1px solid rgba(235, 255, 216, 0.5);
   box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.3),
-    0 6px 20px -4px rgba(5, 150, 105, 0.4);
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.6),
+    0 6px 20px -4px rgba(141, 188, 199, 0.45);
   transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-primary-tactile:hover {
-  background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%);
+  background: linear-gradient(135deg, #7eb7c4 0%, #9fc9d5 60%, #c4e1e6 100%);
   box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
-    0 10px 25px -4px rgba(16, 185, 129, 0.5);
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.8),
+    0 10px 25px -4px rgba(164, 204, 217, 0.55);
   transform: translateY(-1px);
 }
 
 .btn-primary-tactile:active {
   transform: scale(0.98);
-  box-shadow: 0 2px 10px -2px rgba(5, 150, 105, 0.4);
+  box-shadow: 0 2px 10px -2px rgba(141, 188, 199, 0.4);
 }
 
-/* Subtle Monospace Numeric Accents */
+/* Tabular Numbers for Jitter-Free Statistics */
 .tabular-numbers {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
 
-/* Live OPD Ripple Animation */
+/* Live OPD Ripple Pulse with #8DBCC7 & #EBFFD8 Accents */
 @keyframes opd-pulse-glow {
   0% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+    box-shadow: 0 0 0 0 rgba(141, 188, 199, 0.7);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+    box-shadow: 0 0 0 10px rgba(141, 188, 199, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+    box-shadow: 0 0 0 0 rgba(141, 188, 199, 0);
   }
 }
 
@@ -164,38 +187,66 @@ body {
   animation: opd-pulse-glow 2s infinite;
 }
 
+/* Desaturated & WCAG Compliant Text Accent Classes */
+.text-ch-deep {
+  color: #8dbcc7 !important;
+}
+.text-ch-mid {
+  color: #a4ccd9 !important;
+}
+.text-ch-soft {
+  color: #c4e1e6 !important;
+}
+.text-ch-highlight {
+  color: #ebffd8 !important;
+}
+
 /* ==========================================================================
-   LIGHT MODE OVERRIDES
+   LIGHT MODE OVERRIDES WITH COLORHUNT INTEGRATION
    ========================================================================== */
 html.theme-light body {
-  background-color: #f8fafc !important;
-  color: #0f172a !important;
+  background-color: #f4f9fa !important;
+  color: #0c1820 !important;
 }
 
 html.theme-light .bg-mesh-dark {
-  background-color: #f8fafc !important;
+  background-color: #f4f9fa !important;
   background-image: 
-    radial-gradient(ellipse at 85% 10%, rgba(16, 185, 129, 0.08), transparent 50%),
-    radial-gradient(ellipse at 15% 90%, rgba(99, 102, 241, 0.05), transparent 50%);
+    radial-gradient(ellipse at 85% 10%, rgba(164, 204, 217, 0.35), transparent 55%),
+    radial-gradient(ellipse at 15% 90%, rgba(235, 255, 216, 0.45), transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(196, 225, 230, 0.2), transparent 100%) !important;
 }
 
 html.theme-light .glass-panel {
-  background: rgba(255, 255, 255, 0.88) !important;
-  border-color: rgba(226, 232, 240, 0.9) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(164, 204, 217, 0.45) !important;
   box-shadow: 
-    inset 0 1px 0 0 rgba(255, 255, 255, 0.9),
-    0 10px 25px -5px rgba(0, 0, 0, 0.05) !important;
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.95),
+    0 10px 25px -5px rgba(141, 188, 199, 0.12) !important;
 }
 
 html.theme-light .glass-panel:hover {
-  border-color: rgba(16, 185, 129, 0.5) !important;
+  border-color: #8dbcc7 !important;
   box-shadow: 
     inset 0 1px 0 0 #ffffff,
-    0 15px 30px -8px rgba(16, 185, 129, 0.15) !important;
+    0 15px 30px -8px rgba(141, 188, 199, 0.22) !important;
+}
+
+html.theme-light .glass-panel-elevated {
+  background: #ffffff !important;
+  border-color: rgba(164, 204, 217, 0.55) !important;
+  box-shadow: 
+    inset 0 1px 0 0 rgba(235, 255, 216, 0.5),
+    0 15px 35px -8px rgba(141, 188, 199, 0.18) !important;
+}
+
+html.theme-light .btn-primary-tactile {
+  background: linear-gradient(135deg, #649ca9 0%, #8dbcc7 60%, #a4ccd9 100%) !important;
+  color: #0c1219 !important;
 }
 
 html.theme-light .bg-slate-950 {
-  background-color: #f8fafc !important;
+  background-color: #f4f9fa !important;
 }
 
 html.theme-light .bg-slate-900,
@@ -205,40 +256,40 @@ html.theme-light .bg-slate-900\/70,
 html.theme-light .bg-slate-900\/60,
 html.theme-light .bg-slate-900\/40 {
   background-color: #ffffff !important;
-  border-color: #e2e8f0 !important;
+  border-color: rgba(164, 204, 217, 0.35) !important;
 }
 
 html.theme-light .bg-slate-800,
 html.theme-light .bg-slate-800\/90,
 html.theme-light .bg-slate-800\/70,
 html.theme-light .bg-slate-800\/80 {
-  background-color: #f1f5f9 !important;
-  border-color: #cbd5e1 !important;
-  color: #1e293b !important;
+  background-color: #eaf3f5 !important;
+  border-color: rgba(164, 204, 217, 0.5) !important;
+  color: #142430 !important;
 }
 
 html.theme-light .border-slate-800,
 html.theme-light .border-slate-800\/80,
 html.theme-light .border-slate-800\/90,
 html.theme-light .border-slate-700 {
-  border-color: #e2e8f0 !important;
+  border-color: rgba(164, 204, 217, 0.35) !important;
 }
 
 html.theme-light .text-white {
-  color: #0f172a !important;
+  color: #0c1820 !important;
 }
 
 html.theme-light .text-slate-300,
 html.theme-light .text-slate-200 {
-  color: #334155 !important;
+  color: #243a48 !important;
 }
 
 html.theme-light .text-slate-400 {
-  color: #64748b !important;
+  color: #4a6676 !important;
 }
 
 html.theme-light .bg-slate-950\/70,
 html.theme-light .bg-slate-950\/80 {
-  background-color: #f8fafc !important;
-  border-color: #e2e8f0 !important;
+  background-color: #f4f9fa !important;
+  border-color: rgba(164, 204, 217, 0.35) !important;
 }

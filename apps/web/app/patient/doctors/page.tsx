@@ -60,20 +60,20 @@ export default function FindDoctorsPage() {
   return (
     <div className="min-h-screen bg-mesh-dark text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] pb-24 md:pb-12">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-2xl border-b border-white/[0.08] px-4 md:px-8 py-3.5 flex items-center justify-between shadow-xl">
+      <header className="sticky top-0 z-40 bg-[#0c1219]/85 backdrop-blur-2xl border-b border-[rgba(196,225,230,0.14)] px-4 md:px-8 py-3.5 flex items-center justify-between shadow-xl">
         <div className="flex items-center space-x-3">
           <Link
             href="/patient"
-            className="p-2 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 rounded-xl transition border border-white/5 active:scale-95"
+            className="p-2 text-slate-400 hover:text-white bg-[#141e28] hover:bg-[#1c2a38] rounded-xl transition border border-[rgba(196,225,230,0.12)] active:scale-95"
           >
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <div>
             <h1 className="text-base font-black text-white tracking-tight flex items-center space-x-2">
               <span>Find Verified Doctors</span>
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              <ShieldCheck className="w-4 h-4 text-[#8dbcc7]" />
             </h1>
-            <p className="text-[11px] text-slate-400">Deoria District Registered OPD Clinics</p>
+            <p className="text-[11px] text-[#a4ccd9]/70">Deoria District Registered OPD Clinics</p>
           </div>
         </div>
 
@@ -94,7 +94,7 @@ export default function FindDoctorsPage() {
               placeholder="Search doctors by name, specialty (e.g. Ortho, Cardio) or location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-950/70 border border-white/[0.1] text-white rounded-2xl pl-12 pr-10 py-3.5 text-sm focus:outline-none focus:border-emerald-500 transition shadow-inner placeholder:text-slate-500"
+              className="w-full bg-[#0c1219]/80 border border-[rgba(196,225,230,0.18)] text-white rounded-2xl pl-12 pr-10 py-3.5 text-sm focus:outline-none focus:border-[#8dbcc7] transition shadow-inner placeholder:text-slate-400 font-medium"
             />
             {searchQuery && (
               <button
@@ -114,8 +114,8 @@ export default function FindDoctorsPage() {
                 onClick={() => setSelectedSpecialty(chip.id)}
                 className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition active:scale-95 flex items-center space-x-1.5 ${
                   selectedSpecialty === chip.id
-                    ? 'btn-primary-tactile text-white font-black'
-                    : 'glass-panel text-slate-300 hover:text-white'
+                    ? 'btn-primary-tactile text-[#0c1219] font-black'
+                    : 'glass-panel text-slate-300 hover:text-[#ebffd8] hover:border-[#8dbcc7]/40'
                 }`}
               >
                 <span>{chip.label}</span>
@@ -127,7 +127,7 @@ export default function FindDoctorsPage() {
         {/* Results Counter */}
         <div className="flex items-center justify-between px-2">
           <p className="text-xs text-slate-400 font-semibold">
-            Showing <span className="text-emerald-400 font-bold tabular-numbers">{filteredDoctors.length}</span> verified specialists in Deoria District
+            Showing <span className="text-[#8dbcc7] font-bold tabular-numbers">{filteredDoctors.length}</span> verified specialists in Deoria District
           </p>
         </div>
 
@@ -141,18 +141,18 @@ export default function FindDoctorsPage() {
               <div className="space-y-4 relative z-10">
                 {/* Doctor Avatar + Details */}
                 <div className="flex items-start space-x-3.5">
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${doc.bgGradient} flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-emerald-950/40 border border-white/20 flex-shrink-0 group-hover:scale-105 transition`}>
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${doc.bgGradient} flex items-center justify-center text-white text-2xl font-black shadow-lg shadow-black/40 border border-white/20 flex-shrink-0 group-hover:scale-105 transition`}>
                     {doc.photoInitial}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-base font-black text-white group-hover:text-emerald-400 transition truncate">
+                    <h3 className="text-base font-black text-white group-hover:text-[#8dbcc7] transition truncate">
                       {doc.name}
                     </h3>
-                    <p className="text-xs font-bold text-emerald-400 truncate">{doc.specialty}</p>
-                    <p className="text-[11px] text-slate-400 font-medium truncate">{doc.qualifications}</p>
+                    <p className="text-xs font-bold text-[#8dbcc7] truncate">{doc.specialty}</p>
+                    <p className="text-[11px] text-[#a4ccd9]/70 font-medium truncate">{doc.qualifications}</p>
 
                     <div className="flex items-center space-x-2 mt-1.5 text-xs text-slate-400 font-medium">
-                      <span className="flex items-center space-x-1 text-amber-400 font-bold bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
+                      <span className="flex items-center space-x-1 text-amber-300 font-bold bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
                         <Star className="w-3.5 h-3.5 fill-amber-400" />
                         <span className="tabular-numbers">{doc.rating}</span>
                       </span>
@@ -163,35 +163,35 @@ export default function FindDoctorsPage() {
                 </div>
 
                 {/* Clinic Info Inset Box */}
-                <div className="bg-slate-950/70 border border-white/[0.06] rounded-2xl p-3.5 space-y-2 text-xs shadow-inner">
+                <div className="bg-[#0c1219]/70 border border-[rgba(196,225,230,0.12)] rounded-2xl p-3.5 space-y-2 text-xs shadow-inner">
                   <div className="flex items-start space-x-2 text-slate-300">
-                    <Stethoscope className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <Stethoscope className="w-4 h-4 text-[#8dbcc7] flex-shrink-0 mt-0.5" />
                     <span className="font-semibold line-clamp-1">{doc.clinicName}</span>
                   </div>
-                  <div className="flex items-start space-x-2 text-slate-400 text-[11px]">
-                    <MapPin className="w-3.5 h-3.5 text-slate-500 flex-shrink-0 mt-0.5" />
+                  <div className="flex items-start space-x-2 text-[#a4ccd9]/70 text-[11px]">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5" />
                     <span className="line-clamp-2">{doc.clinicAddress}</span>
                   </div>
-                  <div className="flex items-center space-x-2 text-slate-400 text-[11px] pt-1 border-t border-white/[0.06]">
-                    <Clock className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
+                  <div className="flex items-center space-x-2 text-[#a4ccd9]/70 text-[11px] pt-1 border-t border-[rgba(196,225,230,0.08)]">
+                    <Clock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                     <span>{doc.morningSlot} | {doc.eveningSlot}</span>
                   </div>
                 </div>
               </div>
 
               {/* Bottom Row: Consultation Fee + Book Button */}
-              <div className="pt-2 flex items-center justify-between border-t border-white/[0.08] gap-3 relative z-10">
+              <div className="pt-2 flex items-center justify-between border-t border-[rgba(196,225,230,0.1)] gap-3 relative z-10">
                 <div>
                   <span className="text-[10px] text-slate-400 uppercase font-black tracking-wider block">OPD Fee</span>
                   <div className="text-lg font-black text-white tabular-numbers flex items-baseline space-x-1">
                     <span>₹{doc.consultationFee}</span>
-                    <span className="text-[10px] text-emerald-400 font-semibold">+₹{(doc.consultationFee * doc.platformCommission / 100).toFixed(0)} fee</span>
+                    <span className="text-[10px] text-[#ebffd8] font-semibold">+₹{(doc.consultationFee * doc.platformCommission / 100).toFixed(0)} fee</span>
                   </div>
                 </div>
 
                 <Link
                   href={`/patient/book?doctor=${doc.id}`}
-                  className="btn-primary-tactile text-white font-black px-5 py-3 rounded-2xl text-xs flex items-center space-x-1.5 transition"
+                  className="btn-primary-tactile text-[#0c1219] font-black px-5 py-3 rounded-2xl text-xs flex items-center space-x-1.5 transition"
                 >
                   <span>Book Now</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -203,12 +203,12 @@ export default function FindDoctorsPage() {
       </main>
 
       {/* Floating App-like Mobile Bottom Nav */}
-      <nav className="fixed md:hidden bottom-3 left-3 right-3 z-50 bg-slate-900/90 backdrop-blur-2xl border border-white/[0.1] rounded-2xl px-3 py-2 flex items-center justify-around shadow-[0_12px_32px_rgba(0,0,0,0.6)]">
+      <nav className="fixed md:hidden bottom-3 left-3 right-3 z-50 bg-[#0c1219]/90 backdrop-blur-2xl border border-[rgba(196,225,230,0.14)] rounded-2xl px-3 py-2 flex items-center justify-around shadow-[0_12px_32px_rgba(0,0,0,0.6)]">
         <Link href="/patient" className="flex flex-col items-center text-slate-400 hover:text-white py-1 transition active:scale-90">
           <Activity className="w-5 h-5" />
           <span className="text-[10px] font-medium mt-1">Home</span>
         </Link>
-        <Link href="/patient/doctors" className="flex flex-col items-center text-emerald-400 py-1 transition active:scale-90">
+        <Link href="/patient/doctors" className="flex flex-col items-center text-[#8dbcc7] py-1 transition active:scale-90">
           <Stethoscope className="w-5 h-5" />
           <span className="text-[10px] font-bold mt-1">Doctors</span>
         </Link>

@@ -142,17 +142,17 @@ export default function MyAppointmentsPage() {
   return (
     <div className="min-h-screen bg-mesh-dark text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] pb-24 md:pb-12">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-2xl border-b border-white/[0.08] px-4 md:px-8 py-3.5 flex items-center justify-between shadow-xl">
+      <header className="sticky top-0 z-40 bg-[#0c1219]/85 backdrop-blur-2xl border-b border-[rgba(196,225,230,0.14)] px-4 md:px-8 py-3.5 flex items-center justify-between shadow-xl">
         <div className="flex items-center space-x-3">
           <Link
             href="/patient"
-            className="p-2 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 rounded-xl transition border border-white/5 active:scale-95"
+            className="p-2 text-slate-400 hover:text-white bg-[#141e28] hover:bg-[#1c2a38] rounded-xl transition border border-[rgba(196,225,230,0.12)] active:scale-95"
           >
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <div>
             <h1 className="text-base font-black text-white tracking-tight">My Doctor Appointments</h1>
-            <p className="text-[11px] text-slate-400">View bookings, OPD token status, reschedule & reviews</p>
+            <p className="text-[11px] text-[#a4ccd9]/70">View bookings, OPD token status, reschedule & reviews</p>
           </div>
         </div>
 
@@ -170,7 +170,7 @@ export default function MyAppointmentsPage() {
             onClick={() => setActiveTab('upcoming')}
             className={`px-5 py-2.5 rounded-xl text-xs font-black transition ${
               activeTab === 'upcoming'
-                ? 'btn-primary-tactile text-white'
+                ? 'btn-primary-tactile text-[#0c1219]'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -180,7 +180,7 @@ export default function MyAppointmentsPage() {
             onClick={() => setActiveTab('past')}
             className={`px-5 py-2.5 rounded-xl text-xs font-black transition ${
               activeTab === 'past'
-                ? 'btn-primary-tactile text-white'
+                ? 'btn-primary-tactile text-[#0c1219]'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -198,7 +198,7 @@ export default function MyAppointmentsPage() {
                 <p className="text-xs text-slate-400">You don't have any pending doctor consultations.</p>
                 <Link
                   href="/patient/doctors"
-                  className="btn-primary-tactile inline-block text-white font-extrabold px-6 py-3 rounded-2xl text-xs transition"
+                  className="btn-primary-tactile inline-block text-[#0c1219] font-extrabold px-6 py-3 rounded-2xl text-xs transition"
                 >
                   Book Doctor Now →
                 </Link>
@@ -212,13 +212,13 @@ export default function MyAppointmentsPage() {
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="space-y-1">
                       <div className="flex items-center space-x-2">
-                        <span className="text-xs font-mono font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-xl">
+                        <span className="text-xs font-mono font-black text-[#ebffd8] bg-[#8dbcc7]/15 border border-[#8dbcc7]/35 px-3 py-1 rounded-xl">
                           OPD Token #{apt.token}
                         </span>
-                        <span className="text-xs font-bold text-slate-400">{apt.date}</span>
+                        <span className="text-xs font-bold text-[#a4ccd9]">{apt.date}</span>
                       </div>
                       <h3 className="text-lg font-black text-white pt-1">{apt.doctorName}</h3>
-                      <p className="text-xs font-bold text-emerald-400">{apt.specialty}</p>
+                      <p className="text-xs font-bold text-[#8dbcc7]">{apt.specialty}</p>
                       <p className="text-xs text-slate-400 flex items-center space-x-1 pt-0.5">
                         <MapPin className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
                         <span>{apt.clinicName} — {apt.address}</span>
@@ -226,25 +226,25 @@ export default function MyAppointmentsPage() {
                     </div>
 
                     <div className="text-right space-y-1">
-                      <span className="inline-flex items-center space-x-1 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-bold">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span className="inline-flex items-center space-x-1 bg-[#8dbcc7]/15 text-[#ebffd8] border border-[#8dbcc7]/35 px-3 py-1 rounded-full text-xs font-bold">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#8dbcc7]" />
                         <span>Confirmed & Paid ✓</span>
                       </span>
-                      <p className="text-xs font-mono font-bold text-slate-300">Paid: ₹{apt.paidAmount}</p>
-                      <p className="text-[10px] text-slate-500">{apt.paymentMode}</p>
+                      <p className="text-xs font-mono font-bold text-slate-200">Paid: ₹{apt.paidAmount}</p>
+                      <p className="text-[10px] text-slate-400">{apt.paymentMode}</p>
                     </div>
                   </div>
 
-                  <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <div className="bg-[#0c1219]/70 p-3.5 rounded-2xl border border-[rgba(196,225,230,0.12)] flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div className="flex items-center space-x-2 text-slate-300">
-                      <Clock className="w-4 h-4 text-emerald-400" />
+                      <Clock className="w-4 h-4 text-[#8dbcc7]" />
                       <span>{apt.slot}</span>
                     </div>
 
                     <div className="flex items-center space-x-2">
                       <button
                         onClick={() => setRescheduleApt(apt)}
-                        className="text-xs text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 px-3 py-1.5 rounded-xl font-bold transition border border-emerald-500/30 flex items-center space-x-1"
+                        className="text-xs text-[#8dbcc7] hover:text-white hover:bg-[#8dbcc7]/15 px-3 py-1.5 rounded-xl font-bold transition border border-[#8dbcc7]/35 flex items-center space-x-1"
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
                         <span>Reschedule Date</span>
@@ -269,24 +269,24 @@ export default function MyAppointmentsPage() {
             {pastAppointments.map((apt) => (
               <div
                 key={apt.id}
-                className="bg-slate-900/60 border border-slate-800/80 rounded-3xl p-6 shadow-md space-y-3"
+                className="glass-panel rounded-3xl p-6 space-y-3"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2">
-                      <span className="text-xs font-mono font-bold text-slate-400 bg-slate-800 px-2.5 py-0.5 rounded-lg">
+                      <span className="text-xs font-mono font-bold text-[#c4e1e6] bg-[#0c1219]/80 border border-[rgba(196,225,230,0.15)] px-2.5 py-0.5 rounded-lg">
                         Token #{apt.token}
                       </span>
                       <span className="text-xs text-slate-400">{apt.date}</span>
                     </div>
                     <h3 className="text-base font-black text-white">{apt.doctorName}</h3>
-                    <p className="text-xs text-slate-400">{apt.specialty} • {apt.clinicName}</p>
+                    <p className="text-xs text-[#a4ccd9]/70">{apt.specialty} • {apt.clinicName}</p>
                   </div>
 
                   <div className="text-right">
                     <span className={`inline-block text-xs font-bold px-3 py-1 rounded-full border ${
                       apt.status === 'completed'
-                        ? 'bg-blue-500/15 text-blue-300 border-blue-500/30'
+                        ? 'bg-[#8dbcc7]/15 text-[#c4e1e6] border-[#8dbcc7]/35'
                         : 'bg-rose-500/15 text-rose-300 border-rose-500/30'
                     }`}>
                       {apt.status === 'completed' ? 'Completed & Paid ✓' : 'Cancelled ✗'}
@@ -296,9 +296,9 @@ export default function MyAppointmentsPage() {
 
                 {/* Rating & Review Section (Only after successful booking/consultation) */}
                 {apt.status === 'completed' && (
-                  <div className="pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3">
+                  <div className="pt-2 border-t border-[rgba(196,225,230,0.1)] flex flex-wrap items-center justify-between gap-3">
                     {apt.userRating ? (
-                      <div className="text-xs text-amber-400 flex items-center space-x-2">
+                      <div className="text-xs text-amber-300 flex items-center space-x-2">
                         <div className="flex items-center">
                           {Array.from({ length: 5 }).map((_, i) => (
                             <Star
@@ -316,7 +316,7 @@ export default function MyAppointmentsPage() {
                     ) : (
                       <button
                         onClick={() => setReviewApt(apt)}
-                        className="text-xs text-amber-400 hover:text-amber-300 font-bold flex items-center space-x-1.5 bg-amber-500/10 border border-amber-500/30 px-3.5 py-1.5 rounded-xl transition"
+                        className="text-xs text-amber-300 hover:text-white font-bold flex items-center space-x-1.5 bg-amber-400/10 border border-amber-400/30 px-3.5 py-1.5 rounded-xl transition"
                       >
                         <Star className="w-3.5 h-3.5 fill-amber-400" />
                         <span>Rate Doctor & Write Review (रेटिंग दें)</span>
@@ -326,7 +326,7 @@ export default function MyAppointmentsPage() {
                     {apt.hasPrescription && (
                       <Link
                         href="/patient/history"
-                        className="text-xs text-emerald-400 hover:text-emerald-300 font-bold flex items-center space-x-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-1.5 rounded-xl transition"
+                        className="text-xs text-[#8dbcc7] hover:text-white font-bold flex items-center space-x-1.5 bg-[#8dbcc7]/10 border border-[#8dbcc7]/25 px-3.5 py-1.5 rounded-xl transition"
                       >
                         <FileText className="w-3.5 h-3.5" />
                         <span>View Digital Prescription (पर्चा देखें)</span>
@@ -342,16 +342,16 @@ export default function MyAppointmentsPage() {
 
       {/* RESCHEDULE MODAL */}
       {rescheduleApt && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl space-y-5 animate-in zoom-in-95">
+        <div className="fixed inset-0 bg-[#0c1219]/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-[#141e28] border border-[rgba(196,225,230,0.2)] rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl space-y-5 animate-in zoom-in-95">
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="text-lg font-black text-white">Reschedule Appointment</h3>
-                <p className="text-xs text-slate-400">{rescheduleApt.doctorName} • {rescheduleApt.clinicName}</p>
+                <p className="text-xs text-[#a4ccd9]/70">{rescheduleApt.doctorName} • {rescheduleApt.clinicName}</p>
               </div>
               <button
                 onClick={() => setRescheduleApt(null)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-xl bg-slate-800"
+                className="p-1.5 text-slate-400 hover:text-white rounded-xl bg-[#0c1219]/80 border border-[rgba(196,225,230,0.1)]"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -363,7 +363,7 @@ export default function MyAppointmentsPage() {
                 <select
                   value={newDate}
                   onChange={(e) => setNewDate(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-3 text-xs focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[#0c1219]/90 border border-[rgba(196,225,230,0.18)] text-white rounded-xl p-3 text-xs focus:outline-none focus:border-[#8dbcc7]"
                 >
                   <option value="Tomorrow, 02 Oct 2026">Tomorrow, 02 Oct 2026</option>
                   <option value="Saturday, 03 Oct 2026">Saturday, 03 Oct 2026</option>
@@ -377,7 +377,7 @@ export default function MyAppointmentsPage() {
                 <select
                   value={newSlot}
                   onChange={(e) => setNewSlot(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-3 text-xs focus:outline-none focus:border-emerald-500"
+                  className="w-full bg-[#0c1219]/90 border border-[rgba(196,225,230,0.18)] text-white rounded-xl p-3 text-xs focus:outline-none focus:border-[#8dbcc7]"
                 >
                   <option value="Morning Slot (10:00 AM - 02:00 PM)">Morning Slot (10:00 AM - 02:00 PM)</option>
                   <option value="Evening Slot (05:00 PM - 08:00 PM)">Evening Slot (05:00 PM - 08:00 PM)</option>
@@ -388,13 +388,13 @@ export default function MyAppointmentsPage() {
                 <button
                   type="button"
                   onClick={() => setRescheduleApt(null)}
-                  className="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold"
+                  className="px-4 py-2.5 rounded-xl bg-[#0c1219]/80 text-slate-300 text-xs font-bold border border-[rgba(196,225,230,0.1)] hover:text-white"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold shadow"
+                  className="btn-primary-tactile px-5 py-2.5 rounded-xl text-[#0c1219] text-xs font-black"
                 >
                   Save Reschedule ✓
                 </button>
@@ -406,27 +406,27 @@ export default function MyAppointmentsPage() {
 
       {/* RATING & REVIEW MODAL */}
       {reviewApt && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl space-y-5 animate-in zoom-in-95">
+        <div className="fixed inset-0 bg-[#0c1219]/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-[#141e28] border border-[rgba(196,225,230,0.2)] rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl space-y-5 animate-in zoom-in-95">
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-[10px] font-bold text-amber-400 uppercase tracking-widest block">Verified Patient Review</span>
+                <span className="text-[10px] font-bold text-amber-300 uppercase tracking-widest block">Verified Patient Review</span>
                 <h3 className="text-lg font-black text-white pt-0.5">Rate {reviewApt.doctorName}</h3>
-                <p className="text-xs text-slate-400">Available because your consultation was booked & paid via DocNest</p>
+                <p className="text-xs text-[#a4ccd9]/70">Available because your consultation was booked & paid via DocNest</p>
               </div>
               <button
                 onClick={() => setReviewApt(null)}
-                className="p-1.5 text-slate-400 hover:text-white rounded-xl bg-slate-800"
+                className="p-1.5 text-slate-400 hover:text-white rounded-xl bg-[#0c1219]/80 border border-[rgba(196,225,230,0.1)]"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {reviewSubmitted ? (
-              <div className="p-6 bg-emerald-500/10 border border-emerald-500/30 rounded-2xl text-center space-y-2">
-                <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
+              <div className="p-6 bg-[#8dbcc7]/15 border border-[#8dbcc7]/35 rounded-2xl text-center space-y-2">
+                <CheckCircle2 className="w-8 h-8 text-[#ebffd8] mx-auto" />
                 <h4 className="text-sm font-bold text-white">Review Submitted! धन्यवाद!</h4>
-                <p className="text-xs text-slate-400">Your feedback helps improve healthcare in Deoria district.</p>
+                <p className="text-xs text-[#c4e1e6]">Your feedback helps improve healthcare in Deoria district.</p>
               </div>
             ) : (
               <form onSubmit={handleSubmitReview} className="space-y-4">
@@ -462,7 +462,7 @@ export default function MyAppointmentsPage() {
                     value={reviewText}
                     onChange={(e) => setReviewText(e.target.value)}
                     required
-                    className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl p-3 text-xs focus:outline-none focus:border-amber-500"
+                    className="w-full bg-[#0c1219]/90 border border-[rgba(196,225,230,0.18)] text-white rounded-xl p-3 text-xs focus:outline-none focus:border-[#8dbcc7]"
                   />
                 </div>
 
@@ -470,13 +470,13 @@ export default function MyAppointmentsPage() {
                   <button
                     type="button"
                     onClick={() => setReviewApt(null)}
-                    className="px-4 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs font-bold"
+                    className="px-4 py-2.5 rounded-xl bg-[#0c1219]/80 text-slate-300 text-xs font-bold border border-[rgba(196,225,230,0.1)] hover:text-white"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-xs shadow"
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-[#0c1219] font-black text-xs shadow"
                   >
                     Post Verified Review ★
                   </button>
@@ -488,7 +488,7 @@ export default function MyAppointmentsPage() {
       )}
 
       {/* Floating App-like Mobile Bottom Navigation */}
-      <nav className="fixed md:hidden bottom-3 left-3 right-3 z-50 bg-slate-900/90 backdrop-blur-2xl border border-white/[0.1] rounded-2xl px-3 py-2 flex items-center justify-around shadow-[0_12px_32px_rgba(0,0,0,0.6)]">
+      <nav className="fixed md:hidden bottom-3 left-3 right-3 z-50 bg-[#0c1219]/90 backdrop-blur-2xl border border-[rgba(196,225,230,0.14)] rounded-2xl px-3 py-2 flex items-center justify-around shadow-[0_12px_32px_rgba(0,0,0,0.6)]">
         <Link href="/patient" className="flex flex-col items-center text-slate-400 hover:text-white py-1 transition active:scale-90">
           <Activity className="w-5 h-5" />
           <span className="text-[10px] font-medium mt-1">Home</span>
@@ -497,7 +497,7 @@ export default function MyAppointmentsPage() {
           <Stethoscope className="w-5 h-5" />
           <span className="text-[10px] font-medium mt-1">Doctors</span>
         </Link>
-        <Link href="/patient/appointments" className="flex flex-col items-center text-emerald-400 py-1 transition active:scale-90">
+        <Link href="/patient/appointments" className="flex flex-col items-center text-[#8dbcc7] py-1 transition active:scale-90">
           <Calendar className="w-5 h-5" />
           <span className="text-[10px] font-bold mt-1">Bookings</span>
         </Link>

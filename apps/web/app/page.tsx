@@ -77,21 +77,21 @@ export default function UnifiedLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="min-h-screen bg-mesh-dark flex items-center justify-center p-4 font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Background Gradient Accents */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#8dbcc7]/12 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-[#ebffd8]/08 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative z-10 bg-slate-900/85 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 my-6">
+      <div className="relative z-10 glass-panel-elevated rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-6 my-6">
         {/* Logo & Clean Corporate Header */}
         <div className="text-center space-y-2">
-          <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto text-white text-3xl shadow-lg shadow-emerald-900/50">
+          <div className="w-16 h-16 bg-gradient-to-br from-[#8dbcc7] to-[#5a939f] rounded-2xl flex items-center justify-center mx-auto text-[#0c1219] text-3xl shadow-lg shadow-[#8dbcc7]/20 border border-[rgba(235,255,216,0.3)]">
             🏥
           </div>
           <h1 className="text-2xl font-black text-white tracking-tight">DocNest Healthcare</h1>
-          <p className="text-xs text-slate-400 font-medium">District OPD & Clinical Care Platform</p>
+          <p className="text-xs text-[#a4ccd9]/80 font-medium">District OPD & Clinical Care Platform</p>
         </div>
 
         {/* Error Notification */}
@@ -114,10 +114,10 @@ export default function UnifiedLoginPage() {
                   setSelectedRole(e.target.value as UserRole);
                   setUsername('');
                 }}
-                className="w-full appearance-none bg-slate-800/90 border border-slate-700 text-white font-semibold rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 transition pr-10 cursor-pointer"
+                className="w-full appearance-none bg-[#0c1219]/90 border border-[rgba(196,225,230,0.18)] text-white font-semibold rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#8dbcc7] transition pr-10 cursor-pointer shadow-inner"
               >
                 {ROLE_OPTIONS.map((opt) => (
-                  <option key={opt.id} value={opt.id} className="bg-slate-900 text-white py-2">
+                  <option key={opt.id} value={opt.id} className="bg-[#141e28] text-white py-2">
                     {opt.label}
                   </option>
                 ))}
@@ -135,7 +135,7 @@ export default function UnifiedLoginPage() {
                 placeholder={currentRoleOption.placeholder}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-slate-800/90 border border-slate-700 text-white rounded-xl text-sm focus:outline-none focus:border-emerald-500 transition placeholder:text-slate-500 font-medium"
+                className="w-full pl-10 pr-4 py-3 bg-[#0c1219]/90 border border-[rgba(196,225,230,0.18)] text-white rounded-xl text-sm focus:outline-none focus:border-[#8dbcc7] transition placeholder:text-slate-500 font-medium shadow-inner"
               />
             </div>
           </div>
@@ -152,7 +152,7 @@ export default function UnifiedLoginPage() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 bg-slate-800/90 border border-slate-700 text-white rounded-xl text-sm focus:outline-none focus:border-emerald-500 transition placeholder:text-slate-600"
+                className="w-full pl-10 pr-4 py-3 bg-[#0c1219]/90 border border-[rgba(196,225,230,0.18)] text-white rounded-xl text-sm focus:outline-none focus:border-[#8dbcc7] transition placeholder:text-slate-600 shadow-inner"
               />
             </div>
           </div>
@@ -160,7 +160,7 @@ export default function UnifiedLoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white font-black py-3.5 rounded-xl text-sm shadow-xl shadow-emerald-950 flex items-center justify-center space-x-2 transition disabled:opacity-60 cursor-pointer pt-3"
+            className="w-full btn-primary-tactile text-[#0c1219] font-black py-3.5 rounded-xl text-sm shadow-xl flex items-center justify-center space-x-2 transition disabled:opacity-60 cursor-pointer pt-3"
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -174,12 +174,12 @@ export default function UnifiedLoginPage() {
         </form>
 
         {/* Subtle Security & Compliance Tag */}
-        <div className="pt-3 border-t border-slate-800 flex items-center justify-center space-x-2 text-[11px] text-slate-500">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+        <div className="pt-3 border-t border-[rgba(196,225,230,0.1)] flex items-center justify-center space-x-2 text-[11px] text-slate-400">
+          <ShieldCheck className="w-3.5 h-3.5 text-[#8dbcc7]" />
           <span>256-Bit Encrypted Healthcare Architecture</span>
         </div>
 
-        <p className="text-center text-[10px] text-slate-600">DocNest Platform • All Rights Reserved</p>
+        <p className="text-center text-[10px] text-slate-500">DocNest Platform • All Rights Reserved</p>
       </div>
     </div>
   );

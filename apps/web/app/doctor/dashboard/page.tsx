@@ -171,7 +171,7 @@ export default function DoctorDashboard() {
   const waitingCount = patients.filter((p) => p.status === 'waiting').length;
 
   return (
-    <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
+    <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Top Header Bar */}
       <div className="flex flex-wrap justify-between items-center gap-4 glass-panel-elevated p-5 rounded-3xl shadow-xl">
         <div className="flex-1 min-w-[280px]">
@@ -179,7 +179,7 @@ export default function DoctorDashboard() {
             <h1 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center space-x-2">
               <span>OPD Live Queue Controller</span>
             </h1>
-            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-full font-bold shadow-sm">
+            <span className="text-[10px] bg-[#8dbcc7]/15 text-[#ebffd8] border border-[#8dbcc7]/35 px-2.5 py-0.5 rounded-full font-bold shadow-sm">
               Dynamic Multi-Doctor
             </span>
           </div>
@@ -192,10 +192,10 @@ export default function DoctorDashboard() {
                 setSelectedDoctorId(e.target.value);
                 setCurrentToken(1);
               }}
-              className="w-full appearance-none bg-slate-950/80 border border-white/[0.1] hover:border-emerald-500 text-white font-bold text-xs rounded-xl pl-3.5 pr-8 py-2.5 focus:outline-none transition cursor-pointer shadow-inner"
+              className="w-full appearance-none bg-[#0c1219]/90 border border-[rgba(196,225,230,0.18)] hover:border-[#8dbcc7] text-white font-bold text-xs rounded-xl pl-3.5 pr-8 py-2.5 focus:outline-none transition cursor-pointer shadow-inner"
             >
               {DOCTORS_DIRECTORY.map((doc) => (
-                <option key={doc.id} value={doc.id} className="bg-slate-900 text-white py-1">
+                <option key={doc.id} value={doc.id} className="bg-[#141e28] text-white py-1">
                   {doc.name} ({doc.specialty}) — {doc.clinicName}
                 </option>
               ))}
@@ -210,10 +210,10 @@ export default function DoctorDashboard() {
             className="p-2.5 glass-panel text-slate-300 hover:text-white rounded-xl transition active:scale-95"
             title="Toggle Acoustic Bell Ring Chime"
           >
-            {soundEnabled ? <Volume2 className="w-5 h-5 text-emerald-400" /> : <VolumeX className="w-5 h-5 text-slate-500" />}
+            {soundEnabled ? <Volume2 className="w-5 h-5 text-[#8dbcc7]" /> : <VolumeX className="w-5 h-5 text-slate-500" />}
           </button>
-          <div className="bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 shadow-sm">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 opd-live-badge" />
+          <div className="bg-[#8dbcc7]/15 border border-[#8dbcc7]/30 text-[#ebffd8] px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 shadow-sm">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#8dbcc7] opd-live-badge" />
             <span>{currentDoctorProfile.name}</span>
           </div>
         </div>
@@ -226,7 +226,7 @@ export default function DoctorDashboard() {
             <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Total Today</p>
             <p className="text-2xl md:text-3xl font-black tabular-numbers text-white">{patients.length}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center text-lg font-bold border border-purple-500/20">
+          <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-300 flex items-center justify-center text-lg font-bold border border-purple-500/20">
             👥
           </div>
         </div>
@@ -234,9 +234,9 @@ export default function DoctorDashboard() {
         <div className="glass-panel rounded-2xl p-4 flex items-center justify-between">
           <div>
             <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Completed</p>
-            <p className="text-2xl md:text-3xl font-black tabular-numbers text-emerald-400">{completedCount}</p>
+            <p className="text-2xl md:text-3xl font-black tabular-numbers text-[#8dbcc7]">{completedCount}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-lg font-bold border border-emerald-500/20">
+          <div className="w-10 h-10 rounded-xl bg-[#8dbcc7]/15 text-[#8dbcc7] flex items-center justify-center text-lg font-bold border border-[#8dbcc7]/30">
             ✓
           </div>
         </div>
@@ -244,9 +244,9 @@ export default function DoctorDashboard() {
         <div className="glass-panel rounded-2xl p-4 flex items-center justify-between">
           <div>
             <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Waiting</p>
-            <p className="text-2xl md:text-3xl font-black tabular-numbers text-blue-400">{waitingCount}</p>
+            <p className="text-2xl md:text-3xl font-black tabular-numbers text-[#a4ccd9]">{waitingCount}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center text-lg font-bold border border-blue-500/20">
+          <div className="w-10 h-10 rounded-xl bg-[#a4ccd9]/15 text-[#a4ccd9] flex items-center justify-center text-lg font-bold border border-[#a4ccd9]/30">
             ⏳
           </div>
         </div>
@@ -254,9 +254,9 @@ export default function DoctorDashboard() {
         <div className="glass-panel rounded-2xl p-4 flex items-center justify-between">
           <div>
             <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Avg Speed</p>
-            <p className="text-2xl md:text-3xl font-black tabular-numbers text-amber-400">7.5m</p>
+            <p className="text-2xl md:text-3xl font-black tabular-numbers text-[#ebffd8]">7.5m</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center text-lg font-bold border border-amber-500/20">
+          <div className="w-10 h-10 rounded-xl bg-[#ebffd8]/15 text-[#ebffd8] flex items-center justify-center text-lg font-bold border border-[#ebffd8]/30">
             ⚡
           </div>
         </div>
@@ -264,33 +264,34 @@ export default function DoctorDashboard() {
 
       {/* LIVE QUEUE HERO CARD */}
       <section className="glass-panel-elevated text-white rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden space-y-6">
-        <div className="absolute right-0 top-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute right-0 top-0 w-96 h-96 bg-[#8dbcc7]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute left-0 bottom-0 w-64 h-64 bg-[#ebffd8]/08 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 relative z-10">
           <div>
-            <div className="inline-flex items-center space-x-2 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-xs font-semibold mb-3 border border-emerald-500/30">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <div className="inline-flex items-center space-x-2 bg-[#8dbcc7]/15 text-[#ebffd8] px-3 py-1 rounded-full text-xs font-semibold mb-3 border border-[#8dbcc7]/35">
+              <span className="w-2 h-2 rounded-full bg-[#8dbcc7] animate-ping" />
               <span>LIVE OPD TOKEN CONTROLLER</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-black tracking-tight">क्लिनिक टोकन काउंटर</h2>
-            <p className="text-emerald-200/80 text-xs md:text-sm mt-1">Realtime Supabase Sync & Acoustic Bell Ring Chimes</p>
+            <p className="text-[#c4e1e6] text-xs md:text-sm mt-1">Realtime Supabase Sync & Acoustic Bell Ring Chimes</p>
           </div>
           
-          <div className="bg-slate-950/80 backdrop-blur border border-emerald-500/40 rounded-3xl p-6 text-center min-w-[240px] w-full lg:w-auto shadow-2xl">
-            <p className="text-[10px] text-emerald-300 uppercase tracking-widest font-black">Now Serving</p>
-            <p className="text-5xl md:text-6xl font-black text-emerald-400 my-1 tabular-numbers drop-shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+          <div className="bg-[#0c1219]/90 backdrop-blur border border-[#8dbcc7]/40 rounded-3xl p-6 text-center min-w-[240px] w-full lg:w-auto shadow-2xl">
+            <p className="text-[10px] text-[#8dbcc7] uppercase tracking-widest font-black">Now Serving</p>
+            <p className="text-5xl md:text-6xl font-black text-[#ebffd8] my-1 tabular-numbers drop-shadow-[0_0_15px_rgba(141,188,199,0.4)]">
               #{currentToken}
             </p>
             <p className="text-xs text-slate-400 font-semibold tabular-numbers">Total Issued: #{totalIssued}</p>
           </div>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-4 relative z-10">
+        <div className="mt-6 pt-6 border-t border-[rgba(196,225,230,0.1)] flex flex-wrap items-center justify-between gap-4 relative z-10">
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={handleNextToken}
-              className="btn-primary-tactile text-white font-black px-6 py-3.5 rounded-2xl text-sm flex items-center space-x-2 shadow-lg transition"
+              className="btn-primary-tactile text-[#0c1219] font-black px-6 py-3.5 rounded-2xl text-sm flex items-center space-x-2 shadow-lg transition"
             >
-              <Play className="w-4 h-4 fill-white" />
+              <Play className="w-4 h-4 fill-[#0c1219]" />
               <span>Next Patient (अगला टोकन)</span>
             </button>
             <button
@@ -302,7 +303,7 @@ export default function DoctorDashboard() {
             </button>
             <button
               onClick={handleResetQueue}
-              className="bg-slate-950/70 hover:bg-slate-900 text-slate-400 hover:text-white font-medium px-4 py-3.5 rounded-2xl text-xs border border-white/5 flex items-center space-x-2 transition active:scale-95"
+              className="bg-[#0c1219]/70 hover:bg-[#141e28] text-slate-400 hover:text-white font-medium px-4 py-3.5 rounded-2xl text-xs border border-[rgba(196,225,230,0.1)] flex items-center space-x-2 transition active:scale-95"
             >
               <RotateCcw className="w-4 h-4" />
               <span>Reset Token #1</span>
@@ -310,7 +311,7 @@ export default function DoctorDashboard() {
           </div>
 
           <span className={`px-3.5 py-1.5 rounded-xl text-xs font-bold border ${
-            queueStatus === 'active' ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+            queueStatus === 'active' ? 'bg-[#8dbcc7]/15 text-[#ebffd8] border-[#8dbcc7]/35' : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
           }`}>
             {queueStatus === 'active' ? '● OPD ACTIVE' : 'PAUSED'}
           </span>
@@ -321,8 +322,8 @@ export default function DoctorDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Walk-in Registration Form */}
         <div className="glass-panel rounded-3xl p-6 h-fit space-y-4">
-          <h3 className="text-base font-black text-white flex items-center space-x-2 border-b border-white/[0.08] pb-3">
-            <Plus className="w-5 h-5 text-emerald-400" />
+          <h3 className="text-base font-black text-white flex items-center space-x-2 border-b border-[rgba(196,225,230,0.1)] pb-3">
+            <Plus className="w-5 h-5 text-[#8dbcc7]" />
             <span>Add Walk-in Patient (पर्ची बनाएं)</span>
           </h3>
           <form onSubmit={handleAddOfflinePatient} className="space-y-4">
@@ -333,7 +334,7 @@ export default function DoctorDashboard() {
                 placeholder="Enter patient name"
                 value={offlineName}
                 onChange={(e) => setOfflineName(e.target.value)}
-                className="w-full px-3.5 py-3 rounded-2xl bg-slate-950/70 border border-white/[0.1] text-white text-sm focus:outline-none focus:border-emerald-500 transition shadow-inner font-semibold"
+                className="w-full px-3.5 py-3 rounded-2xl bg-[#0c1219]/90 border border-[rgba(196,225,230,0.18)] text-white text-sm focus:outline-none focus:border-[#8dbcc7] transition shadow-inner font-semibold"
                 required
               />
             </div>
@@ -345,13 +346,13 @@ export default function DoctorDashboard() {
                 value={offlinePhone}
                 onChange={(e) => setOfflinePhone(e.target.value)}
                 maxLength={10}
-                className="w-full px-3.5 py-3 rounded-2xl bg-slate-950/70 border border-white/[0.1] text-white text-sm focus:outline-none focus:border-emerald-500 font-mono transition shadow-inner"
+                className="w-full px-3.5 py-3 rounded-2xl bg-[#0c1219]/90 border border-[rgba(196,225,230,0.18)] text-white text-sm focus:outline-none focus:border-[#8dbcc7] font-mono transition shadow-inner"
               />
             </div>
             <button
               type="submit"
               disabled={addingPatient}
-              className="w-full btn-primary-tactile text-white font-black py-3.5 rounded-2xl text-xs shadow-lg transition flex items-center justify-center space-x-2 disabled:opacity-60"
+              className="w-full btn-primary-tactile text-[#0c1219] font-black py-3.5 rounded-2xl text-xs shadow-lg transition flex items-center justify-center space-x-2 disabled:opacity-60"
             >
               {addingPatient ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>+ Issue Token #{(patients.length > 0 ? Math.max(...patients.map((p) => p.token)) : 0) + 1}</span>}
             </button>
@@ -360,7 +361,7 @@ export default function DoctorDashboard() {
 
         {/* Right Column: Patient List Table (Responsive + Item 5 Status Tabs) */}
         <div className="lg:col-span-2 glass-panel rounded-3xl p-6 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/[0.08]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-[rgba(196,225,230,0.1)]">
             <h3 className="text-base font-black text-white">Today's Patient Queue</h3>
             <div className="flex items-center space-x-3">
               <div className="relative">
@@ -370,14 +371,14 @@ export default function DoctorDashboard() {
                   placeholder="Search name or token..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-950/80 border border-white/[0.1] text-white focus:outline-none focus:border-emerald-500 w-48 shadow-inner"
+                  className="pl-9 pr-3 py-2 text-xs rounded-xl bg-[#0c1219]/90 border border-[rgba(196,225,230,0.18)] text-white focus:outline-none focus:border-[#8dbcc7] w-48 shadow-inner"
                 />
               </div>
             </div>
           </div>
 
           {/* QUEUE STATUS FILTER TABS (Item 5) */}
-          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs border-b border-slate-800">
+          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 text-xs border-b border-[rgba(196,225,230,0.1)]">
             {[
               { id: 'all', label: `All (${patients.length})` },
               { id: 'waiting', label: `Waiting (${patients.filter(p => p.status === 'waiting').length})` },
@@ -390,8 +391,8 @@ export default function DoctorDashboard() {
                 onClick={() => setStatusFilter(tab.id)}
                 className={`px-3 py-1.5 rounded-xl font-semibold transition whitespace-nowrap ${
                   statusFilter === tab.id
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                    ? 'bg-[#8dbcc7]/20 text-[#ebffd8] border border-[#8dbcc7]/40'
+                    : 'text-slate-400 hover:text-white hover:bg-[#141e28]'
                 }`}
               >
                 {tab.label}
@@ -403,7 +404,7 @@ export default function DoctorDashboard() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-sm min-w-[500px]">
               <thead>
-                <tr className="border-b border-slate-800 text-xs font-bold text-slate-400 uppercase tracking-wider">
+                <tr className="border-b border-[rgba(196,225,230,0.1)] text-xs font-bold text-slate-400 uppercase tracking-wider">
                   <th className="py-3 px-3">Token</th>
                   <th className="py-3 px-3">Patient Name</th>
                   <th className="py-3 px-3">Type</th>
@@ -411,33 +412,33 @@ export default function DoctorDashboard() {
                   <th className="py-3 px-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-[rgba(196,225,230,0.08)]">
                 {filteredPatients.map((p) => {
                   const isCurrent = p.token === currentToken;
                   return (
                     <tr
                       key={p.id}
                       onClick={() => setSelectedPatientForDrawer(p)}
-                      className={`cursor-pointer transition ${isCurrent ? 'bg-emerald-500/10 font-bold' : 'hover:bg-slate-800/40'}`}
+                      className={`cursor-pointer transition ${isCurrent ? 'bg-[#8dbcc7]/10 font-bold' : 'hover:bg-[#141e28]/70'}`}
                     >
-                      <td className="py-3.5 px-3 font-mono font-black text-emerald-400">#{p.token}</td>
+                      <td className="py-3.5 px-3 font-mono font-black text-[#8dbcc7]">#{p.token}</td>
                       <td className="py-3.5 px-3">
                         <div className="text-white font-semibold flex items-center space-x-1.5">
                           <span>{p.name}</span>
-                          <span className="text-[10px] text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded font-normal">Click for History 📋</span>
+                          <span className="text-[10px] text-[#a4ccd9]/70 bg-[#0c1219]/80 border border-[rgba(196,225,230,0.1)] px-1.5 py-0.5 rounded font-normal">Click for History 📋</span>
                         </div>
                         {p.phone !== 'N/A' && <div className="text-[11px] text-slate-400 font-mono">{p.phone}</div>}
                       </td>
                       <td className="py-3.5 px-3">
                         <span className={`inline-block text-[11px] px-2.5 py-0.5 rounded-md font-semibold ${
-                          p.type === 'Online Booking' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                          p.type === 'Online Booking' ? 'bg-[#8dbcc7]/15 text-[#c4e1e6] border border-[#8dbcc7]/30' : 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
                         }`}>
                           {p.type}
                         </span>
                       </td>
                       <td className="py-3.5 px-3">
                         {p.status === 'in_consultation' || isCurrent ? (
-                          <span className="inline-flex items-center text-xs text-emerald-400 font-bold bg-emerald-500/20 border border-emerald-500/30 px-2.5 py-1 rounded-full">
+                          <span className="inline-flex items-center text-xs text-[#ebffd8] font-bold bg-[#8dbcc7]/20 border border-[#8dbcc7]/40 px-2.5 py-1 rounded-full">
                             ● In Consultation
                           </span>
                         ) : p.status === 'completed' ? (
@@ -454,7 +455,7 @@ export default function DoctorDashboard() {
                         <div className="flex items-center justify-end space-x-2">
                           <Link
                             href={`/doctor/prescription?patient=${encodeURIComponent(p.name)}&token=${p.token}`}
-                            className="text-xs bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-400 border border-emerald-500/30 px-3 py-1.5 rounded-xl font-bold transition flex items-center space-x-1"
+                            className="text-xs bg-[#8dbcc7]/15 hover:bg-[#8dbcc7]/25 text-[#ebffd8] border border-[#8dbcc7]/35 px-3 py-1.5 rounded-xl font-bold transition flex items-center space-x-1"
                           >
                             <FileText className="w-3.5 h-3.5" />
                             <span>Rx</span>
@@ -463,14 +464,14 @@ export default function DoctorDashboard() {
                             <>
                               <button
                                 onClick={() => updatePatientStatus(p.id, 'skipped')}
-                                className="p-1.5 text-slate-400 hover:text-amber-400 bg-slate-800 rounded-lg transition"
+                                className="p-1.5 text-slate-400 hover:text-amber-400 bg-[#0c1219]/80 border border-[rgba(196,225,230,0.1)] rounded-lg transition"
                                 title="Skip Patient"
                               >
                                 <SkipForward className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => updatePatientStatus(p.id, 'cancelled')}
-                                className="p-1.5 text-slate-400 hover:text-rose-400 bg-slate-800 rounded-lg transition"
+                                className="p-1.5 text-slate-400 hover:text-rose-400 bg-[#0c1219]/80 border border-[rgba(196,225,230,0.1)] rounded-lg transition"
                                 title="Cancel Token"
                               >
                                 <XCircle className="w-4 h-4" />
@@ -490,21 +491,21 @@ export default function DoctorDashboard() {
 
       {/* QUICK PATIENT HISTORY & VITALS SIDE DRAWER (Item 2) */}
       {selectedPatientForDrawer && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex justify-end">
-          <div className="w-full max-w-md bg-slate-900 border-l border-slate-800 h-full p-6 space-y-6 overflow-y-auto animate-in slide-in-from-right duration-200">
+        <div className="fixed inset-0 bg-[#0c1219]/80 backdrop-blur-sm z-50 flex justify-end">
+          <div className="w-full max-w-md bg-[#141e28] border-l border-[rgba(196,225,230,0.18)] h-full p-6 space-y-6 overflow-y-auto animate-in slide-in-from-right duration-200">
             {/* Header */}
-            <div className="flex justify-between items-start border-b border-slate-800 pb-4">
+            <div className="flex justify-between items-start border-b border-[rgba(196,225,230,0.12)] pb-4">
               <div className="space-y-1">
-                <div className="inline-flex items-center space-x-1.5 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
+                <div className="inline-flex items-center space-x-1.5 bg-[#8dbcc7]/15 text-[#ebffd8] border border-[#8dbcc7]/35 px-2.5 py-0.5 rounded-full text-[11px] font-bold">
                   <User className="w-3 h-3" />
                   <span>Token #{selectedPatientForDrawer.token}</span>
                 </div>
                 <h3 className="text-xl font-extrabold text-white">{selectedPatientForDrawer.name}</h3>
-                <p className="text-xs text-slate-400 font-mono">Mobile: {selectedPatientForDrawer.phone}</p>
+                <p className="text-xs text-[#a4ccd9]/70 font-mono">Mobile: {selectedPatientForDrawer.phone}</p>
               </div>
               <button
                 onClick={() => setSelectedPatientForDrawer(null)}
-                className="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800 border border-slate-700"
+                className="p-2 text-slate-400 hover:text-white rounded-xl bg-[#0c1219]/80 border border-[rgba(196,225,230,0.12)]"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -518,13 +519,13 @@ export default function DoctorDashboard() {
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-xs">
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                  <span className="text-slate-500 block text-[10px] uppercase font-bold">Age / Gender</span>
+                <div className="bg-[#0c1219]/80 p-3 rounded-xl border border-[rgba(196,225,230,0.12)]">
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Age / Gender</span>
                   <span className="font-bold text-white">{selectedPatientForDrawer.ageGender || '32 / Male'}</span>
                 </div>
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                  <span className="text-slate-500 block text-[10px] uppercase font-bold">Last Visit</span>
-                  <span className="font-bold text-emerald-400">{selectedPatientForDrawer.lastVisit || '14 Aug 2026'}</span>
+                <div className="bg-[#0c1219]/80 p-3 rounded-xl border border-[rgba(196,225,230,0.12)]">
+                  <span className="text-slate-400 block text-[10px] uppercase font-bold">Last Visit</span>
+                  <span className="font-bold text-[#8dbcc7]">{selectedPatientForDrawer.lastVisit || '14 Aug 2026'}</span>
                 </div>
               </div>
             </div>
@@ -532,10 +533,10 @@ export default function DoctorDashboard() {
             {/* Consultation History Notes */}
             <div className="space-y-2">
               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
-                <History className="w-4 h-4 text-emerald-400" />
+                <History className="w-4 h-4 text-[#8dbcc7]" />
                 <span>Clinical Notes & Complaints</span>
               </h4>
-              <div className="bg-slate-950 border border-slate-800 p-4 rounded-2xl text-xs text-slate-300 font-medium">
+              <div className="bg-[#0c1219]/80 border border-[rgba(196,225,230,0.12)] p-4 rounded-2xl text-xs text-slate-300 font-medium">
                 {selectedPatientForDrawer.notes || 'No previous complaints logged.'}
               </div>
             </div>
@@ -543,34 +544,34 @@ export default function DoctorDashboard() {
             {/* Vitals History */}
             <div className="space-y-2">
               <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
-                <Activity className="w-4 h-4 text-blue-400" />
+                <Activity className="w-4 h-4 text-[#a4ccd9]" />
                 <span>Last Vitals Reading</span>
               </h4>
               <div className="grid grid-cols-2 gap-2 text-xs">
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between">
-                  <span className="text-slate-500">B.P.:</span>
+                <div className="bg-[#0c1219]/80 p-3 rounded-xl border border-[rgba(196,225,230,0.12)] flex justify-between">
+                  <span className="text-slate-400">B.P.:</span>
                   <span className="font-bold text-white">120/80 mmHg</span>
                 </div>
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between">
-                  <span className="text-slate-500">Pulse:</span>
+                <div className="bg-[#0c1219]/80 p-3 rounded-xl border border-[rgba(196,225,230,0.12)] flex justify-between">
+                  <span className="text-slate-400">Pulse:</span>
                   <span className="font-bold text-white">72 bpm</span>
                 </div>
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between">
-                  <span className="text-slate-500">Weight:</span>
+                <div className="bg-[#0c1219]/80 p-3 rounded-xl border border-[rgba(196,225,230,0.12)] flex justify-between">
+                  <span className="text-slate-400">Weight:</span>
                   <span className="font-bold text-white">68 kg</span>
                 </div>
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between">
-                  <span className="text-slate-500">Temp:</span>
+                <div className="bg-[#0c1219]/80 p-3 rounded-xl border border-[rgba(196,225,230,0.12)] flex justify-between">
+                  <span className="text-slate-400">Temp:</span>
                   <span className="font-bold text-white">98.6 °F</span>
                 </div>
               </div>
             </div>
 
             {/* Quick Action Button */}
-            <div className="pt-4 border-t border-slate-800">
+            <div className="pt-4 border-t border-[rgba(196,225,230,0.12)]">
               <Link
                 href={`/doctor/prescription?patient=${encodeURIComponent(selectedPatientForDrawer.name)}&token=${selectedPatientForDrawer.token}`}
-                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl text-xs flex items-center justify-center space-x-2 transition shadow-lg"
+                className="w-full btn-primary-tactile text-[#0c1219] font-black py-3.5 rounded-xl text-xs flex items-center justify-center space-x-2 transition shadow-lg"
               >
                 <FileText className="w-4 h-4" />
                 <span>Create Digital Prescription for {selectedPatientForDrawer.name}</span>

@@ -140,19 +140,19 @@ export default function Sidebar({ user, onLogout, isOpenMobile = false, onCloseM
       )}
 
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-slate-950 border-r border-slate-800 flex flex-col transform transition-transform duration-200 ease-in-out ${
+        className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-[#0c1219] border-r border-[rgba(196,225,230,0.14)] flex flex-col transform transition-transform duration-200 ease-in-out ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >
         {/* Brand Header */}
-        <div className={`p-5 bg-gradient-to-br ${roleColors[user.role] || 'from-emerald-600 to-teal-700'} flex items-center justify-between shadow-lg`}>
+        <div className={`p-5 bg-gradient-to-br ${roleColors[user.role] || 'from-[#6ea5b1] to-[#457984]'} flex items-center justify-between shadow-lg border-b border-[rgba(235,255,216,0.2)]`}>
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center text-2xl shadow-inner">
               {roleIcons[user.role] || '🏥'}
             </div>
             <div>
-              <h1 className="text-lg font-extrabold text-white tracking-tight">DocNest</h1>
-              <p className="text-xs text-white/80 font-medium">{roleLabels[user.role] || 'Portal'}</p>
+              <h1 className="text-lg font-black text-white tracking-tight">DocNest</h1>
+              <p className="text-xs text-white/90 font-semibold">{roleLabels[user.role] || 'Portal'}</p>
             </div>
           </div>
           {onCloseMobile && (
@@ -166,14 +166,14 @@ export default function Sidebar({ user, onLogout, isOpenMobile = false, onCloseM
         </div>
 
         {/* User Info */}
-        <div className="px-4 py-4 border-b border-slate-800 bg-slate-900/50">
+        <div className="px-4 py-4 border-b border-[rgba(196,225,230,0.1)] bg-[#141e28]/70">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-full bg-slate-800 flex items-center justify-center text-emerald-400 font-black text-sm border border-slate-700 shadow-sm">
+            <div className="w-9 h-9 rounded-full bg-[#0c1219] flex items-center justify-center text-[#8dbcc7] font-black text-sm border border-[rgba(196,225,230,0.2)] shadow-sm">
               {user.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-white truncate">{user.name}</p>
-              <p className="text-[11px] text-slate-400 truncate">
+              <p className="text-[11px] text-[#a4ccd9]/70 truncate">
                 {user.village ? `${user.village}, ` : ''}
                 {user.block ? `${user.block}, ` : ''}
                 {user.district || user.specialty || user.email || user.phone}
@@ -193,11 +193,11 @@ export default function Sidebar({ user, onLogout, isOpenMobile = false, onCloseM
                 onClick={onCloseMobile}
                 className={`flex items-center space-x-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition ${
                   isActive
-                    ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-sm'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    ? 'bg-[#8dbcc7]/15 text-[#ebffd8] border border-[#8dbcc7]/35 shadow-sm'
+                    : 'text-slate-400 hover:text-white hover:bg-[#141e28]/70'
                 }`}
               >
-                <link.icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-slate-500'}`} />
+                <link.icon className={`w-4 h-4 ${isActive ? 'text-[#8dbcc7]' : 'text-slate-500'}`} />
                 <span>{link.label}</span>
               </Link>
             );
@@ -205,7 +205,7 @@ export default function Sidebar({ user, onLogout, isOpenMobile = false, onCloseM
         </nav>
 
         {/* Footer */}
-        <div className="p-3 border-t border-slate-800 space-y-2 bg-slate-900/40">
+        <div className="p-3 border-t border-[rgba(196,225,230,0.1)] space-y-2 bg-[#141e28]/40">
           <div className="flex items-center space-x-2">
             <div className="flex-1">
               <LanguageTogglePill />
