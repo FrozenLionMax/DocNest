@@ -173,14 +173,14 @@ export default function DoctorDashboard() {
   return (
     <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto w-full">
       {/* Top Header Bar */}
-      <div className="flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-xl">
+      <div className="flex flex-wrap justify-between items-center gap-4 glass-panel-elevated p-5 rounded-3xl shadow-xl">
         <div className="flex-1 min-w-[280px]">
           <div className="flex items-center space-x-2">
             <h1 className="text-xl md:text-2xl font-black text-white tracking-tight flex items-center space-x-2">
               <span>OPD Live Queue Controller</span>
             </h1>
-            <span className="text-[10px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2.5 py-0.5 rounded-full font-bold">
-              Dynamic OPD
+            <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-full font-bold shadow-sm">
+              Dynamic Multi-Doctor
             </span>
           </div>
           
@@ -192,7 +192,7 @@ export default function DoctorDashboard() {
                 setSelectedDoctorId(e.target.value);
                 setCurrentToken(1);
               }}
-              className="w-full appearance-none bg-slate-800/90 border border-slate-700 hover:border-emerald-500 text-white font-bold text-xs rounded-xl pl-3 pr-8 py-2 focus:outline-none transition cursor-pointer shadow-inner"
+              className="w-full appearance-none bg-slate-950/80 border border-white/[0.1] hover:border-emerald-500 text-white font-bold text-xs rounded-xl pl-3.5 pr-8 py-2.5 focus:outline-none transition cursor-pointer shadow-inner"
             >
               {DOCTORS_DIRECTORY.map((doc) => (
                 <option key={doc.id} value={doc.id} className="bg-slate-900 text-white py-1">
@@ -200,115 +200,117 @@ export default function DoctorDashboard() {
                 </option>
               ))}
             </select>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-2.5 pointer-events-none" />
+            <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-3.5 pointer-events-none" />
           </div>
         </div>
 
         <div className="flex items-center space-x-3">
           <button
             onClick={() => setSoundEnabled(!soundEnabled)}
-            className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 transition"
+            className="p-2.5 glass-panel text-slate-300 hover:text-white rounded-xl transition active:scale-95"
             title="Toggle Acoustic Bell Ring Chime"
           >
             {soundEnabled ? <Volume2 className="w-5 h-5 text-emerald-400" /> : <VolumeX className="w-5 h-5 text-slate-500" />}
           </button>
-          <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+          <div className="bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-2 shadow-sm">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 opd-live-badge" />
             <span>{currentDoctorProfile.name}</span>
           </div>
         </div>
       </div>
 
-      {/* OPD PERFORMANCE ANALYTICS SUMMARY BAR (Item 4) */}
+      {/* OPD PERFORMANCE ANALYTICS SUMMARY BAR */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+        <div className="glass-panel rounded-2xl p-4 flex items-center justify-between">
           <div>
-            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Total Today</p>
-            <p className="text-2xl font-black text-white">{patients.length}</p>
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Total Today</p>
+            <p className="text-2xl md:text-3xl font-black tabular-numbers text-white">{patients.length}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center text-lg font-bold">
+          <div className="w-10 h-10 rounded-xl bg-purple-500/15 text-purple-400 flex items-center justify-center text-lg font-bold border border-purple-500/20">
             👥
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+        <div className="glass-panel rounded-2xl p-4 flex items-center justify-between">
           <div>
-            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Completed</p>
-            <p className="text-2xl font-black text-emerald-400">{completedCount}</p>
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Completed</p>
+            <p className="text-2xl md:text-3xl font-black tabular-numbers text-emerald-400">{completedCount}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-lg font-bold">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center text-lg font-bold border border-emerald-500/20">
             ✓
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+        <div className="glass-panel rounded-2xl p-4 flex items-center justify-between">
           <div>
-            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Waiting</p>
-            <p className="text-2xl font-black text-blue-400">{waitingCount}</p>
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Waiting</p>
+            <p className="text-2xl md:text-3xl font-black tabular-numbers text-blue-400">{waitingCount}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center text-lg font-bold">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/15 text-blue-400 flex items-center justify-center text-lg font-bold border border-blue-500/20">
             ⏳
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center justify-between">
+        <div className="glass-panel rounded-2xl p-4 flex items-center justify-between">
           <div>
-            <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">Avg Speed</p>
-            <p className="text-2xl font-black text-amber-400">7.5m</p>
+            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Avg Speed</p>
+            <p className="text-2xl md:text-3xl font-black tabular-numbers text-amber-400">7.5m</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center text-lg font-bold">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center text-lg font-bold border border-amber-500/20">
             ⚡
           </div>
         </div>
       </div>
 
       {/* LIVE QUEUE HERO CARD */}
-      <section className="bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 text-white border border-emerald-500/20 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+      <section className="glass-panel-elevated text-white rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden space-y-6">
         <div className="absolute right-0 top-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 relative z-10">
           <div>
             <div className="inline-flex items-center space-x-2 bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full text-xs font-semibold mb-3 border border-emerald-500/30">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>OPD TOKEN CONTROLLER</span>
+              <span>LIVE OPD TOKEN CONTROLLER</span>
             </div>
-            <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight">क्लिनिक टोकन काउंटर</h2>
+            <h2 className="text-2xl md:text-3xl font-black tracking-tight">क्लिनिक टोकन काउंटर</h2>
             <p className="text-emerald-200/80 text-xs md:text-sm mt-1">Realtime Supabase Sync & Acoustic Bell Ring Chimes</p>
           </div>
           
-          <div className="bg-slate-950/80 backdrop-blur border border-emerald-500/30 rounded-2xl p-5 text-center min-w-[220px] w-full lg:w-auto shadow-xl">
-            <p className="text-xs text-emerald-400 uppercase tracking-wider font-extrabold">Now Serving</p>
-            <p className="text-5xl md:text-6xl font-black text-emerald-400 my-1 font-mono">#{currentToken}</p>
-            <p className="text-xs text-slate-400 font-semibold">Total Issued: #{totalIssued}</p>
+          <div className="bg-slate-950/80 backdrop-blur border border-emerald-500/40 rounded-3xl p-6 text-center min-w-[240px] w-full lg:w-auto shadow-2xl">
+            <p className="text-[10px] text-emerald-300 uppercase tracking-widest font-black">Now Serving</p>
+            <p className="text-5xl md:text-6xl font-black text-emerald-400 my-1 tabular-numbers drop-shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+              #{currentToken}
+            </p>
+            <p className="text-xs text-slate-400 font-semibold tabular-numbers">Total Issued: #{totalIssued}</p>
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-slate-800 flex flex-wrap items-center justify-between gap-4 relative z-10">
+        <div className="mt-6 pt-6 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-4 relative z-10">
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={handleNextToken}
-              className="bg-emerald-500 hover:bg-emerald-400 active:scale-95 text-slate-950 font-black px-6 py-3.5 rounded-xl text-sm flex items-center space-x-2 shadow-lg transition"
+              className="btn-primary-tactile text-white font-black px-6 py-3.5 rounded-2xl text-sm flex items-center space-x-2 shadow-lg transition"
             >
-              <Play className="w-5 h-5 fill-slate-950" />
+              <Play className="w-4 h-4 fill-white" />
               <span>Next Patient (अगला टोकन)</span>
             </button>
             <button
               onClick={handleToggleQueueStatus}
-              className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-4 py-3.5 rounded-xl text-sm border border-slate-700 flex items-center space-x-2 transition"
+              className="glass-panel text-slate-200 font-bold px-4 py-3.5 rounded-2xl text-sm flex items-center space-x-2 transition active:scale-95"
             >
               <Pause className="w-4 h-4" />
               <span>{queueStatus === 'active' ? 'Pause OPD' : 'Resume OPD'}</span>
             </button>
             <button
               onClick={handleResetQueue}
-              className="bg-slate-900 hover:bg-slate-800 text-slate-400 font-medium px-4 py-3.5 rounded-xl text-xs border border-slate-800 flex items-center space-x-2 transition"
+              className="bg-slate-950/70 hover:bg-slate-900 text-slate-400 hover:text-white font-medium px-4 py-3.5 rounded-2xl text-xs border border-white/5 flex items-center space-x-2 transition active:scale-95"
             >
               <RotateCcw className="w-4 h-4" />
               <span>Reset Token #1</span>
             </button>
           </div>
 
-          <span className={`px-3 py-1.5 rounded-xl text-xs font-bold border ${
-            queueStatus === 'active' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+          <span className={`px-3.5 py-1.5 rounded-xl text-xs font-bold border ${
+            queueStatus === 'active' ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30' : 'bg-amber-500/15 text-amber-300 border-amber-500/30'
           }`}>
             {queueStatus === 'active' ? '● OPD ACTIVE' : 'PAUSED'}
           </span>
@@ -318,57 +320,57 @@ export default function DoctorDashboard() {
       {/* TWO COLUMN GRID / RESPONSIVE */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Walk-in Registration Form */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 h-fit space-y-4">
-          <h3 className="text-lg font-bold text-white flex items-center space-x-2">
+        <div className="glass-panel rounded-3xl p-6 h-fit space-y-4">
+          <h3 className="text-base font-black text-white flex items-center space-x-2 border-b border-white/[0.08] pb-3">
             <Plus className="w-5 h-5 text-emerald-400" />
-            <span>Add Walk-in Patient</span>
+            <span>Add Walk-in Patient (पर्ची बनाएं)</span>
           </h3>
           <form onSubmit={handleAddOfflinePatient} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Patient Name *</label>
+              <label className="block text-xs font-bold text-slate-300 mb-1">Patient Name *</label>
               <input
                 type="text"
                 placeholder="Enter patient name"
                 value={offlineName}
                 onChange={(e) => setOfflineName(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500 transition"
+                className="w-full px-3.5 py-3 rounded-2xl bg-slate-950/70 border border-white/[0.1] text-white text-sm focus:outline-none focus:border-emerald-500 transition shadow-inner font-semibold"
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">Mobile Number (Optional)</label>
+              <label className="block text-xs font-bold text-slate-300 mb-1">Mobile Number (Optional)</label>
               <input
                 type="tel"
                 placeholder="9876543210"
                 value={offlinePhone}
                 onChange={(e) => setOfflinePhone(e.target.value)}
                 maxLength={10}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white text-sm focus:outline-none focus:border-emerald-500 font-mono transition"
+                className="w-full px-3.5 py-3 rounded-2xl bg-slate-950/70 border border-white/[0.1] text-white text-sm focus:outline-none focus:border-emerald-500 font-mono transition shadow-inner"
               />
             </div>
             <button
               type="submit"
               disabled={addingPatient}
-              className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl text-sm shadow transition flex items-center justify-center space-x-2 disabled:opacity-60"
+              className="w-full btn-primary-tactile text-white font-black py-3.5 rounded-2xl text-xs shadow-lg transition flex items-center justify-center space-x-2 disabled:opacity-60"
             >
-              {addingPatient ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>+ Add Token #{(patients.length > 0 ? Math.max(...patients.map((p) => p.token)) : 0) + 1}</span>}
+              {addingPatient ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>+ Issue Token #{(patients.length > 0 ? Math.max(...patients.map((p) => p.token)) : 0) + 1}</span>}
             </button>
           </form>
         </div>
 
         {/* Right Column: Patient List Table (Responsive + Item 5 Status Tabs) */}
-        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
-            <h3 className="text-lg font-bold text-white">Today's Patient Queue</h3>
+        <div className="lg:col-span-2 glass-panel rounded-3xl p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-white/[0.08]">
+            <h3 className="text-base font-black text-white">Today's Patient Queue</h3>
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
+                <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
                 <input
                   type="text"
                   placeholder="Search name or token..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 pr-3 py-1.5 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-emerald-500 w-44"
+                  className="pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-950/80 border border-white/[0.1] text-white focus:outline-none focus:border-emerald-500 w-48 shadow-inner"
                 />
               </div>
             </div>

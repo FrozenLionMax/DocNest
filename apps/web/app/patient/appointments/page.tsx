@@ -140,13 +140,13 @@ export default function MyAppointmentsPage() {
   const pastAppointments = appointments.filter((a) => a.status === 'completed' || a.status === 'cancelled');
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] pb-24 md:pb-12">
+    <div className="min-h-screen bg-mesh-dark text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] pb-24 md:pb-12">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-xl border-b border-slate-800 px-4 md:px-8 py-3.5 flex items-center justify-between shadow-xl">
+      <header className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-2xl border-b border-white/[0.08] px-4 md:px-8 py-3.5 flex items-center justify-between shadow-xl">
         <div className="flex items-center space-x-3">
           <Link
             href="/patient"
-            className="p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-xl transition"
+            className="p-2 text-slate-400 hover:text-white bg-slate-800/80 hover:bg-slate-700/80 rounded-xl transition border border-white/5 active:scale-95"
           >
             <ChevronLeft className="w-5 h-5" />
           </Link>
@@ -165,12 +165,12 @@ export default function MyAppointmentsPage() {
       {/* Main Body */}
       <main className="flex-1 max-w-4xl mx-auto w-full p-4 md:p-8 space-y-6">
         {/* Tab Switcher */}
-        <div className="flex items-center space-x-2 bg-slate-900 border border-slate-800 p-1.5 rounded-2xl w-fit">
+        <div className="flex items-center space-x-2 glass-panel p-1.5 rounded-2xl w-fit">
           <button
             onClick={() => setActiveTab('upcoming')}
             className={`px-5 py-2.5 rounded-xl text-xs font-black transition ${
               activeTab === 'upcoming'
-                ? 'bg-emerald-500 text-slate-950 shadow-md'
+                ? 'btn-primary-tactile text-white'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -180,7 +180,7 @@ export default function MyAppointmentsPage() {
             onClick={() => setActiveTab('past')}
             className={`px-5 py-2.5 rounded-xl text-xs font-black transition ${
               activeTab === 'past'
-                ? 'bg-emerald-500 text-slate-950 shadow-md'
+                ? 'btn-primary-tactile text-white'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
@@ -192,13 +192,13 @@ export default function MyAppointmentsPage() {
         {activeTab === 'upcoming' && (
           <div className="space-y-4">
             {upcomingAppointments.length === 0 ? (
-              <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-12 text-center space-y-3">
+              <div className="glass-panel rounded-3xl p-12 text-center space-y-3">
                 <Calendar className="w-12 h-12 text-slate-600 mx-auto" />
                 <h3 className="text-base font-bold text-white">No Upcoming Appointments</h3>
                 <p className="text-xs text-slate-400">You don't have any pending doctor consultations.</p>
                 <Link
                   href="/patient/doctors"
-                  className="inline-block bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-5 py-2.5 rounded-xl text-xs transition"
+                  className="btn-primary-tactile inline-block text-white font-extrabold px-6 py-3 rounded-2xl text-xs transition"
                 >
                   Book Doctor Now →
                 </Link>
@@ -207,7 +207,7 @@ export default function MyAppointmentsPage() {
               upcomingAppointments.map((apt) => (
                 <div
                   key={apt.id}
-                  className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4 relative overflow-hidden"
+                  className="glass-panel rounded-3xl p-6 space-y-4 relative overflow-hidden"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="space-y-1">
@@ -487,25 +487,25 @@ export default function MyAppointmentsPage() {
         </div>
       )}
 
-      {/* Mobile Nav */}
-      <nav className="fixed md:hidden bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 px-3 py-2 flex items-center justify-around shadow-2xl">
-        <Link href="/patient" className="flex flex-col items-center text-slate-400 hover:text-white py-1">
+      {/* Floating App-like Mobile Bottom Navigation */}
+      <nav className="fixed md:hidden bottom-3 left-3 right-3 z-50 bg-slate-900/90 backdrop-blur-2xl border border-white/[0.1] rounded-2xl px-3 py-2 flex items-center justify-around shadow-[0_12px_32px_rgba(0,0,0,0.6)]">
+        <Link href="/patient" className="flex flex-col items-center text-slate-400 hover:text-white py-1 transition active:scale-90">
           <Activity className="w-5 h-5" />
           <span className="text-[10px] font-medium mt-1">Home</span>
         </Link>
-        <Link href="/patient/doctors" className="flex flex-col items-center text-slate-400 hover:text-white py-1">
+        <Link href="/patient/doctors" className="flex flex-col items-center text-slate-400 hover:text-white py-1 transition active:scale-90">
           <Stethoscope className="w-5 h-5" />
           <span className="text-[10px] font-medium mt-1">Doctors</span>
         </Link>
-        <Link href="/patient/appointments" className="flex flex-col items-center text-emerald-400 py-1">
+        <Link href="/patient/appointments" className="flex flex-col items-center text-emerald-400 py-1 transition active:scale-90">
           <Calendar className="w-5 h-5" />
           <span className="text-[10px] font-bold mt-1">Bookings</span>
         </Link>
-        <Link href="/patient/history" className="flex flex-col items-center text-slate-400 hover:text-white py-1">
+        <Link href="/patient/history" className="flex flex-col items-center text-slate-400 hover:text-white py-1 transition active:scale-90">
           <FileText className="w-5 h-5" />
           <span className="text-[10px] font-medium mt-1">History</span>
         </Link>
-        <Link href="/patient/settings" className="flex flex-col items-center text-slate-400 hover:text-white py-1">
+        <Link href="/patient/settings" className="flex flex-col items-center text-slate-400 hover:text-white py-1 transition active:scale-90">
           <Settings className="w-5 h-5" />
           <span className="text-[10px] font-medium mt-1">Settings</span>
         </Link>
