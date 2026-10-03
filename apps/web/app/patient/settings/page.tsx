@@ -17,6 +17,7 @@ import {
   FileText
 } from 'lucide-react';
 import { LanguageTogglePill } from '../../../components/LanguageContext';
+import { ThemeTogglePill } from '../../../components/ThemeContext';
 
 export default function PatientSettingsPage() {
   const [emailEnabled, setEmailEnabled] = useState(false);
@@ -61,7 +62,10 @@ export default function PatientSettingsPage() {
           </div>
         </div>
 
-        <LanguageTogglePill />
+        <div className="flex items-center space-x-2.5">
+          <ThemeTogglePill />
+          <LanguageTogglePill />
+        </div>
       </header>
 
       {/* Main Container */}

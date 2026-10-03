@@ -23,6 +23,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { LanguageTogglePill } from '../../../components/LanguageContext';
+import { ThemeTogglePill } from '../../../components/ThemeContext';
 
 function BookingContent() {
   const router = useRouter();
@@ -56,15 +57,29 @@ function BookingContent() {
   const [emailNoticeSent, setEmailNoticeSent] = useState(false);
   const [smsNoticeSent, setSmsNoticeSent] = useState(true);
 
-  // Compute next 7 days dates
+  // Compute next 7 days dates with doctor offDays and daily token cap
+  const tokenCap = doctor.dailyTokenCap || 35;
   const nextDays = Array.from({ length: 7 }).map((_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i);
+    const dayOfWeek = d.getDay(); // 0 = Sun
+    const isoDate = d.toISOString().split('T')[0];
+    
+    // Check if doctor is closed on this day of week or marked holiday
+    const isHoliday = (doctor.offDays || []).includes(dayOfWeek) || (doctor.leaveDates || []).includes(isoDate);
+    
+    // Check if shift is fully booked based on daily token cap (simulated booked tokens for demonstration)
+    const bookedCount = (i === 0) ? Math.min(tokenCap - 3, 32) : Math.floor(tokenCap * 0.45);
+    const isFull = !isHoliday && bookedCount >= tokenCap;
+
     return {
       dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
       dateNum: d.getDate(),
       monthName: d.toLocaleDateString('en-US', { month: 'short' }),
       formatted: d.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }),
+      isHoliday,
+      isFull,
+      remainingTokens: Math.max(0, tokenCap - bookedCount),
     };
   });
 
@@ -169,7 +184,10 @@ function BookingContent() {
           </div>
         </div>
 
-        <LanguageTogglePill />
+        <div className="flex items-center space-x-2.5">
+          <ThemeTogglePill />
+          <LanguageTogglePill />
+        </div>
       </header>
 
       {/* Main Container */}
@@ -239,21 +257,33 @@ function BookingContent() {
 
             {/* Next 7 Days Horizontal Scroll */}
             <div className="grid grid-cols-4 sm:grid-cols-7 gap-2">
-              {nextDays.map((item, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedDateIndex(idx)}
-                  className={`p-3 rounded-2xl flex flex-col items-center justify-center transition border active:scale-95 ${
-                    selectedDateIndex === idx
-                      ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-black shadow-lg shadow-emerald-950/40'
-                      : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 border-slate-700'
-                  }`}
-                >
-                  <span className="text-[11px] uppercase tracking-wider">{item.dayName}</span>
-                  <span className="text-lg font-mono font-black my-0.5">{item.dateNum}</span>
-                  <span className="text-[10px] opacity-80">{item.monthName}</span>
-                </button>
-              ))}
+              {nextDays.map((item, idx) => {
+                const isDisabled = item.isHoliday || item.isFull;
+                return (
+                  <button
+                    key={idx}
+                    disabled={isDisabled}
+                    onClick={() => setSelectedDateIndex(idx)}
+                    className={`p-2.5 rounded-2xl flex flex-col items-center justify-center transition border ${
+                      isDisabled
+                        ? 'opacity-40 bg-slate-900 border-slate-800 text-slate-500 cursor-not-allowed'
+                        : selectedDateIndex === idx
+                        ? 'bg-emerald-500 text-slate-950 border-emerald-400 font-black shadow-lg shadow-emerald-950/40 active:scale-95'
+                        : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 border-slate-700 active:scale-95'
+                    }`}
+                  >
+                    <span className="text-[10px] uppercase tracking-wider">{item.dayName}</span>
+                    <span className="text-lg font-mono font-black my-0.5">{item.dateNum}</span>
+                    {item.isHoliday ? (
+                      <span className="text-[9px] font-bold text-rose-400">Off</span>
+                    ) : item.isFull ? (
+                      <span className="text-[9px] font-bold text-amber-400">Full</span>
+                    ) : (
+                      <span className="text-[9px] font-mono font-bold opacity-80">{item.remainingTokens} left</span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="pt-2">

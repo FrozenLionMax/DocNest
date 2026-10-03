@@ -23,6 +23,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { LanguageTogglePill } from '../../components/LanguageContext';
+import { ThemeTogglePill } from '../../components/ThemeContext';
 
 export default function PatientHomePage() {
   const router = useRouter();
@@ -69,7 +70,8 @@ export default function PatientHomePage() {
           </div>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5">
+          <ThemeTogglePill />
           <LanguageTogglePill />
           <button
             onClick={handleLogout}

@@ -16,11 +16,11 @@ import {
 
 export default function BlockAgentsPage() {
   const [agents, setAgents] = useState([
-    { id: 'va-1', name: 'Suresh Kumar (सुरेश कुमार)', village: 'Rampur', phone: '9988776655', totalBookings: 320, totalRevenue: 96000, isActive: true },
-    { id: 'va-2', name: 'Mohan Lal (मोहन लाल)', village: 'Khariya', phone: '9988776611', totalBookings: 240, totalRevenue: 72000, isActive: true },
-    { id: 'va-3', name: 'Ramesh Bind (रमेश बिंद)', village: 'Nawalpur', phone: '9988776622', totalBookings: 195, totalRevenue: 58500, isActive: true },
-    { id: 'va-4', name: 'Pooja Tiwari (पूजा तिवारी)', village: 'Bhatni Road', phone: '9988776633', totalBookings: 280, totalRevenue: 84000, isActive: true },
-    { id: 'va-5', name: 'Dharmendra Yadav (धर्मेन्द्र यादव)', village: 'Majhauli Raj', phone: '9988776644', totalBookings: 150, totalRevenue: 45000, isActive: false },
+    { id: 'va-1', name: 'Suresh Kumar (सुरेश कुमार)', village: 'Rampur', phone: '9988776655', totalBookings: 320, totalRevenue: 96000, commissionPerBooking: 25, totalCommission: 8000, payoutStatus: 'Paid ✓', isActive: true },
+    { id: 'va-2', name: 'Mohan Lal (मोहन लाल)', village: 'Khariya', phone: '9988776611', totalBookings: 240, totalRevenue: 72000, commissionPerBooking: 25, totalCommission: 6000, payoutStatus: 'Pending Deposit', isActive: true },
+    { id: 'va-3', name: 'Ramesh Bind (रमेश बिंद)', village: 'Nawalpur', phone: '9988776622', totalBookings: 195, totalRevenue: 58500, commissionPerBooking: 25, totalCommission: 4875, payoutStatus: 'Paid ✓', isActive: true },
+    { id: 'va-4', name: 'Pooja Tiwari (पूजा तिवारी)', village: 'Bhatni Road', phone: '9988776633', totalBookings: 280, totalRevenue: 84000, commissionPerBooking: 25, totalCommission: 7000, payoutStatus: 'Pending Deposit', isActive: true },
+    { id: 'va-5', name: 'Dharmendra Yadav (धर्मेन्द्र यादव)', village: 'Majhauli Raj', phone: '9988776644', totalBookings: 150, totalRevenue: 45000, commissionPerBooking: 20, totalCommission: 3000, payoutStatus: 'Paid ✓', isActive: false },
   ]);
 
   const toggleStatus = (id: string) => {
@@ -93,6 +93,21 @@ export default function BlockAgentsPage() {
                 <span className="text-[10px] font-bold text-slate-500 uppercase block">Cash Flow Generated</span>
                 <span className="font-mono font-black text-emerald-400 text-base">₹{agent.totalRevenue.toLocaleString()}</span>
               </div>
+            </div>
+
+            {/* Agent Commission Tracker Breakdown */}
+            <div className="bg-emerald-950/20 border border-emerald-500/20 rounded-2xl p-3 flex items-center justify-between text-xs">
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Agent Commission (₹{agent.commissionPerBooking}/booking)</span>
+                <span className="font-mono font-black text-emerald-300 text-sm">₹{agent.totalCommission.toLocaleString()}</span>
+              </div>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                agent.payoutStatus.includes('Paid')
+                  ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                  : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+              }`}>
+                {agent.payoutStatus}
+              </span>
             </div>
           </div>
         ))}

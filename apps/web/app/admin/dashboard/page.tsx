@@ -27,14 +27,38 @@ export default function AdminDashboardPage() {
           <span className="text-[10px] text-slate-400">Across 8 Specialties</span>
         </div>
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-1">
-          <p className="text-xs text-slate-400 font-medium">Active Compounders</p>
-          <p className="text-3xl font-extrabold text-blue-400">18</p>
-          <span className="text-[10px] text-slate-400">Pharmacy Staff</span>
+          <p className="text-xs text-slate-400 font-medium">Today's Gross Bookings</p>
+          <p className="text-3xl font-extrabold text-amber-400 font-mono">₹74,400</p>
+          <span className="text-[10px] text-amber-300 font-semibold">Razorpay Online + Field Cash</span>
         </div>
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-1">
-          <p className="text-xs text-slate-400 font-medium">System Health</p>
-          <p className="text-3xl font-extrabold text-purple-400">99.9%</p>
-          <span className="text-[10px] text-emerald-400 font-semibold">Supabase Realtime Sync OK</span>
+          <p className="text-xs text-rose-400 font-medium font-bold">DocNest Platform Net (25%)</p>
+          <p className="text-3xl font-extrabold text-rose-400 font-mono">₹18,600</p>
+          <span className="text-[10px] text-slate-400">Direct Company Commission</span>
+        </div>
+      </div>
+
+      {/* ADMIN REVENUE ANALYTICS BAR */}
+      <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-emerald-950/40 border border-emerald-500/20 p-6 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div>
+          <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest block">Executive Financial Overview</span>
+          <h2 className="text-xl font-black text-white pt-0.5">Monthly Revenue & Settlement Breakdown</h2>
+          <p className="text-xs text-slate-400 mt-1">Real-time reconciliation of online Razorpay collections, agent cash deposits & doctor settlements</p>
+        </div>
+
+        <div className="flex flex-wrap gap-4 text-xs font-mono">
+          <div className="bg-slate-950 p-3 rounded-2xl border border-slate-800">
+            <span className="text-slate-400 block text-[10px] uppercase">This Month Gross</span>
+            <span className="text-white font-black text-base">₹14,82,000</span>
+          </div>
+          <div className="bg-slate-950 p-3 rounded-2xl border border-slate-800">
+            <span className="text-slate-400 block text-[10px] uppercase">Doctor Payouts (75-80%)</span>
+            <span className="text-emerald-400 font-black text-base">₹11,48,500</span>
+          </div>
+          <div className="bg-slate-950 p-3 rounded-2xl border border-rose-500/30">
+            <span className="text-rose-400 block text-[10px] uppercase font-bold">DocNest Net Margin</span>
+            <span className="text-rose-300 font-black text-base">₹3,33,500</span>
+          </div>
         </div>
       </div>
 

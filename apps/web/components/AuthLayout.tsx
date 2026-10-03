@@ -7,6 +7,7 @@ import Sidebar from './Sidebar';
 import { Loader2, Menu } from 'lucide-react';
 
 import { LanguageTogglePill } from './LanguageContext';
+import { ThemeTogglePill } from './ThemeContext';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -55,6 +56,7 @@ export default function AuthLayout({ children, allowedRoles }: AuthLayoutProps) 
           <span className="font-extrabold text-white">DocNest</span>
         </div>
         <div className="flex items-center space-x-2">
+          <ThemeTogglePill />
           <LanguageTogglePill />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -84,8 +86,8 @@ export default function AuthLayout({ children, allowedRoles }: AuthLayoutProps) 
             <span className="text-xs text-emerald-400 font-extrabold">{user.clinic || user.name}</span>
           </div>
           
-          <div className="flex items-center space-x-4">
-            {/* Global Language Switcher Pill */}
+          <div className="flex items-center space-x-3">
+            <ThemeTogglePill />
             <LanguageTogglePill />
           </div>
         </header>

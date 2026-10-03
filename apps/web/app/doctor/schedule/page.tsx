@@ -267,6 +267,79 @@ export default function DoctorSchedulePage() {
           </div>
         </div>
 
+        {/* TOKEN CAP & OPD CAPACITY */}
+        <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800/80 space-y-4">
+          <div className="flex flex-wrap justify-between items-center gap-2">
+            <div>
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block">Doctor Daily Token Cap (दैनिक टोकन सीमा)</span>
+              <p className="text-xs text-slate-400">Maximum patients permitted per session before OPD automatically marks full</p>
+            </div>
+            <span className="text-xs font-mono font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 px-3 py-1 rounded-xl">
+              Capacity Guard Active
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">Morning Token Limit (सुबह अधिकतम टोकन)</label>
+              <input
+                type="number"
+                defaultValue={35}
+                min={5}
+                max={150}
+                className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 font-mono font-bold"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 mb-1">Evening Token Limit (शाम अधिकतम टोकन)</label>
+              <input
+                type="number"
+                defaultValue={25}
+                min={5}
+                max={150}
+                className="w-full bg-slate-800 border border-slate-700 text-white rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500 font-mono font-bold"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* DOCTOR AVAILABILITY & VACATION CALENDAR */}
+        <div className="bg-slate-950 p-5 rounded-2xl border border-slate-800/80 space-y-4">
+          <div className="flex flex-wrap justify-between items-center gap-2">
+            <div>
+              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">Doctor Availability & Leave Calendar (अवकाश व छुट्टी प्रबंधन)</span>
+              <p className="text-xs text-slate-400">Mark scheduled surgery days or clinic closed dates so patients cannot book</p>
+            </div>
+            <span className="text-xs font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30 px-3 py-1 rounded-xl">
+              Auto-Blocks Online Booking
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+            {[
+              { day: 'Sundays (रविवार)', desc: 'Weekly Routine Day-off', status: 'Closed', color: 'rose' },
+              { day: 'Tuesdays (मंगलवार)', desc: 'Hospital OT Surgeries', status: 'Evening Only', color: 'amber' },
+              { day: 'Public Holidays', desc: 'Festival Emergency Only', status: 'On-Call', color: 'blue' },
+            ].map((slot, i) => (
+              <div key={i} className="bg-slate-900 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-bold text-white">{slot.day}</p>
+                  <p className="text-[10px] text-slate-400">{slot.desc}</p>
+                </div>
+                <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg ${
+                  slot.color === 'rose'
+                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                    : slot.color === 'amber'
+                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                    : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
+                }`}>
+                  {slot.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
         <div className="pt-4 flex items-center justify-between border-t border-slate-800">
           <p className="text-xs text-slate-400">Timings apply to online token availability & patient mobile app.</p>
           <button

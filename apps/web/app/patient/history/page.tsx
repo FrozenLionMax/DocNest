@@ -20,6 +20,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { LanguageTogglePill } from '../../../components/LanguageContext';
+import { ThemeTogglePill } from '../../../components/ThemeContext';
 
 export default function PatientHistoryPage() {
   const [expandedVisitId, setExpandedVisitId] = useState<string | null>('v-1');
@@ -104,7 +105,10 @@ export default function PatientHistoryPage() {
           </div>
         </div>
 
-        <LanguageTogglePill />
+        <div className="flex items-center space-x-2.5">
+          <ThemeTogglePill />
+          <LanguageTogglePill />
+        </div>
       </header>
 
       {/* Main Container */}

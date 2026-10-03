@@ -21,6 +21,7 @@ import {
   Activity
 } from 'lucide-react';
 import { LanguageTogglePill } from '../../../components/LanguageContext';
+import { ThemeTogglePill } from '../../../components/ThemeContext';
 
 const SPECIALTY_CHIPS = [
   { id: 'all', label: 'All Specialties' },
@@ -77,7 +78,10 @@ export default function DoctorDirectoryPage() {
           </div>
         </div>
 
-        <LanguageTogglePill />
+        <div className="flex items-center space-x-2.5">
+          <ThemeTogglePill />
+          <LanguageTogglePill />
+        </div>
       </header>
 
       {/* Main Container */}

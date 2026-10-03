@@ -1,6 +1,7 @@
 import React from 'react';
 import './globals.css';
 import { LanguageProvider } from '../components/LanguageContext';
+import { ThemeProvider } from '../components/ThemeContext';
 
 export const metadata = {
   title: 'DocNest — Healthcare Appointment & Clinic Operations Platform',
@@ -56,9 +57,11 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-slate-950 text-slate-100 antialiased font-['Plus_Jakarta_Sans',sans-serif] selection:bg-emerald-500 selection:text-slate-950 overflow-x-hidden min-h-screen">
-        <LanguageProvider>
-          {children}
-        </LanguageProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            {children}
+          </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

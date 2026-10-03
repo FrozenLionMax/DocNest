@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { DocNestUser, UserRole } from '../lib/auth';
 import { LanguageTogglePill } from './LanguageContext';
+import { ThemeTogglePill } from './ThemeContext';
 
 interface SidebarProps {
   user: DocNestUser;
@@ -205,7 +206,12 @@ export default function Sidebar({ user, onLogout, isOpenMobile = false, onCloseM
 
         {/* Footer */}
         <div className="p-3 border-t border-slate-800 space-y-2 bg-slate-900/40">
-          <LanguageTogglePill />
+          <div className="flex items-center space-x-2">
+            <div className="flex-1">
+              <LanguageTogglePill />
+            </div>
+            <ThemeTogglePill />
+          </div>
           <button
             onClick={onLogout}
             className="w-full flex items-center space-x-2 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition"
