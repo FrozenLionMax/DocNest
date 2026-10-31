@@ -9,7 +9,7 @@ import { DOCTORS_DIRECTORY, DoctorProfile } from '../../../lib/doctors-data';
 import {
   Users, Play, Pause, RotateCcw, Plus, Phone, Stethoscope, FileText, Tv,
   CheckCircle2, XCircle, SkipForward, Search, Volume2, VolumeX, Loader2,
-  Calendar, AlertCircle, QrCode, Filter, Clock, Activity, History, X, User, ChevronDown
+  Calendar, AlertCircle, QrCode, Filter, Clock, Activity, History, X, User, ChevronDown, Video
 } from 'lucide-react';
 import {
   getQueueEntries,
@@ -488,6 +488,15 @@ export default function DoctorDashboard() {
                       </td>
                       <td className="py-3.5 px-3.5 text-right" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-end space-x-2">
+                          <Link
+                            href={`/consultation/video?room=room-${p.token}&patient=${encodeURIComponent(p.name)}&token=${p.token}&doctor=${encodeURIComponent(session?.name || 'Dr. Amit Kumar')}&role=doctor`}
+                            className="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-2.5 py-1.5 rounded-xl font-black transition flex items-center space-x-1 shadow-sm"
+                            title="Start Video Tele-Consultation with Patient"
+                          >
+                            <Video className="w-3.5 h-3.5 text-emerald-600 fill-emerald-600" />
+                            <span>Call</span>
+                          </Link>
+
                           <Link
                             href={`/doctor/prescription?patient=${encodeURIComponent(p.name)}&token=${p.token}`}
                             className="text-xs bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200/90 px-3 py-1.5 rounded-xl font-black transition flex items-center space-x-1 shadow-sm"

@@ -16,7 +16,8 @@ import {
   Settings,
   Star,
   RefreshCw,
-  X
+  X,
+  Video
 } from 'lucide-react';
 import { LanguageTogglePill } from '../../../components/LanguageContext';
 import { ThemeTogglePill } from '../../../components/ThemeContext';
@@ -27,6 +28,7 @@ interface PatientAppointment {
   id: string;
   token: number;
   doctorName: string;
+  patientName?: string;
   specialty: string;
   clinicName: string;
   address: string;
@@ -100,6 +102,7 @@ export default function MyAppointmentsPage() {
             id: a.id,
             token: a.tokenNumber,
             doctorName: a.doctorName,
+            patientName: a.patientName,
             specialty: a.specialty,
             clinicName: a.clinicName,
             address: a.address,
@@ -271,20 +274,28 @@ export default function MyAppointmentsPage() {
                       <span>{apt.slot}</span>
                     </div>
 
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link
+                        href={`/consultation/video?room=room-${apt.token}&patient=${encodeURIComponent(apt.patientName || 'Patient')}&token=${apt.token}&doctor=${encodeURIComponent(apt.doctorName)}&role=patient`}
+                        className="text-xs text-white bg-emerald-600 hover:bg-emerald-500 px-3.5 py-1.5 rounded-xl font-black transition flex items-center space-x-1.5 shadow-sm shadow-emerald-950"
+                      >
+                        <Video className="w-3.5 h-3.5 fill-white" />
+                        <span>Video Consult (परामर्श)</span>
+                      </Link>
+
                       <button
                         onClick={() => setRescheduleApt(apt)}
                         className="text-xs text-teal-800 dark:text-teal-300 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/60 px-3 py-1.5 rounded-xl font-bold transition border border-teal-200/80 dark:border-teal-800 flex items-center space-x-1 cursor-pointer"
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
-                        <span>Reschedule Date</span>
+                        <span>Reschedule</span>
                       </button>
 
                       <button
                         onClick={() => handleCancel(apt.id)}
                         className="text-xs text-rose-700 dark:text-rose-400 hover:text-rose-800 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 px-3 py-1.5 rounded-xl font-bold transition border border-rose-200 dark:border-rose-800 cursor-pointer"
                       >
-                        Cancel & Refund
+                        Cancel
                       </button>
                     </div>
                   </div>

@@ -120,6 +120,9 @@ export default function LoginPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [isOtpMode, setIsOtpMode] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const [generatedOtp, setGeneratedOtp] = useState('4829');
+  const [enteredOtp, setEnteredOtp] = useState('');
+  const [smsNotification, setSmsNotification] = useState<string | null>(null);
   const [selectedPreset, setSelectedPreset] = useState<DemoRolePreset | null>(null);
 
   // #14: Dynamic Time-of-Day Greeting State (Hydration Safe)
@@ -220,9 +223,19 @@ export default function LoginPage() {
             setLoading(false);
             return;
           }
+          const code = Math.floor(1000 + Math.random() * 9000).toString();
+          setGeneratedOtp(code);
           setOtpSent(true);
+          setSmsNotification(`📩 SMS Alert: Your DocNest Healthcare 4-digit verification code is ${code}. (Valid for 10 minutes)`);
           setLoading(false);
           return;
+        } else {
+          // Verify entered OTP
+          if (!enteredOtp || (enteredOtp !== generatedOtp && enteredOtp !== '1234')) {
+            setErrorMessage(`Invalid OTP code entered. Please enter ${generatedOtp} (or 1234) to verify.`);
+            setLoading(false);
+            return;
+          }
         }
       }
 
@@ -409,22 +422,59 @@ export default function LoginPage() {
                 {isOtpMode ? (
                   <div className="space-y-3 animate-in fade-in slide-in-from-right-4 duration-300">
                     {otpSent ? (
-                      <div className="space-y-2">
-                        <label className="block text-xs font-bold text-slate-300">Enter 4-Digit OTP Code</label>
-                        <input
-                          type="text"
-                          maxLength={4}
-                          placeholder="• • • •"
-                          className="w-full text-center tracking-widest font-mono text-2xl py-3 bg-[#0c1219] border-2 border-teal-400 text-[#ebffd8] rounded-2xl focus:outline-none shadow-lg shadow-teal-900/30"
-                        />
-                        <p className="text-[11px] text-teal-300 flex items-center justify-center space-x-1.5 pt-1">
+                      <div className="space-y-3">
+                        {smsNotification && (
+                          <div className="p-3 bg-emerald-950/80 border border-emerald-500/50 rounded-2xl text-xs text-emerald-300 flex items-center justify-between gap-2 shadow-lg">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-sm">📩</span>
+                              <span className="font-semibold text-[11px]">{smsNotification}</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setEnteredOtp(generatedOtp)}
+                              className="px-2.5 py-1 bg-emerald-400 hover:bg-emerald-300 text-slate-950 rounded-lg text-[10px] font-black uppercase tracking-wider flex-shrink-0"
+                            >
+                              Auto-Fill
+                            </button>
+                          </div>
+                        )}
+
+                        <div>
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="block text-xs font-bold text-slate-300">Enter 4-Digit OTP Code</label>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newCode = Math.floor(1000 + Math.random() * 9000).toString();
+                                setGeneratedOtp(newCode);
+                                setSmsNotification(`📩 SMS Resent: Your new DocNest 4-digit OTP is ${newCode}.`);
+                              }}
+                              className="text-[11px] text-emerald-400 hover:underline font-bold"
+                            >
+                              Resend OTP Code
+                            </button>
+                          </div>
+
+                          <input
+                            type="text"
+                            maxLength={4}
+                            placeholder="• • • •"
+                            value={enteredOtp}
+                            onChange={(e) => setEnteredOtp(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                            className="w-full text-center tracking-[0.5em] font-mono text-3xl py-3 bg-[#0c1219] border-2 border-teal-400 text-[#ebffd8] rounded-2xl focus:outline-none shadow-lg shadow-teal-900/30"
+                            autoFocus
+                          />
+                        </div>
+
+                        <p className="text-[11px] text-teal-300 flex items-center justify-center space-x-1.5 pt-0.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-teal-400" />
-                          <span>OTP successfully dispatched via SMS to {identifier}</span>
+                          <span>OTP sent to Indian mobile {identifier}</span>
                         </p>
                       </div>
                     ) : (
-                      <div className="p-3 bg-[#141e28] rounded-2xl border border-[rgba(196,225,230,0.14)] text-[11px] text-slate-300 leading-relaxed">
-                        A secure 4-digit verification passcode will be sent via SMS & WhatsApp to your phone.
+                      <div className="p-3.5 bg-[#141e28] rounded-2xl border border-[rgba(196,225,230,0.14)] text-xs text-slate-300 leading-relaxed flex items-center space-x-2">
+                        <span className="text-base">📲</span>
+                        <span>Click &quot;Send Verification OTP&quot; below to receive a secure 4-digit code.</span>
                       </div>
                     )}
                   </div>
@@ -505,8 +555,10 @@ export default function LoginPage() {
                   ) : (
                     <>
                       <span>
-                        {isOtpMode && !otpSent
-                          ? 'Send Verification OTP →'
+                        {isOtpMode
+                          ? otpSent
+                            ? 'Verify 4-Digit OTP & Enter Portal →'
+                            : 'Send Verification OTP →'
                           : selectedPreset
                           ? `Sign In as ${selectedPreset.name}`
                           : 'Sign In to Portal (प्रवेश करें)'}
