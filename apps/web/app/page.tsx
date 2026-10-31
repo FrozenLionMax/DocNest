@@ -103,7 +103,7 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0c1219] bg-mesh-dark text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] selection:bg-[#8dbcc7] selection:text-[#0c1219] relative overflow-hidden">
+    <div className="min-h-screen bg-[#0c1219] bg-mesh-dark text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] selection:bg-[#8dbcc7] selection:text-[#0c1219] relative overflow-x-clip">
       {/* Interactive Particle Stardust Mesh */}
       <InteractiveParticles />
       

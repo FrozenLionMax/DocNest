@@ -139,7 +139,7 @@ export default function Sidebar({ user, onLogout, isOpenMobile = false, onCloseM
       )}
 
       <aside
-        className={`fixed md:static inset-y-0 left-0 z-50 w-64 bg-white dark:bg-[#0c1219] border-r border-slate-200/90 dark:border-teal-900/40 flex flex-col transform transition-transform duration-200 ease-in-out shadow-sm ${
+        className={`fixed md:sticky md:top-0 md:h-screen md:overflow-y-auto inset-y-0 left-0 z-50 w-64 bg-white dark:bg-[#0c1219] border-r border-slate-200/90 dark:border-teal-900/40 flex flex-col transform transition-transform duration-200 ease-in-out shadow-sm ${
           isOpenMobile ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         }`}
       >

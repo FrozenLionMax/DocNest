@@ -35,20 +35,21 @@
   --border-light: rgba(164, 204, 217, 0.4);
 }
 
-/* Touch & viewport optimization for all mobile devices */
+/* Touch & viewport optimization for ultra-smooth scrolling on all devices */
 html {
-  scroll-behavior: smooth;
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
 }
 
-html, body {
+body {
   -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
-  overscroll-behavior-y: none;
+  touch-action: pan-y pinch-zoom;
+  -webkit-overflow-scrolling: touch;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: clip;
+  min-height: 100vh;
 }
 
 /* Prevent text overflow on small phone screens (320px - 414px) */

@@ -46,7 +46,7 @@ export default function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className="bg-[#0c1219] text-slate-100 antialiased font-['Plus_Jakarta_Sans',sans-serif] selection:bg-teal-500 selection:text-slate-950 overflow-x-hidden min-h-screen"
+        className="bg-[#0c1219] text-slate-100 antialiased font-['Plus_Jakarta_Sans',sans-serif] selection:bg-teal-500 selection:text-slate-950 overflow-x-clip min-h-screen"
       >
         <LanguageProvider>
           <ServiceWorkerRegistration />

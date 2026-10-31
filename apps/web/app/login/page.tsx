@@ -275,7 +275,7 @@ export default function LoginPage() {
   const ActiveAvatarIcon = selectedPreset ? selectedPreset.icon : null;
 
   return (
-    <div className="min-h-screen bg-[#0c1219] bg-mesh-dark flex items-center justify-center p-4 md:p-6 font-['Plus_Jakarta_Sans',sans-serif] selection:bg-[#8dbcc7] selection:text-[#0c1219] relative overflow-hidden">
+    <div className="min-h-screen bg-[#0c1219] bg-mesh-dark flex items-center justify-center p-4 md:p-6 font-['Plus_Jakarta_Sans',sans-serif] selection:bg-[#8dbcc7] selection:text-[#0c1219] relative overflow-x-clip">
       {/* #8: Interactive Particle Stardust Mesh Canvas */}
       <InteractiveParticles />
 
