@@ -4,11 +4,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getSession } from '../../../lib/auth';
 import { supabase } from '../../../lib/supabase';
-import { savePrescription, getQueueEntries, updateQueueEntryStatus } from '../../../lib/clinical-store';
+import { savePrescription, getQueueEntries, updateQueueEntryStatus, getPatientPastVisits, PastClinicalVisit } from '../../../lib/clinical-store';
 import {
   Printer, Plus, Trash2, Save, Download, Stethoscope,
   User, Calendar, Pill, CheckCircle2, FileText, ArrowLeft, Search, Check, Sparkles, Zap, MessageSquare, Clock,
-  AlertTriangle, ShieldAlert, ShieldCheck, Info
+  AlertTriangle, ShieldAlert, ShieldCheck, Info, FlaskConical, History, PenTool, Stamp, X, RotateCcw, BadgeCheck, Copy, ChevronDown, ChevronUp
 } from 'lucide-react';
 import Link from 'next/link';
 import NavControls from '../../../components/NavControls';
@@ -21,7 +21,7 @@ interface RxMedicine {
   timing: string; // e.g. After Food (खाने के बाद)
 }
 
-export interface SafetyAlert {
+interface SafetyAlert {
   type: 'danger' | 'warning' | 'info';
   title: string;
   message: string;
@@ -290,6 +290,48 @@ const COMMON_ILLNESS_TEMPLATES = [
   },
 ];
 
+const POPULAR_INVESTIGATIONS = [
+  {
+    category: 'Blood & Biochemistry (रक्त जाँच)',
+    tests: [
+      'Complete Blood Count (CBC)',
+      'Fasting Blood Sugar (FBS / PPBS)',
+      'HbA1c (Glycated Hemoglobin)',
+      'Liver Function Test (LFT)',
+      'Kidney Function Test (KFT / RFT)',
+      'Lipid Profile (Cholesterol / Triglycerides)',
+      'Serum Uric Acid',
+      'Thyroid Profile (T3, T4, TSH)',
+      'Serum Calcium & Vitamin D3',
+      'ESR & CRP (Inflammatory Markers)',
+      'Serum Electrolytes (Na+, K+, Cl-)',
+    ]
+  },
+  {
+    category: 'Radiology & Imaging (एक्स-रे व स्कैन)',
+    tests: [
+      'X-Ray Lumbar Spine AP/Lat',
+      'X-Ray Cervical Spine AP/Lat',
+      'X-Ray Both Knees AP/Lat Standing',
+      'X-Ray Chest PA View',
+      'X-Ray Pelvis with Both Hips AP',
+      'USG Whole Abdomen & Pelvis',
+      'MRI Lumbosacral Spine',
+      '12-Lead Electrocardiogram (ECG)',
+    ]
+  },
+  {
+    category: 'Urine & Infection Markers (अन्य जाँच)',
+    tests: [
+      'Urine Routine & Microscopic',
+      'Urine Culture & Sensitivity',
+      'Dengue NS1 Antigen & Platelet Count',
+      'Widal Test (Typhoid)',
+      'Rheumatoid Factor (RA Factor / Anti-CCP)',
+    ]
+  }
+];
+
 function PrescriptionContent() {
   const searchParams = useSearchParams();
   const [session, setSession] = useState<any>(null);
@@ -311,6 +353,25 @@ function PrescriptionContent() {
   const [followUpDays, setFollowUpDays] = useState<number>(5);
   const [followUpDateStr, setFollowUpDateStr] = useState<string>('');
 
+  // Feature 2: Diagnostic Lab & Radiology Requisitions
+  const [orderedTests, setOrderedTests] = useState<string[]>([
+    'Complete Blood Count (CBC)',
+    'X-Ray Lumbar Spine AP/Lat',
+  ]);
+  const [customTestInput, setCustomTestInput] = useState<string>('');
+  const [showTestPicker, setShowTestPicker] = useState<boolean>(false);
+
+  // Feature 3: Patient Past Medical History & Revisit Timeline Drawer
+  const [showHistoryDrawer, setShowHistoryDrawer] = useState<boolean>(false);
+  const [pastVisits, setPastVisits] = useState<PastClinicalVisit[]>([]);
+  const [copyHistorySuccess, setCopyHistorySuccess] = useState<string | null>(null);
+
+  // Feature 4: Digital Signature Pad & Clinic Seal Stamp
+  const [signatureMode, setSignatureMode] = useState<'seal' | 'draw'>('seal');
+  const [signatureDataUrl, setSignatureDataUrl] = useState<string | null>(null);
+  const [isDrawing, setIsDrawing] = useState<boolean>(false);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
   const [medicines, setMedicines] = useState<RxMedicine[]>([
     { id: 'm-1', name: 'Tab. Dolo 650mg (Paracetamol)', dosage: '1-0-1', duration: '5 Days', timing: 'After Food (खाने के बाद)' },
     { id: 'm-2', name: 'Tab. Pantocid 40mg (Pantoprazole)', dosage: '1-0-0', duration: '7 Days', timing: 'Empty Stomach (खाली पेट)' },
@@ -322,6 +383,11 @@ function PrescriptionContent() {
   const [filteredSuggestions, setFilteredSuggestions] = useState<MedicineSuggestion[]>([]);
 
   const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  // Load past visits for current patient
+  useEffect(() => {
+    setPastVisits(getPatientPastVisits(patientName));
+  }, [patientName]);
 
   // AI Clinical Drug Interaction & Duplicate Salt Safety Warning Checker
   const safetyAlerts = checkPrescriptionSafety(medicines);
@@ -432,6 +498,110 @@ function PrescriptionContent() {
     setMedicines((prev) => prev.filter((m) => m.id !== id));
   };
 
+  // Feature 2: Diagnostic Investigations & Lab Tests Handlers
+  const toggleTest = (testName: string) => {
+    setOrderedTests((prev) =>
+      prev.includes(testName) ? prev.filter((t) => t !== testName) : [...prev, testName]
+    );
+  };
+
+  const addCustomTest = (e: React.FormEvent) => {
+    e.preventDefault();
+    const clean = customTestInput.trim();
+    if (clean && !orderedTests.includes(clean)) {
+      setOrderedTests((prev) => [...prev, clean]);
+      setCustomTestInput('');
+    }
+  };
+
+  const removeTest = (testName: string) => {
+    setOrderedTests((prev) => prev.filter((t) => t !== testName));
+  };
+
+  // Feature 3: Patient Past Medical History Refill Handler
+  const refillFromVisit = (visit: PastClinicalVisit) => {
+    setDiagnosis(visit.diagnosis);
+    setAdvice(visit.advice);
+    setMedicines(
+      visit.medicines.map((m, idx) => ({
+        id: `med-${Date.now()}-${idx}`,
+        name: m.name,
+        dosage: m.dosage,
+        duration: m.duration,
+        timing: m.timing,
+      }))
+    );
+    if (visit.orderedTests && visit.orderedTests.length > 0) {
+      setOrderedTests(visit.orderedTests);
+    }
+    setCopyHistorySuccess(`Previous prescription from ${visit.date} copied successfully!`);
+    setTimeout(() => {
+      setCopyHistorySuccess(null);
+      setShowHistoryDrawer(false);
+    }, 1200);
+  };
+
+  // Feature 4: Digital Signature Pad Canvas Drawing Handlers
+  const getCanvasPos = (canvas: HTMLCanvasElement, clientX: number, clientY: number) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    return {
+      x: (clientX - rect.left) * scaleX,
+      y: (clientY - rect.top) * scaleY,
+    };
+  };
+
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    setIsDrawing(true);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#064e3b'; // deep medical emerald ink
+
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const pos = getCanvasPos(canvas, clientX, clientY);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  };
+
+  const drawMove = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
+    const pos = getCanvasPos(canvas, clientX, clientY);
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+  };
+
+  const stopDrawing = () => {
+    if (!isDrawing) return;
+    setIsDrawing(false);
+    const canvas = canvasRef.current;
+    if (canvas) {
+      setSignatureDataUrl(canvas.toDataURL('image/png'));
+    }
+  };
+
+  const clearSignature = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    setSignatureDataUrl(null);
+  };
+
   // Item 4: One-Click Direct PDF / Print File Download
   const handlePrintOrPDF = () => {
     if (typeof window !== 'undefined') {
@@ -446,7 +616,10 @@ function PrescriptionContent() {
   const handleShareWhatsApp = () => {
     const docName = session?.name || 'Dr. Amit Kumar';
     const clinic = session?.clinic || 'Gupta Clinic & Joint Care Center';
-    const message = `🏥 *${clinic}*\n👨‍⚕️ *${docName}*\n\nनमस्ते *${patientName}*,\nआपका डिजिटल पर्चा (Token #${tokenNumber}) तैयार है।\n\n📋 *निदान (Diagnosis):* ${diagnosis}\n💊 *दवाएं (${medicines.length}):*\n${medicines.map((m, i) => `${i + 1}. ${m.name} (${m.dosage}) - ${m.duration}`).join('\n')}\n\n📅 *पुनः परामर्श तिथि (Follow-up):* ${followUpDateStr}\n\nपर्चा ऑनलाइन देखें: https://www.drugs.systems/patient`;
+    const testsMsg = orderedTests.length > 0
+      ? `\n\n🔬 *जाँच सलाह (Lab / Radiology Orders):*\n${orderedTests.map((t, i) => `${i + 1}. ${t}`).join('\n')}`
+      : '';
+    const message = `🏥 *${clinic}*\n👨‍⚕️ *${docName}*\n\nनमस्ते *${patientName}*,\nआपका डिजिटल पर्चा (Token #${tokenNumber}) तैयार है।\n\n📋 *निदान (Diagnosis):* ${diagnosis}\n💊 *दवाएं (${medicines.length}):*\n${medicines.map((m, i) => `${i + 1}. ${m.name} (${m.dosage}) - ${m.duration}`).join('\n')}${testsMsg}\n\n📅 *पुनः परामर्श तिथि (Follow-up):* ${followUpDateStr}\n\nपर्चा ऑनलाइन देखें: https://www.drugs.systems/patient`;
 
     const cleanPhone = patientPhone.replace(/\D/g, '');
     const targetPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
@@ -472,6 +645,8 @@ function PrescriptionContent() {
         diagnosis: diagnosis || 'General Clinical Consultation',
         advice: advice || 'Take medicines on time as prescribed.',
         followUpDate: followUpDateStr,
+        orderedTests: orderedTests,
+        signatureDataUrl: signatureDataUrl || undefined,
         medicines: medicines.map(m => ({
           name: m.name,
           dosage: m.dosage,
@@ -578,6 +753,17 @@ function PrescriptionContent() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
+          {/* Feature 3: Patient Past Medical History & Revisit Timeline Button */}
+          <button
+            type="button"
+            onClick={() => setShowHistoryDrawer(true)}
+            className="bg-slate-800 hover:bg-slate-700 text-teal-300 border border-teal-500/30 px-3.5 py-2.5 rounded-xl text-xs font-black flex items-center space-x-1.5 transition shadow"
+            title="View previous clinical visits and 1-click refill past medicines"
+          >
+            <History className="w-4 h-4 text-teal-400" />
+            <span>Past History ({pastVisits.length})</span>
+          </button>
+
           {/* Item 2: WhatsApp Share Button */}
           <button
             onClick={handleShareWhatsApp}
@@ -661,6 +847,105 @@ function PrescriptionContent() {
             Return: {followUpDateStr}
           </span>
         </div>
+      </div>
+
+      {/* FEATURE 2: DIAGNOSTIC LAB & RADIOLOGY REQUISITIONS CONTROLLER BAR (Hidden on Print) */}
+      <div className="print:hidden w-full max-w-4xl bg-slate-900/90 border border-slate-800 p-5 rounded-2xl mb-6 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center space-x-2">
+            <FlaskConical className="w-4 h-4 text-teal-400" />
+            <h3 className="text-xs font-black text-slate-100 uppercase tracking-wider">
+              Diagnostic Lab & Radiology Orders (जाँच सलाह)
+            </h3>
+            <span className="text-[10px] bg-teal-500/20 text-teal-300 font-extrabold px-2.5 py-0.5 rounded-full border border-teal-500/30">
+              {orderedTests.length} Selected
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowTestPicker(!showTestPicker)}
+            className="text-xs font-bold text-teal-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3.5 py-1.5 rounded-xl transition flex items-center space-x-1.5"
+          >
+            <span>{showTestPicker ? 'Hide Test Catalog' : '+ Browse Test Catalog (CBC, X-Ray, etc.)'}</span>
+            {showTestPicker ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+          </button>
+        </div>
+
+        {/* Selected Test Chips */}
+        {orderedTests.length > 0 ? (
+          <div className="flex flex-wrap gap-2 pt-1">
+            {orderedTests.map((test) => (
+              <span
+                key={test}
+                className="inline-flex items-center space-x-1.5 bg-teal-950/70 border border-teal-600/40 text-teal-200 text-xs px-3 py-1.5 rounded-xl font-bold shadow-sm"
+              >
+                <span>{test}</span>
+                <button
+                  type="button"
+                  onClick={() => removeTest(test)}
+                  className="p-0.5 text-teal-400 hover:text-rose-400 transition"
+                  title="Remove test"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-slate-400 italic">No investigations currently ordered for this prescription.</p>
+        )}
+
+        {/* Custom Test Adder Form */}
+        <form onSubmit={addCustomTest} className="flex gap-2 pt-1">
+          <input
+            type="text"
+            placeholder="Type custom test name (e.g. Vitamin B12, Bilateral Knee MRI, Dengue NS1)..."
+            value={customTestInput}
+            onChange={(e) => setCustomTestInput(e.target.value)}
+            className="flex-1 px-3.5 py-2 text-xs rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-teal-500 font-medium"
+          />
+          <button
+            type="submit"
+            className="bg-teal-600 hover:bg-teal-500 active:scale-95 text-white font-extrabold px-4 py-2 rounded-xl text-xs transition flex items-center space-x-1 shadow"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Test</span>
+          </button>
+        </form>
+
+        {/* Expandable Test Catalog Picker */}
+        {showTestPicker && (
+          <div className="pt-3 border-t border-slate-800/80 space-y-4 animate-in fade-in duration-200">
+            {POPULAR_INVESTIGATIONS.map((cat, catIdx) => (
+              <div key={catIdx} className="space-y-2">
+                <span className="text-[11px] font-black text-slate-400 uppercase tracking-wider block">
+                  {cat.category}
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {cat.tests.map((test) => {
+                    const isSelected = orderedTests.includes(test);
+                    return (
+                      <button
+                        key={test}
+                        type="button"
+                        onClick={() => toggleTest(test)}
+                        className={`text-xs px-3 py-1.5 rounded-xl font-bold transition flex items-center space-x-1.5 ${
+                          isSelected
+                            ? 'bg-teal-500 text-slate-950 font-black shadow-md border border-teal-400'
+                            : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                        }`}
+                      >
+                        {isSelected && <Check className="w-3.5 h-3.5" />}
+                        <span>{test}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* GENUINE A4 RX SHEET CANVAS CONTAINER */}
@@ -931,6 +1216,37 @@ function PrescriptionContent() {
             </form>
           </div>
 
+          {/* FEATURE 2: PRINTABLE DIAGNOSTIC INVESTIGATIONS & LAB ORDERS SECTION */}
+          {orderedTests.length > 0 && (
+            <div className="pt-2 border-t border-slate-200">
+              <div className="flex items-center space-x-2 pb-2">
+                <FlaskConical className="w-4 h-4 text-emerald-800" />
+                <span className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                  Diagnostic Investigations & Radiology Orders (जाँच सलाह)
+                </span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-900 font-bold px-2 py-0.5 rounded-full">
+                  {orderedTests.length} Tests
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+                {orderedTests.map((test, idx) => (
+                  <div key={idx} className="flex items-center space-x-2 p-2 bg-emerald-50/70 border border-emerald-200 rounded-xl">
+                    <span className="w-2 h-2 rounded-full bg-emerald-600 flex-shrink-0"></span>
+                    <span className="font-extrabold text-slate-900 flex-1">{test}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeTest(test)}
+                      className="print:hidden text-slate-400 hover:text-rose-600 p-0.5"
+                      title="Remove Test"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Doctor Remarks & Instructions */}
           <div className="pt-2">
             <label className="block text-xs font-extrabold text-slate-500 uppercase tracking-wider mb-1">Doctor Advice & Remarks (चिकित्सकीय सलाह व निर्देश)</label>
@@ -953,24 +1269,261 @@ function PrescriptionContent() {
             </span>
           </div>
 
-          {/* Official Footer Signature & Verification QR Stamp */}
-          <div className="pt-6 border-t-2 border-slate-900 flex justify-between items-end">
+          {/* FEATURE 4: NMC-COMPLIANT OFFICIAL FOOTER SIGNATURE & CLINIC SEAL ZONE */}
+          <div className="pt-6 border-t-2 border-slate-900 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
             <div className="space-y-1 text-[10px] text-slate-500">
-              <p className="font-extrabold text-slate-700 uppercase tracking-wider">DocNest Authenticated Digital Prescription</p>
+              <p className="font-extrabold text-slate-700 uppercase tracking-wider flex items-center space-x-1">
+                <BadgeCheck className="w-3.5 h-3.5 text-emerald-700" />
+                <span>NMC Section 3.7 Compliant Digital Prescription</span>
+              </p>
               <p>Scan QR code using DocNest Patient Mobile App to verify authentic digital copy.</p>
               <p className="font-mono text-emerald-900 font-bold">DocNest-Rx-ID: {`DN-2026-${tokenNumber}-9481`}</p>
             </div>
 
-            <div className="text-center space-y-1">
-              <div className="font-serif italic text-lg font-bold text-emerald-900 border-b-2 border-slate-700 pb-1 px-6">
-                Dr. Amit Kumar
+            {/* Signature & Seal Zone */}
+            <div className="flex flex-col items-center md:items-end space-y-2 w-full md:w-auto">
+              {/* Screen mode toggle (hidden on print) */}
+              <div className="print:hidden flex items-center space-x-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setSignatureMode('seal')}
+                  className={`px-3 py-1 rounded-lg font-bold transition flex items-center space-x-1 ${
+                    signatureMode === 'seal'
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Stamp className="w-3.5 h-3.5" />
+                  <span>Clinic Seal Stamp</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSignatureMode('draw')}
+                  className={`px-3 py-1 rounded-lg font-bold transition flex items-center space-x-1 ${
+                    signatureMode === 'draw'
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <PenTool className="w-3.5 h-3.5" />
+                  <span>Draw Signature Pad</span>
+                </button>
               </div>
-              <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Authorized Doctor Signature</p>
+
+              {/* Mode A: Official Clinic Council Seal */}
+              {signatureMode === 'seal' && (
+                <div className="p-3 border-2 border-emerald-800 rounded-2xl bg-emerald-50/60 text-center text-emerald-950 font-sans min-w-[220px] shadow-sm">
+                  <div className="flex items-center justify-center space-x-1 text-[9px] font-black uppercase tracking-widest text-emerald-900 border-b border-emerald-300 pb-1">
+                    <BadgeCheck className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>REGISTERED MEDICAL PRACTITIONER</span>
+                  </div>
+                  <p className="font-serif italic font-black text-base text-emerald-900 mt-1">
+                    {session?.name || 'Dr. Amit Kumar'}
+                  </p>
+                  <p className="text-[10px] font-extrabold text-slate-800">M.B.B.S., M.S. (Orthopedics)</p>
+                  <p className="font-mono text-[10px] font-black text-emerald-900 tracking-wide">
+                    Reg. No: UP-MED-84920
+                  </p>
+                  <p className="text-[9px] text-slate-600 font-semibold pt-0.5">
+                    {session?.clinic || 'Gupta Clinic & Joint Care Center'}
+                  </p>
+                </div>
+              )}
+
+              {/* Mode B: Interactive Canvas Drawing Pad */}
+              {signatureMode === 'draw' && (
+                <div className="space-y-1.5 text-center">
+                  <div className="border-2 border-emerald-800/80 rounded-2xl bg-slate-50/80 p-1 relative shadow-inner">
+                    <canvas
+                      ref={canvasRef}
+                      width={260}
+                      height={90}
+                      onMouseDown={startDrawing}
+                      onMouseMove={drawMove}
+                      onMouseUp={stopDrawing}
+                      onMouseLeave={stopDrawing}
+                      onTouchStart={startDrawing}
+                      onTouchMove={drawMove}
+                      onTouchEnd={stopDrawing}
+                      className="cursor-crosshair bg-white rounded-xl touch-none"
+                    />
+                    {!signatureDataUrl && (
+                      <div className="absolute inset-0 pointer-events-none flex items-center justify-center text-slate-400 text-xs font-semibold">
+                        Sign here with stylus / finger / mouse
+                      </div>
+                    )}
+                  </div>
+                  <div className="print:hidden flex justify-between items-center text-[10px] px-1">
+                    <span className="text-slate-500 font-medium">Digital Signature Pad</span>
+                    <button
+                      type="button"
+                      onClick={clearSignature}
+                      className="text-rose-600 hover:text-rose-700 font-bold flex items-center space-x-0.5"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      <span>Clear</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="text-center pt-1">
+                <p className="text-xs font-serif italic font-bold text-slate-900">
+                  {session?.name || 'Dr. Amit Kumar'}
+                </p>
+                <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                  Authorized Doctor Signature & Verification Seal
+                </p>
+              </div>
             </div>
           </div>
 
         </div>
       </div>
+
+      {/* FEATURE 3: PATIENT PAST MEDICAL HISTORY & REVISIT TIMELINE DRAWER */}
+      {showHistoryDrawer && (
+        <div className="print:hidden fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex justify-end">
+          <div className="w-full max-w-xl bg-slate-900 text-slate-100 border-l border-slate-800 h-full p-6 space-y-6 overflow-y-auto animate-in slide-in-from-right duration-200 shadow-2xl flex flex-col justify-between">
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="flex justify-between items-start border-b border-slate-800 pb-4">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center space-x-1.5 bg-teal-500/10 text-teal-400 border border-teal-500/20 px-3 py-1 rounded-full text-xs font-black">
+                    <History className="w-3.5 h-3.5" />
+                    <span>Clinical Consultation Timeline</span>
+                  </div>
+                  <h3 className="text-xl font-black text-white">{patientName}</h3>
+                  <p className="text-xs text-slate-400">Past visits, vitals, prescriptions & diagnostic reports</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowHistoryDrawer(false)}
+                  className="p-2 text-slate-400 hover:text-white rounded-xl bg-slate-800 border border-slate-700 transition"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Toast for copy */}
+              {copyHistorySuccess && (
+                <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 rounded-xl text-xs font-bold flex items-center space-x-2 animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                  <span>{copyHistorySuccess}</span>
+                </div>
+              )}
+
+              {/* Visits List */}
+              <div className="space-y-4">
+                {pastVisits.map((visit, vIdx) => (
+                  <div
+                    key={visit.id || vIdx}
+                    className="p-5 bg-slate-800/80 border border-slate-700/80 rounded-2xl space-y-4 hover:border-teal-500/40 transition"
+                  >
+                    {/* Top Row: Date & Refill Button */}
+                    <div className="flex flex-wrap justify-between items-center gap-2 border-b border-slate-700/60 pb-3">
+                      <div>
+                        <span className="text-xs font-black text-teal-400 bg-teal-500/10 px-2.5 py-1 rounded-lg border border-teal-500/20">
+                          📅 {visit.date}
+                        </span>
+                        <p className="text-[11px] text-slate-400 mt-1">{visit.doctorName} • {visit.clinicName}</p>
+                      </div>
+
+                      {/* 1-Click Copy / Refill Previous Rx Button */}
+                      <button
+                        type="button"
+                        onClick={() => refillFromVisit(visit)}
+                        className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white font-black px-3.5 py-2 rounded-xl text-xs shadow flex items-center space-x-1.5 transition active:scale-95"
+                        title="Copy all medicines, diagnosis, tests and advice into active prescription"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                        <span>🔁 Refill / Copy Rx</span>
+                      </button>
+                    </div>
+
+                    {/* Diagnosis */}
+                    <div>
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Diagnosis</span>
+                      <p className="text-xs font-extrabold text-white mt-0.5">{visit.diagnosis}</p>
+                    </div>
+
+                    {/* Vitals Snapshot */}
+                    <div className="grid grid-cols-4 gap-2 text-center text-[11px] bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+                      <div>
+                        <span className="text-slate-500 block text-[9px] uppercase">B.P.</span>
+                        <span className="font-bold text-white">{visit.vitals.bp}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block text-[9px] uppercase">Pulse</span>
+                        <span className="font-bold text-white">{visit.vitals.pulse}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block text-[9px] uppercase">Weight</span>
+                        <span className="font-bold text-white">{visit.vitals.weight}</span>
+                      </div>
+                      <div>
+                        <span className="text-slate-500 block text-[9px] uppercase">Temp</span>
+                        <span className="font-bold text-white">{visit.vitals.temp}</span>
+                      </div>
+                    </div>
+
+                    {/* Prescribed Medicines */}
+                    <div className="space-y-1.5">
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">
+                        Medicines Prescribed ({visit.medicines.length})
+                      </span>
+                      <div className="space-y-1">
+                        {visit.medicines.map((m, mIdx) => (
+                          <div key={mIdx} className="flex justify-between items-center text-xs p-2 bg-slate-900/60 rounded-xl border border-slate-800">
+                            <div>
+                              <span className="font-bold text-slate-200">{m.name}</span>
+                              <span className="text-[10px] text-slate-400 block">{m.timing}</span>
+                            </div>
+                            <span className="font-mono text-[11px] text-teal-400 font-black">{m.dosage} • {m.duration}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Ordered Tests if any */}
+                    {visit.orderedTests && visit.orderedTests.length > 0 && (
+                      <div className="space-y-1 pt-1">
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">
+                          Lab / Radiology Orders
+                        </span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {visit.orderedTests.map((t, tIdx) => (
+                            <span key={tIdx} className="text-[11px] bg-teal-950/80 text-teal-300 border border-teal-800/50 px-2 py-0.5 rounded-md font-semibold">
+                              🔬 {t}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Advice */}
+                    {visit.advice && (
+                      <div className="text-[11px] text-slate-400 italic bg-slate-900/40 p-2.5 rounded-xl border border-slate-800/60">
+                        "{visit.advice}"
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => setShowHistoryDrawer(false)}
+                className="w-full bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold py-3 rounded-xl text-xs transition"
+              >
+                Close History Drawer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

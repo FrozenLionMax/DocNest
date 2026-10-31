@@ -20,7 +20,8 @@ import {
   addWalkInPatient,
   updateQueueEntryStatus,
   subscribeToClinicalEvents,
-  QueueEntry
+  QueueEntry,
+  getPatientPastVisits
 } from '../../../lib/clinical-store';
 
 interface PatientEntry {
@@ -488,6 +489,16 @@ export default function DoctorDashboard() {
                       </td>
                       <td className="py-3.5 px-3.5 text-right" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-end space-x-2">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedPatientForDrawer(p)}
+                            className="text-xs bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-2.5 py-1.5 rounded-xl font-bold transition flex items-center space-x-1 shadow-sm"
+                            title="View Patient Medical History & Vitals"
+                          >
+                            <History className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+                            <span>History</span>
+                          </button>
+
                           <Link
                             href={`/consultation/video?room=room-${p.token}&patient=${encodeURIComponent(p.name)}&token=${p.token}&doctor=${encodeURIComponent(session?.name || 'Dr. Amit Kumar')}&role=doctor`}
                             className="text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-2.5 py-1.5 rounded-xl font-black transition flex items-center space-x-1 shadow-sm"
@@ -608,6 +619,42 @@ export default function DoctorDashboard() {
                   <span className="text-slate-500">Temp:</span>
                   <span className="font-bold text-slate-900 dark:text-white">98.6 °F</span>
                 </div>
+              </div>
+            </div>
+
+            {/* Previous Prescriptions & Revisit History */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center space-x-1.5">
+                <FileText className="w-4 h-4 text-teal-600" />
+                <span>Previous Prescriptions & Revisit History</span>
+              </h4>
+              <div className="space-y-2">
+                {getPatientPastVisits(selectedPatientForDrawer.name).map((pv, idx) => (
+                  <div key={idx} className="p-3.5 bg-slate-50 dark:bg-[#0c1219] rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-2 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="font-extrabold text-teal-600 dark:text-teal-400">📅 {pv.date}</span>
+                      <span className="text-[10px] text-slate-500 font-medium">{pv.doctorName}</span>
+                    </div>
+                    <p className="font-bold text-slate-900 dark:text-white">{pv.diagnosis}</p>
+                    <div className="space-y-1">
+                      {pv.medicines.map((m, mIdx) => (
+                        <div key={mIdx} className="text-[11px] text-slate-600 dark:text-slate-400 flex justify-between">
+                          <span>• {m.name}</span>
+                          <span className="font-mono text-teal-600 font-bold">{m.dosage}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {pv.orderedTests && pv.orderedTests.length > 0 && (
+                      <div className="flex flex-wrap gap-1 pt-1">
+                        {pv.orderedTests.map((t, tIdx) => (
+                          <span key={tIdx} className="text-[10px] bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 px-2 py-0.5 rounded font-medium">
+                            🔬 {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
 

@@ -54,6 +54,8 @@ export interface PrescriptionRecord {
   clinicName: string;
   tokenNumber: number;
   medicines: MedicineItem[];
+  orderedTests?: string[];
+  signatureDataUrl?: string;
   totalBill: number;
   status: 'pending' | 'dispensed';
   createdAt: string;
@@ -599,3 +601,76 @@ export function getQueueEstimatedWaitTime(doctorId: string, targetToken: number)
     isCompleted
   };
 }
+
+// --- Patient Past Medical History & Revisit Timeline ---
+
+export interface PastClinicalVisit {
+  id: string;
+  date: string;
+  diagnosis: string;
+  vitals: { bp: string; pulse: string; weight: string; temp: string };
+  medicines: { id: string; name: string; dosage: string; duration: string; timing: string }[];
+  orderedTests: string[];
+  advice: string;
+  doctorName: string;
+  clinicName: string;
+}
+
+export const SEED_PATIENT_HISTORY: Record<string, PastClinicalVisit[]> = {
+  'rahul': [
+    {
+      id: 'vis-1',
+      date: '14 Aug 2026',
+      diagnosis: 'Acute Lumbar Spondylosis & Muscle Spasm (कमर दर्द)',
+      vitals: { bp: '126/82 mmHg', pulse: '74 bpm', weight: '68 kg', temp: '98.4 °F' },
+      medicines: [
+        { id: 'm-old-1', name: 'Tab. Zerodol-SP (Aceclofenac + Serratiopeptidase)', dosage: '1-0-1', duration: '5 Days', timing: 'After Food (खाने के बाद)' },
+        { id: 'm-old-2', name: 'Tab. Pantocid 40mg (Pantoprazole)', dosage: '1-0-0', duration: '7 Days', timing: 'Empty Stomach (खाली पेट)' },
+        { id: 'm-old-3', name: 'Cap. Shelcal 500 (Calcium + Vit D3)', dosage: '0-0-1', duration: '30 Days', timing: 'After Food (खाने के बाद)' },
+      ],
+      orderedTests: ['Complete Blood Count (CBC)', 'X-Ray Lumbar Spine AP/Lat', 'Serum Uric Acid'],
+      advice: 'Avoid lifting heavy objects. Lumbar stretching exercises daily after hot fomentation.',
+      doctorName: 'Dr. Amit Kumar (MS Ortho)',
+      clinicName: 'Gupta Clinic & Joint Care Center',
+    },
+    {
+      id: 'vis-2',
+      date: '02 Jun 2026',
+      diagnosis: 'Cervical Strain & Shoulder Stiffness (गर्दन में अकड़न)',
+      vitals: { bp: '120/80 mmHg', pulse: '70 bpm', weight: '67.5 kg', temp: '98.6 °F' },
+      medicines: [
+        { id: 'm-old-4', name: 'Tab. Myoril 4mg (Thiocolchicoside)', dosage: '1-0-1', duration: '5 Days', timing: 'After Food (खाने के बाद)' },
+        { id: 'm-old-5', name: 'Tab. Dolo 650mg (Paracetamol)', dosage: '1-0-1', duration: '3 Days', timing: 'After Food (खाने के बाद)' },
+        { id: 'm-old-6', name: 'Ointment Volini Gel (Pain Relief)', dosage: 'Apply twice daily', duration: '7 Days', timing: 'External application' },
+      ],
+      orderedTests: ['X-Ray Cervical Spine AP/Lat'],
+      advice: 'Use cervical pillow while sleeping. Avoid bending neck downwards while using mobile phone.',
+      doctorName: 'Dr. Amit Kumar (MS Ortho)',
+      clinicName: 'Gupta Clinic & Joint Care Center',
+    }
+  ],
+  'priya': [
+    {
+      id: 'vis-3',
+      date: '02 Jul 2026',
+      diagnosis: 'Early Bilateral Knee Osteoarthritis (घुटनों का दर्द)',
+      vitals: { bp: '118/76 mmHg', pulse: '76 bpm', weight: '59 kg', temp: '98.6 °F' },
+      medicines: [
+        { id: 'm-old-7', name: 'Tab. Cartigen Forte (Glucosamine + Chondroitin)', dosage: '1-0-1', duration: '30 Days', timing: 'After Food (खाने के बाद)' },
+        { id: 'm-old-8', name: 'Tab. Calpol 500mg', dosage: 'SOS (As needed)', duration: '5 Days', timing: 'After Food (खाने के बाद)' },
+      ],
+      orderedTests: ['X-Ray Both Knees AP/Lat Standing', 'Serum Calcium & Vitamin D3'],
+      advice: 'Quadriceps strengthening exercises. Avoid sitting cross-legged on floor.',
+      doctorName: 'Dr. Amit Kumar (MS Ortho)',
+      clinicName: 'Gupta Clinic & Joint Care Center',
+    }
+  ]
+};
+
+export function getPatientPastVisits(patientNameOrPhone: string): PastClinicalVisit[] {
+  const norm = (patientNameOrPhone || '').toLowerCase();
+  if (norm.includes('priya')) return SEED_PATIENT_HISTORY['priya'];
+  if (norm.includes('rahul')) return SEED_PATIENT_HISTORY['rahul'];
+  return SEED_PATIENT_HISTORY['rahul'];
+}
+
