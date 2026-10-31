@@ -1,12 +1,16 @@
 {
-  "name": "DocNest Healthcare",
+  "name": "DocNest — Health & Pharmacy System",
   "short_name": "DocNest",
-  "description": "District Healthcare Appointment & OPD Live Queue Platform",
-  "start_url": "/patient",
+  "description": "Unified Smart Healthcare Platform for Patients, Doctors, and Pharmacy Dispensing",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#10b981",
-  "orientation": "portrait-primary",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "background_color": "#0c1219",
+  "theme_color": "#0D9488",
+  "orientation": "any",
+  "categories": ["medical", "health", "productivity", "business"],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -19,6 +23,29 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book Appointment",
+      "short_name": "Book OPD",
+      "description": "Find doctor and book live queue token",
+      "url": "/patient",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Pharmacy Dispensing",
+      "short_name": "Pharmacy POS",
+      "description": "Dispense doctor prescriptions and track orders",
+      "url": "/compounder/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Doctor OPD Queue",
+      "short_name": "Doctor Queue",
+      "description": "Manage live tokens and write digital prescriptions",
+      "url": "/doctor/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     }
   ]
 }
