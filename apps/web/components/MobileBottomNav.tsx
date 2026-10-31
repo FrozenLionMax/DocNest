@@ -13,7 +13,12 @@ import {
   Stethoscope,
   Pill,
   Tv,
-  QrCode
+  QrCode,
+  ShieldCheck,
+  BarChart3,
+  Settings,
+  Users,
+  CreditCard
 } from 'lucide-react';
 import { useLanguage } from './LanguageContext';
 
@@ -29,6 +34,10 @@ export default function MobileBottomNav() {
   // Determine user role based on pathname
   const isDoctor = pathname.startsWith('/doctor');
   const isCompounder = pathname.startsWith('/compounder');
+  const isAdmin = pathname.startsWith('/admin');
+  const isAgent = pathname.startsWith('/agent');
+  const isBlock = pathname.startsWith('/block');
+  const isDistrict = pathname.startsWith('/district');
   const isPatient = pathname.startsWith('/patient');
 
   // Define tabs per role
@@ -39,6 +48,12 @@ export default function MobileBottomNav() {
       label: 'Home',
       labelHi: 'होम',
       exact: true,
+    },
+    {
+      href: '/patient/doctors',
+      icon: Stethoscope,
+      label: 'Doctors',
+      labelHi: 'डॉक्टर्स',
     },
     {
       href: '/patient/book',
@@ -58,12 +73,6 @@ export default function MobileBottomNav() {
       icon: FileText,
       label: 'Rx Records',
       labelHi: 'पर्चा',
-    },
-    {
-      href: '/patient/settings',
-      icon: User,
-      label: 'Profile',
-      labelHi: 'प्रोफ़ाइल',
     },
   ];
 
@@ -113,7 +122,123 @@ export default function MobileBottomNav() {
     },
   ];
 
-  const tabs = isDoctor ? doctorTabs : isCompounder ? compounderTabs : patientTabs;
+  const adminTabs = [
+    {
+      href: '/admin/dashboard',
+      icon: LayoutDashboard,
+      label: 'Overview',
+      labelHi: 'डैशबोर्ड',
+      exact: true,
+    },
+    {
+      href: '/admin/doctors',
+      icon: Stethoscope,
+      label: 'Doctors',
+      labelHi: 'डॉक्टर्स',
+    },
+    {
+      href: '/admin/analytics',
+      icon: BarChart3,
+      label: 'Analytics',
+      labelHi: 'विश्लेषण',
+      highlight: true,
+    },
+    {
+      href: '/admin/settings',
+      icon: Settings,
+      label: 'Settings',
+      labelHi: 'सेटिंग्स',
+    },
+  ];
+
+  const agentTabs = [
+    {
+      href: '/agent/dashboard',
+      icon: LayoutDashboard,
+      label: 'Queue',
+      labelHi: 'कतार',
+      exact: true,
+    },
+    {
+      href: '/agent/bookings',
+      icon: PlusCircle,
+      label: 'Book Token',
+      labelHi: 'टोकन बुक',
+      highlight: true,
+    },
+    {
+      href: '/patient',
+      icon: Users,
+      label: 'Patients',
+      labelHi: 'मरीज',
+    },
+  ];
+
+  const blockTabs = [
+    {
+      href: '/block/dashboard',
+      icon: LayoutDashboard,
+      label: 'Block OPD',
+      labelHi: 'ब्लॉक OPD',
+      exact: true,
+    },
+    {
+      href: '/block/agents',
+      icon: Users,
+      label: 'Agents',
+      labelHi: 'एजेंट्स',
+      highlight: true,
+    },
+    {
+      href: '/doctor/dashboard',
+      icon: Stethoscope,
+      label: 'Clinics',
+      labelHi: 'क्लिनिक',
+    },
+  ];
+
+  const districtTabs = [
+    {
+      href: '/district/dashboard',
+      icon: LayoutDashboard,
+      label: 'District',
+      labelHi: 'जिला',
+      exact: true,
+    },
+    {
+      href: '/district/doctors',
+      icon: Stethoscope,
+      label: 'Doctors',
+      labelHi: 'डॉक्टर्स',
+    },
+    {
+      href: '/district/agents',
+      icon: Users,
+      label: 'Agents',
+      labelHi: 'एजेंट्स',
+    },
+    {
+      href: '/district/payments',
+      icon: CreditCard,
+      label: 'Payouts',
+      labelHi: 'भुगतान',
+      highlight: true,
+    },
+  ];
+
+  const tabs = isDoctor
+    ? doctorTabs
+    : isCompounder
+    ? compounderTabs
+    : isAdmin
+    ? adminTabs
+    : isAgent
+    ? agentTabs
+    : isBlock
+    ? blockTabs
+    : isDistrict
+    ? districtTabs
+    : patientTabs;
 
   return (
     <nav

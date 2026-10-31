@@ -131,7 +131,7 @@ export default function AgentDashboardPage() {
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6 max-w-6xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="p-4 md:p-8 pb-28 space-y-6 max-w-6xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Header Banner */}
       <div className="flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
         <div>
@@ -146,10 +146,48 @@ export default function AgentDashboardPage() {
           </p>
         </div>
 
-        <div className="text-right bg-slate-950 p-4 rounded-2xl border border-slate-800">
-          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Today's Collection</span>
-          <span className="text-2xl font-black font-mono text-emerald-400">₹3,600</span>
-          <span className="text-[10px] text-slate-400 block">12 Bookings Handled</span>
+        <div className="flex items-center space-x-3">
+          <div className="text-right bg-slate-950 p-4 rounded-2xl border border-slate-800">
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Today's Collection</span>
+            <span className="text-2xl font-black font-mono text-emerald-400">₹3,600</span>
+            <span className="text-[10px] text-slate-400 block">{recentBookings.length} Bookings Handled</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Village Cash Reconciliation Strip */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-md flex items-center justify-between">
+          <div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Physical Cash In Hand</span>
+            <p className="text-xl font-black font-mono text-amber-400 mt-0.5">₹1,200</p>
+            <span className="text-[10px] text-slate-500">To deposit with Block Coordinator</span>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 font-bold text-sm">
+            💵
+          </div>
+        </div>
+
+        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-md flex items-center justify-between">
+          <div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Settled / Deposited</span>
+            <p className="text-xl font-black font-mono text-emerald-400 mt-0.5">₹2,400</p>
+            <span className="text-[10px] text-emerald-400/80 font-semibold">✓ Audited & Verified</span>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 font-bold text-sm">
+            ✓
+          </div>
+        </div>
+
+        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-md flex items-center justify-between">
+          <div>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Agent Commission Earned</span>
+            <p className="text-xl font-black font-mono text-teal-400 mt-0.5">₹300</p>
+            <span className="text-[10px] text-slate-500">₹25 per patient booking</span>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 font-bold text-sm">
+            🪙
+          </div>
         </div>
       </div>
 

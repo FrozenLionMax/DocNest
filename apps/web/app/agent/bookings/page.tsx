@@ -32,7 +32,7 @@ export default function AgentBookingsPage() {
   });
 
   return (
-    <div className="p-4 md:p-8 space-y-6 max-w-6xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="p-4 md:p-8 pb-28 space-y-6 max-w-6xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Header */}
       <div className="flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
         <div>
@@ -84,9 +84,45 @@ export default function AgentBookingsPage() {
         </div>
       </div>
 
-      {/* Bookings Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-        <div className="overflow-x-auto">
+      {/* Bookings View: Mobile Cards + Desktop Table */}
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 md:p-6 shadow-xl space-y-4">
+        {/* Mobile Card List (Visible on phones) */}
+        <div className="md:hidden space-y-3">
+          {filtered.map((b) => (
+            <div key={b.id} className="p-4 bg-slate-950 rounded-2xl border border-slate-800/80 space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="font-mono font-black text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-xl text-xs">
+                  Token #{b.token}
+                </span>
+                <span className="text-[11px] font-mono text-slate-400">{b.date} • {b.time}</span>
+              </div>
+              <div>
+                <p className="font-bold text-white text-sm">{b.patient}</p>
+                <p className="font-mono text-xs text-slate-400">{b.phone}</p>
+              </div>
+              <div className="flex justify-between items-center text-xs pt-1 border-t border-slate-800/60">
+                <span className="text-slate-300 truncate max-w-[180px]">{b.doctor}</span>
+                <span className="font-mono font-bold text-white">₹{b.fee}</span>
+              </div>
+              <div className="flex justify-between items-center pt-1">
+                <span className={`font-semibold px-2 py-0.5 rounded text-[10px] ${b.mode === 'Cash' ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30' : 'bg-blue-500/15 text-blue-300 border border-blue-500/30'}`}>
+                  {b.mode}
+                </span>
+                <span className="text-emerald-400 text-[11px] font-bold bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+                  Confirmed ✓
+                </span>
+              </div>
+            </div>
+          ))}
+          {filtered.length === 0 && (
+            <div className="p-8 text-center text-xs text-slate-400">
+              No bookings matched your search query.
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Table (Hidden on mobile) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-slate-800 text-slate-400 uppercase font-black tracking-wider">

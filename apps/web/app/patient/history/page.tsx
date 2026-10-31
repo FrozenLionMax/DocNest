@@ -251,30 +251,6 @@ export default function PatientHistoryPage() {
           })}
         </div>
       </main>
-
-      {/* Mobile Nav */}
-      <nav className="fixed md:hidden bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 px-3 py-2 flex items-center justify-around shadow-2xl">
-        <Link href="/patient" className="flex flex-col items-center text-slate-400 hover:text-white py-1">
-          <Activity className="w-5 h-5" />
-          <span className="text-[10px] font-medium mt-1">Home</span>
-        </Link>
-        <Link href="/patient/doctors" className="flex flex-col items-center text-slate-400 hover:text-white py-1">
-          <Stethoscope className="w-5 h-5" />
-          <span className="text-[10px] font-medium mt-1">Doctors</span>
-        </Link>
-        <Link href="/patient/appointments" className="flex flex-col items-center text-slate-400 hover:text-white py-1">
-          <Calendar className="w-5 h-5" />
-          <span className="text-[10px] font-medium mt-1">Bookings</span>
-        </Link>
-        <Link href="/patient/history" className="flex flex-col items-center text-emerald-400 py-1">
-          <FileText className="w-5 h-5" />
-          <span className="text-[10px] font-bold mt-1">History</span>
-        </Link>
-        <Link href="/patient/settings" className="flex flex-col items-center text-slate-400 hover:text-white py-1">
-          <Settings className="w-5 h-5" />
-          <span className="text-[10px] font-medium mt-1">Settings</span>
-        </Link>
-      </nav>
     </div>
   );
 }

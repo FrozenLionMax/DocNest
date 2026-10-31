@@ -159,7 +159,7 @@ export default function DoctorSchedulePage() {
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6 max-w-5xl mx-auto w-full">
+    <div className="p-4 md:p-8 pb-28 space-y-6 max-w-5xl mx-auto w-full">
       {/* Page Header */}
       <div className="flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl">
         <div>

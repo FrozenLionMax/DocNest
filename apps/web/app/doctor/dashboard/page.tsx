@@ -173,7 +173,7 @@ export default function DoctorDashboard() {
   const waitingCount = patients.filter((p) => p.status === 'waiting').length;
 
   return (
-    <div className="p-4 md:p-8 space-y-6 max-w-7xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="p-4 md:p-8 pb-28 space-y-6 max-w-7xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Top Header Bar */}
       <div className="flex flex-wrap justify-between items-center gap-4 bg-white/95 dark:bg-[#141e28] border border-teal-100 dark:border-teal-900/40 p-5 rounded-3xl shadow-sm hover:shadow-md transition">
         <div className="flex-1 min-w-[280px]">

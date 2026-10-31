@@ -30,7 +30,7 @@ export default function CompounderDashboardPage() {
   const totalRevenue = dispensed.reduce((sum, p) => sum + (p.totalBill || 0), 0);
 
   return (
-    <div className="p-6 md:p-8 space-y-8 max-w-7xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="p-6 md:p-8 pb-28 space-y-8 max-w-7xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Top Banner */}
       <div className="flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
         <div className="flex items-center space-x-3">
@@ -104,7 +104,49 @@ export default function CompounderDashboardPage() {
           </Link>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile Cards (Visible on phones) */}
+        <div className="md:hidden space-y-3">
+          {prescriptions.slice(0, 5).map((rx) => (
+            <div key={rx.id} className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2.5">
+              <div className="flex justify-between items-center">
+                <span className="font-mono font-bold text-xs text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">
+                  Token #{rx.tokenNumber}
+                </span>
+                <span className={`px-2 py-0.5 rounded-md font-bold uppercase text-[10px] ${
+                  rx.status === 'dispensed' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'
+                }`}>
+                  {rx.status}
+                </span>
+              </div>
+
+              <div>
+                <p className="font-bold text-white text-sm">{rx.patientName}</p>
+                <p className="text-xs text-slate-300">{rx.doctorName}</p>
+                <p className="text-[11px] text-slate-400 mt-1 line-clamp-2">
+                  {rx.medicines.map(m => m.name.split(' (')[0]).join(', ')}
+                </p>
+              </div>
+
+              <div className="flex justify-between items-center pt-2 border-t border-slate-800">
+                <span className="font-mono font-bold text-emerald-400 text-sm">₹{rx.totalBill}</span>
+                <Link
+                  href="/compounder/dispense"
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-1.5 rounded-xl font-bold text-xs shadow transition active:scale-95"
+                >
+                  Dispense Rx →
+                </Link>
+              </div>
+            </div>
+          ))}
+          {prescriptions.length === 0 && (
+            <div className="p-6 text-center text-xs text-slate-400">
+              No prescriptions in pharmacy queue.
+            </div>
+          )}
+        </div>
+
+        {/* Desktop Table (Hidden on mobile) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead>
               <tr className="border-b border-slate-800 text-slate-400 font-semibold uppercase">

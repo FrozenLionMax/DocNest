@@ -29,7 +29,7 @@ export default function DistrictDashboardPage() {
   ];
 
   return (
-    <div className="p-4 md:p-8 space-y-6 max-w-6xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="p-4 md:p-8 pb-28 space-y-6 max-w-6xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Header Banner */}
       <div className="flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
         <div>
@@ -103,8 +103,8 @@ export default function DistrictDashboardPage() {
         </div>
       </div>
 
-      {/* Block-wise Performance Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      {/* Block-wise Performance View */}
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 md:p-6 shadow-xl space-y-4">
         <div className="flex justify-between items-center">
           <h3 className="text-base font-black text-white flex items-center space-x-2">
             <Building2 className="w-5 h-5 text-rose-400" />
@@ -113,7 +113,41 @@ export default function DistrictDashboardPage() {
           <span className="text-xs text-slate-400 font-mono">Live District Feed</span>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile Cards (Visible on phones) */}
+        <div className="md:hidden space-y-3">
+          {blockPerformance.map((bp, idx) => (
+            <div key={idx} className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2.5">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="font-bold text-white text-sm">{bp.block}</h4>
+                  <p className="text-xs text-slate-400">Coordinator: {bp.coordinator}</p>
+                  <p className="text-[11px] font-mono text-cyan-400 font-bold">{bp.agents} Field Agents</p>
+                </div>
+                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                  {bp.status}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 bg-slate-900/80 p-3 rounded-xl border border-slate-800 text-center">
+                <div>
+                  <span className="text-[9px] text-slate-500 uppercase block">Bookings</span>
+                  <span className="font-mono font-bold text-white text-xs">{bp.todayBookings}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] text-slate-500 uppercase block">Gross OPD</span>
+                  <span className="font-mono font-black text-emerald-400 text-xs">₹{bp.revenue.toLocaleString()}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] text-slate-500 uppercase block">DocNest 25%</span>
+                  <span className="font-mono font-bold text-rose-300 text-xs">₹{bp.commission.toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table (Hidden on mobile) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-slate-800 text-slate-400 uppercase font-black tracking-wider">

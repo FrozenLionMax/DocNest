@@ -55,7 +55,7 @@ export default function BlockDashboardPage() {
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6 max-w-6xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="p-4 md:p-8 pb-28 space-y-6 max-w-6xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Header */}
       <div className="flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
         <div>
@@ -114,8 +114,8 @@ export default function BlockDashboardPage() {
         </div>
       </div>
 
-      {/* Village Agent Cash Reconciliation Workflow Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      {/* Village Agent Cash Reconciliation Workflow View */}
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 md:p-6 shadow-xl space-y-4">
         <div className="flex flex-wrap justify-between items-center gap-3">
           <div>
             <h3 className="text-base font-black text-white flex items-center space-x-2">
@@ -127,7 +127,54 @@ export default function BlockDashboardPage() {
           <span className="text-xs text-slate-400 font-mono">End of Day Settlement</span>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile-first cards (Visible on phones) */}
+        <div className="md:hidden space-y-3">
+          {villageAgents.map((agent) => (
+            <div key={agent.id} className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2.5">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="font-bold text-white text-sm">{agent.name}</h4>
+                  <p className="text-xs text-cyan-400 font-semibold">{agent.village} Village</p>
+                  <p className="text-[11px] text-slate-500 font-mono">{agent.phone}</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-sm font-black font-mono text-white block">₹{agent.collection.toLocaleString()}</span>
+                  <span className="text-[10px] text-emerald-400 font-mono">{agent.todayBookings} Bookings</span>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
+                <div>
+                  {agent.reconciliationStatus === 'reconciled' ? (
+                    <span className="inline-flex items-center space-x-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>Deposited ✓</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center space-x-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                      <Clock className="w-3 h-3" />
+                      <span>Pending Handover</span>
+                    </span>
+                  )}
+                </div>
+
+                {agent.reconciliationStatus === 'pending_handover' ? (
+                  <button
+                    onClick={() => handleAcknowledgeCash(agent.id, agent.name, agent.collection)}
+                    className="bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold px-3 py-1.5 rounded-xl text-xs transition shadow-md whitespace-nowrap"
+                  >
+                    Acknowledge ₹{agent.collection} ✓
+                  </button>
+                ) : (
+                  <span className="text-[11px] text-slate-500 font-semibold">Audited ✓</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table (Hidden on mobile) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="border-b border-slate-800 text-slate-400 uppercase font-black tracking-wider">

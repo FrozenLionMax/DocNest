@@ -711,7 +711,7 @@ function PrescriptionContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 flex flex-col items-center">
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 pb-28 flex flex-col items-center">
       {/* Dynamic CSS Print Styles for Genuine A4 Printable Output */}
       <style jsx global>{`
         @media print {

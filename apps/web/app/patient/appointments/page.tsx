@@ -640,30 +640,6 @@ export default function MyAppointmentsPage() {
           </div>
         </div>
       )}
-
-      {/* Floating App-like Mobile Bottom Navigation */}
-      <nav className="fixed md:hidden bottom-3 left-3 right-3 z-50 bg-[#0c1219]/90 backdrop-blur-2xl border border-[rgba(196,225,230,0.14)] rounded-2xl px-3 py-2 flex items-center justify-around shadow-[0_12px_32px_rgba(0,0,0,0.6)]">
-        <Link href="/patient" className="flex flex-col items-center text-slate-400 hover:text-white py-1 transition active:scale-90">
-          <Activity className="w-5 h-5" />
-          <span className="text-[10px] font-medium mt-1">Home</span>
-        </Link>
-        <Link href="/patient/doctors" className="flex flex-col items-center text-slate-400 hover:text-white py-1 transition active:scale-90">
-          <Stethoscope className="w-5 h-5" />
-          <span className="text-[10px] font-medium mt-1">Doctors</span>
-        </Link>
-        <Link href="/patient/appointments" className="flex flex-col items-center text-[#8dbcc7] py-1 transition active:scale-90">
-          <Calendar className="w-5 h-5" />
-          <span className="text-[10px] font-bold mt-1">Bookings</span>
-        </Link>
-        <Link href="/patient/history" className="flex flex-col items-center text-slate-400 hover:text-white py-1 transition active:scale-90">
-          <FileText className="w-5 h-5" />
-          <span className="text-[10px] font-medium mt-1">History</span>
-        </Link>
-        <Link href="/patient/settings" className="flex flex-col items-center text-slate-400 hover:text-white py-1 transition active:scale-90">
-          <Settings className="w-5 h-5" />
-          <span className="text-[10px] font-medium mt-1">Settings</span>
-        </Link>
-      </nav>
     </div>
   );
 }

@@ -14,7 +14,7 @@ export default function AdminAnalyticsPage() {
   ];
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-7xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
+    <div className="p-6 md:p-8 pb-28 space-y-6 max-w-7xl mx-auto w-full font-['Plus_Jakarta_Sans',sans-serif]">
       {/* Page Header */}
       <div className="flex flex-wrap justify-between items-center gap-4 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
         <div>
@@ -92,7 +92,40 @@ export default function AdminAnalyticsPage() {
           </span>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile Cards (Visible on phones) */}
+        <div className="md:hidden space-y-3">
+          {weeklyForecast.map((item, idx) => (
+            <div key={idx} className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+              <div className="flex justify-between items-center">
+                <span className="font-bold text-white text-sm">{item.day}</span>
+                <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
+                  item.level.includes('Surge') || item.level.includes('Rush')
+                    ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                    : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                }`}>
+                  {item.level}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-slate-400">Volume:</span>
+                <span className="font-mono font-black text-emerald-400">~{item.expected} Patients</span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-slate-400">Peak Hours:</span>
+                <span className="font-mono text-slate-300">{item.peak}</span>
+              </div>
+              <div className="pt-2 border-t border-slate-800/80 text-[11px] text-slate-300 flex items-center justify-between">
+                <span className="text-slate-500">Staffing:</span>
+                <span className="font-semibold text-cyan-300">
+                  {item.expected > 130 ? 'Open 2 Counters' : 'Standard 1 Counter'}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table (Hidden on mobile) */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-800 text-xs font-extrabold text-slate-400 uppercase tracking-wider">
