@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { DOCTORS_DIRECTORY, DoctorProfile } from '../../../lib/doctors-data';
 import { getSession } from '../../../lib/auth';
+import { bookAppointment } from '../../../lib/clinical-store';
 import {
   UserPlus,
   Calendar,
@@ -81,9 +82,26 @@ export default function AgentDashboardPage() {
 
   const handleBookingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!patientName || !patientPhone) return;
+    // Real sequential token and clinical store synchronization
+    const booked = bookAppointment({
+      doctorId: selectedDoctor.id,
+      doctorName: selectedDoctor.name,
+      specialty: selectedDoctor.specialty,
+      clinicName: selectedDoctor.clinicName,
+      address: selectedDoctor.clinicAddress || 'Deoria',
+      date: new Date().toISOString().split('T')[0],
+      slot: selectedSlot === 'morning' ? 'Morning Slot (10:00 AM - 02:00 PM)' : 'Evening Slot (04:00 PM - 08:00 PM)',
+      patientName: patientName,
+      patientPhone: patientPhone,
+      patientEmail: '',
+      patientAge: patientAge || '35',
+      patientGender: patientGender,
+      paymentMode: paymentMode === 'cash_collected' ? 'pay_at_clinic' : 'online_upi',
+      consultationFee: selectedDoctor.consultationFee,
+      platformFee: 29
+    });
 
-    const assignedToken = Math.floor(18 + Math.random() * 5);
+    const assignedToken = booked.queueEntry.tokenNumber;
     const newEntry = {
       id: `ag-${Date.now()}`,
       token: assignedToken,
