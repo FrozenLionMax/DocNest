@@ -142,15 +142,15 @@ export default function PatientHomePage() {
   return (
     <div className="min-h-screen bg-mesh-dark text-slate-100 flex flex-col font-['Plus_Jakarta_Sans',sans-serif] pb-24 md:pb-12">
       {/* Top Header */}
-      <header className="sticky top-0 z-40 bg-[#0c1219]/80 backdrop-blur-2xl border-b border-[rgba(196,225,230,0.12)] px-4 md:px-8 py-3.5 flex flex-wrap items-center justify-between shadow-xl gap-3">
-        <div className="flex items-center space-x-4">
+      <header className="sticky top-0 z-40 bg-[#0c1219]/90 backdrop-blur-2xl border-b border-[rgba(196,225,230,0.12)] px-4 md:px-8 py-2.5 flex items-center justify-between shadow-xl">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           <Link href="/patient" className="hover:opacity-95 transition">
-            <DocNestLogo size="md" subtitle="Patient Portal • Deoria Network" />
+            <DocNestLogo size="sm" subtitle="Patient Portal" />
           </Link>
           <NavControls fallbackBackUrl="/" showHome={false} showLogout={false} />
         </div>
 
-        <div className="flex items-center space-x-2.5">
+        <div className="flex items-center space-x-2">
           <ThemeTogglePill />
           <LanguageTogglePill />
           <NavControls showHome={false} showLogout={true} />

@@ -121,8 +121,8 @@ export default function NavControls({
     : 'px-2.5 py-1.5 rounded-xl transition duration-150 active:scale-95 text-xs font-semibold flex items-center space-x-1.5';
 
   return (
-    <div className={`flex items-center space-x-2 select-none ${className}`}>
-      {/* Back Button */}
+    <div className={`flex items-center space-x-1.5 select-none ${className}`}>
+      {/* Back Button - Always accessible, sleek on mobile */}
       <button
         type="button"
         onClick={handleBack}
@@ -130,38 +130,38 @@ export default function NavControls({
         className={`${btnBase} ${
           canGoBack || fallbackBackUrl || pathname !== '/'
             ? 'bg-[#141e28] hover:bg-[#1f2f3f] text-[#a4ccd9] hover:text-white border border-[rgba(196,225,230,0.18)] hover:border-[#8dbcc7]/40 shadow-sm'
-            : 'bg-[#141e28]/40 text-slate-600 border border-transparent cursor-not-allowed'
+            : 'bg-[#141e28]/40 text-slate-600 border border-transparent cursor-not-allowed hidden sm:flex'
         }`}
         title="Go Back (Alt + Left Arrow)"
         aria-label="Go Back"
       >
         <ArrowLeft className={compact ? 'w-4 h-4' : 'w-3.5 h-3.5'} />
-        {!compact && <span className="hidden sm:inline">Back</span>}
+        {!compact && <span className="hidden md:inline">Back</span>}
       </button>
 
-      {/* Forward Button */}
+      {/* Forward Button - Visible on tablets/desktop where mouse navigation is standard */}
       <button
         type="button"
         onClick={handleForward}
-        className={`${btnBase} bg-[#141e28] hover:bg-[#1f2f3f] text-[#a4ccd9] hover:text-white border border-[rgba(196,225,230,0.18)] hover:border-[#8dbcc7]/40 shadow-sm`}
+        className={`${btnBase} hidden sm:flex bg-[#141e28] hover:bg-[#1f2f3f] text-[#a4ccd9] hover:text-white border border-[rgba(196,225,230,0.18)] hover:border-[#8dbcc7]/40 shadow-sm`}
         title="Go Forward (Alt + Right Arrow)"
         aria-label="Go Forward"
       >
-        {!compact && <span className="hidden sm:inline">Forward</span>}
+        {!compact && <span className="hidden md:inline">Forward</span>}
         <ArrowRight className={compact ? 'w-4 h-4' : 'w-3.5 h-3.5'} />
       </button>
 
-      {/* Role Home shortcut */}
+      {/* Role Home shortcut - Visible on tablets/desktop (mobile has bottom nav) */}
       {showHome && pathname !== '/' && (
         <button
           type="button"
           onClick={handleHome}
-          className={`${btnBase} bg-[#141e28] hover:bg-[#1f2f3f] text-[#c4e1e6] hover:text-white border border-[rgba(196,225,230,0.18)] hover:border-[#8dbcc7]/40 shadow-sm`}
+          className={`${btnBase} hidden sm:flex bg-[#141e28] hover:bg-[#1f2f3f] text-[#c4e1e6] hover:text-white border border-[rgba(196,225,230,0.18)] hover:border-[#8dbcc7]/40 shadow-sm`}
           title="Return to Portal Home"
           aria-label="Portal Home"
         >
           <Home className={compact ? 'w-4 h-4 text-[#8dbcc7]' : 'w-3.5 h-3.5 text-[#8dbcc7]'} />
-          {!compact && <span className="hidden sm:inline">Home</span>}
+          {!compact && <span className="hidden md:inline">Home</span>}
         </button>
       )}
 
@@ -182,7 +182,7 @@ export default function NavControls({
           aria-label="Logout"
         >
           <LogOut className={compact ? 'w-4 h-4 text-rose-400' : 'w-3.5 h-3.5 text-rose-400'} />
-          {!compact && <span>Logout</span>}
+          {!compact && <span className="hidden sm:inline">Logout</span>}
         </button>
       )}
     </div>
