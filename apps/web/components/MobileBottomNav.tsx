@@ -118,7 +118,7 @@ export default function MobileBottomNav() {
   return (
     <nav
       aria-label="Mobile Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-2xl bg-slate-950/92 border-t border-slate-800/80 shadow-[0_-10px_30px_rgba(0,0,0,0.6)] px-2 pt-1 pb-[max(env(safe-area-inset-bottom),10px)] select-none transition-all duration-200"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-50 backdrop-blur-2xl bg-slate-950/95 border-t border-slate-800/80 shadow-[0_-10px_30px_rgba(0,0,0,0.7)] px-2 pt-1.5 pb-[max(env(safe-area-inset-bottom),12px)] select-none transition-all duration-200"
     >
       <div className="flex items-center justify-around max-w-lg mx-auto">
         {tabs.map((tab) => {

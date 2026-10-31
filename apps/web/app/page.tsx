@@ -150,8 +150,8 @@ export default function LandingPage() {
           </nav>
 
           {/* Action Buttons, NavControls & Language Switcher */}
-          <div className="flex items-center space-x-2.5">
-            <NavControls showHome={false} showLogout={false} />
+          <div className="flex items-center space-x-2">
+            <NavControls showHome={false} showLogout={false} className="hidden sm:flex" />
             <LanguageTogglePill />
 
             {loggedInUser ? (
@@ -166,17 +166,17 @@ export default function LandingPage() {
                       ? '/compounder/dashboard'
                       : `/${loggedInUser.role}/dashboard`
                   }
-                  className="btn-primary-tactile text-[#0c1219] font-black text-xs px-4 py-2 rounded-xl shadow-lg flex items-center space-x-1.5 transition active:scale-95 cursor-pointer"
+                  className="btn-primary-tactile text-[#0c1219] font-black text-xs px-3.5 py-2 rounded-xl shadow-lg flex items-center space-x-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap"
                 >
                   <span>My Portal ({loggedInUser.name.split(' ')[0]})</span>
                   <ArrowRight className="w-3.5 h-3.5 text-[#0c1219]" />
                 </Link>
-                <NavControls showHome={false} showLogout={true} />
+                <NavControls showHome={false} showLogout={true} className="hidden sm:flex" />
               </div>
             ) : (
               <Link
                 href="/login"
-                className="btn-primary-tactile text-[#0c1219] font-black text-xs px-5 py-2.5 rounded-xl shadow-lg flex items-center space-x-2 transition active:scale-95 cursor-pointer"
+                className="btn-primary-tactile text-[#0c1219] font-black text-xs px-4 py-2 rounded-xl shadow-lg flex items-center space-x-1.5 transition active:scale-95 cursor-pointer whitespace-nowrap flex-shrink-0"
               >
                 <LogIn className="w-3.5 h-3.5 text-[#0c1219]" />
                 <span>Sign In</span>

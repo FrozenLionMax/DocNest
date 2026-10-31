@@ -8,7 +8,7 @@ import { savePrescription, getQueueEntries, updateQueueEntryStatus, getPatientPa
 import {
   Printer, Plus, Trash2, Save, Download, Stethoscope,
   User, Calendar, Pill, CheckCircle2, FileText, ArrowLeft, Search, Check, Sparkles, Zap, MessageSquare, Clock,
-  AlertTriangle, ShieldAlert, ShieldCheck, Info, FlaskConical, History, PenTool, Stamp, X, RotateCcw, BadgeCheck, Copy, ChevronDown, ChevronUp
+  AlertTriangle, ShieldAlert, ShieldCheck, Info, FlaskConical, History, PenTool, Stamp, X, RotateCcw, BadgeCheck, Copy, ChevronDown, ChevronUp, ChevronLeft
 } from 'lucide-react';
 import Link from 'next/link';
 import NavControls from '../../../components/NavControls';
@@ -742,7 +742,15 @@ function PrescriptionContent() {
       {/* Top Action Bar (Hidden on Print) */}
       <div className="print:hidden w-full max-w-4xl bg-slate-900 border border-slate-800 text-white p-4 rounded-2xl mb-4 flex flex-wrap items-center justify-between shadow-xl gap-4">
         <div className="flex items-center space-x-3">
-          <NavControls fallbackBackUrl="/doctor/dashboard" showHome={true} showLogout={false} />
+          <Link
+            href="/doctor/dashboard"
+            className="p-2 bg-[#141e28] text-slate-300 hover:text-white rounded-xl border border-[rgba(196,225,230,0.18)] flex items-center justify-center sm:hidden"
+            title="Back to OPD Queue"
+            aria-label="Back to OPD Queue"
+          >
+            <ChevronLeft className="w-5 h-5 text-emerald-400" />
+          </Link>
+          <NavControls fallbackBackUrl="/doctor/dashboard" showHome={true} showLogout={false} className="hidden sm:flex" />
           <div>
             <h1 className="text-lg font-bold flex items-center space-x-2">
               <FileText className="w-5 h-5 text-emerald-400" />

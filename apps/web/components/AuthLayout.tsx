@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSession, logout, DocNestUser, UserRole } from '../lib/auth';
 import Sidebar from './Sidebar';
-import { Loader2, Menu } from 'lucide-react';
+import { Loader2, Menu, LogOut } from 'lucide-react';
 
 import { LanguageTogglePill } from './LanguageContext';
 import DocNestLogo from './DocNestLogo';
@@ -50,23 +50,26 @@ export default function AuthLayout({ children, allowedRoles }: AuthLayoutProps) 
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-mesh-dark text-slate-100">
-      {/* Mobile Top Header */}
-      <header className="md:hidden bg-[#0c1219]/95 border-b border-[rgba(196,225,230,0.14)] p-3 flex flex-col space-y-2 sticky top-0 z-30 shadow-sm backdrop-blur-md">
-        <div className="flex items-center justify-between">
-          <DocNestLogo size="sm" subtitle="Clinical Portal" />
-          <div className="flex items-center space-x-2">
-            <LanguageTogglePill />
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 bg-[#141e28] text-slate-300 hover:text-white rounded-xl border border-[rgba(196,225,230,0.14)]"
-              aria-label="Toggle Navigation Menu"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-        <div className="pt-1 border-t border-[rgba(196,225,230,0.08)]">
-          <NavControls compact={false} showHome={true} showLogout={true} />
+      {/* Mobile Top Header - Single row, sleek and compact */}
+      <header className="md:hidden bg-[#0c1219]/95 border-b border-[rgba(196,225,230,0.14)] px-4 py-2.5 flex items-center justify-between sticky top-0 z-30 shadow-md backdrop-blur-md">
+        <DocNestLogo size="sm" subtitle="Clinical Portal" />
+        <div className="flex items-center space-x-2">
+          <LanguageTogglePill />
+          <button
+            onClick={handleLogout}
+            className="p-2 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 rounded-xl border border-rose-800/40 text-xs flex items-center"
+            title="Logout"
+            aria-label="Logout"
+          >
+            <LogOut className="w-4 h-4 text-rose-400" />
+          </button>
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-2 bg-[#141e28] text-slate-300 hover:text-white rounded-xl border border-[rgba(196,225,230,0.14)]"
+            aria-label="Toggle Navigation Menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
         </div>
       </header>
 
