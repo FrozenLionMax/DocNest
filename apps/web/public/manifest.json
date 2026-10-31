@@ -2,7 +2,7 @@
   "name": "DocNest — Health & Pharmacy System",
   "short_name": "DocNest",
   "description": "Unified Smart Healthcare Platform for Patients, Doctors, and Pharmacy Dispensing",
-  "id": "/",
+  "id": "https://www.drugs.systems/",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -10,7 +10,10 @@
   "background_color": "#0c1219",
   "theme_color": "#0D9488",
   "orientation": "any",
+  "dir": "ltr",
+  "lang": "en-US",
   "categories": ["medical", "health", "productivity", "business"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192.png",
@@ -31,6 +34,22 @@
       "purpose": "maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "DocNest OPD Queue Controller & Pharmacy Dispensing Station"
+    },
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "DocNest Patient Token & Appointment Tracker"
+    }
+  ],
   "shortcuts": [
     {
       "name": "Book Appointment",
@@ -43,7 +62,7 @@
       "name": "Pharmacy Dispensing",
       "short_name": "Pharmacy POS",
       "description": "Dispense doctor prescriptions and track orders",
-      "url": "/compounder/dashboard",
+      "url": "/compounder/dispense",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
     },
     {
@@ -52,6 +71,61 @@
       "description": "Manage live tokens and write digital prescriptions",
       "url": "/doctor/dashboard",
       "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Waiting Room TV",
+      "short_name": "TV Display",
+      "description": "Smart TV display for clinic waiting room",
+      "url": "/doctor/tv",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+  "share_target": {
+    "action": "/patient/history",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+docnest",
+      "url": "/patient/book?token=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/patient/history",
+      "accept": {
+        "application/pdf": [".pdf"],
+        "image/*": [".png", ".jpg", ".jpeg"]
+      }
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
+  "widgets": [
+    {
+      "name": "Live OPD Token",
+      "description": "View current clinic token number on desktop widget",
+      "tag": "opd-token-widget",
+      "template": "widget-template",
+      "ms_ac_template": "widget.json",
+      "data": "/doctor/tv",
+      "type": "application/json",
+      "screenshots": [
+        {
+          "src": "/screenshot-mobile.png",
+          "sizes": "750x1334",
+          "label": "OPD Token Widget"
+        }
+      ]
     }
   ]
 }

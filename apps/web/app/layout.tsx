@@ -4,6 +4,7 @@ import Script from 'next/script';
 import './globals.css';
 import { LanguageProvider } from '../components/LanguageContext';
 import CommandPalette from '../components/CommandPalette';
+import ServiceWorkerRegistration from '../components/ServiceWorkerRegistration';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -47,6 +48,7 @@ export default function RootLayout({
         className="bg-[#0c1219] text-slate-100 antialiased font-['Plus_Jakarta_Sans',sans-serif] selection:bg-teal-500 selection:text-slate-950 overflow-x-hidden min-h-screen"
       >
         <LanguageProvider>
+          <ServiceWorkerRegistration />
           {children}
           <CommandPalette />
         </LanguageProvider>
