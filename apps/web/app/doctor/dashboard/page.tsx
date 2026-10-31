@@ -11,6 +11,17 @@ import {
   CheckCircle2, XCircle, SkipForward, Search, Volume2, VolumeX, Loader2,
   Calendar, AlertCircle, QrCode, Filter, Clock, Activity, History, X, User, ChevronDown
 } from 'lucide-react';
+import {
+  getQueueEntries,
+  getClinicState,
+  advanceDoctorToken,
+  toggleQueueStatus as storeToggleStatus,
+  resetQueue as storeResetQueue,
+  addWalkInPatient,
+  updateQueueEntryStatus,
+  subscribeToClinicalEvents,
+  QueueEntry
+} from '../../../lib/clinical-store';
 
 interface PatientEntry {
   id: string;
@@ -59,49 +70,45 @@ export default function DoctorDashboard() {
     { id: 'q-4', token: 4, name: 'Sunita Devi (सुनीता देवी)', phone: '9765432109', time: '10:45 AM', status: 'waiting', type: 'Offline पर्चा', ageGender: '52 / Female', allergies: ['Sulfa drugs'], lastVisit: '20 Jun 2026', notes: 'Hypertension checkup and cervical spondylosis.' },
   ]);
 
-  useEffect(() => {
-    async function loadQueueData() {
-      setLoading(true);
-      try {
-        const doctorId = selectedDoctorId;
-        const { data: queueData } = await supabase.from('clinic_queues').select('*').eq('doctor_id', doctorId).single();
-        if (queueData) {
-          setCurrentToken(queueData.current_token || 1);
-          setTotalIssued(queueData.total_issued || 4);
-          setQueueStatus(queueData.status || 'active');
-        }
-        const { data: entries } = await supabase.from('queue_entries').select('*').order('token_number', { ascending: true });
-        if (entries && entries.length > 0) {
-          setPatients(entries.map((item: any) => ({
-            id: item.id, token: item.token_number, name: item.patient_name,
-            phone: item.patient_phone || '', time: item.created_at ? new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '10:00 AM',
-            status: item.status, type: item.source === 'online' ? 'Online Booking' : 'Offline पर्चा',
-            ageGender: '35 / M', allergies: ['None'], lastVisit: '10 Aug 2026', notes: 'Routine OPD checkup.'
-          })));
-          setTotalIssued(Math.max(entries.length, queueData?.total_issued || 0));
-        }
-      } catch (err: any) { console.warn('Using local queue cache:', err.message); }
-      finally { setLoading(false); }
+  const syncFromStore = () => {
+    try {
+      const state = getClinicState(selectedDoctorId);
+      setCurrentToken(state.currentToken);
+      setTotalIssued(state.totalIssued);
+      setQueueStatus(state.status);
+
+      const entries = getQueueEntries(selectedDoctorId);
+      if (entries && entries.length > 0) {
+        setPatients(entries.map(e => ({
+          id: e.id,
+          token: e.tokenNumber,
+          name: e.patientName,
+          phone: e.patientPhone,
+          time: e.time,
+          status: e.status,
+          type: e.source === 'online' ? 'Online Booking' : 'Offline पर्चा',
+          ageGender: e.ageGender || '30 / M',
+          allergies: e.allergies || ['None'],
+          notes: e.notes || 'OPD Consultation',
+        })));
+      }
+    } catch (e) {
+      console.warn('Sync from store error:', e);
     }
-    loadQueueData();
-  }, [session?.id]);
+  };
 
   useEffect(() => {
-    const channel = supabase.channel('opd-live-queue')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'clinic_queues' }, (payload: any) => {
-        if (payload.new?.current_token !== undefined) setCurrentToken(payload.new.current_token);
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'queue_entries' }, (payload: any) => {
-        if (payload.new) {
-          setPatients((prev) => {
-            const index = prev.findIndex((p) => p.id === payload.new.id);
-            if (index !== -1) { const updated = [...prev]; updated[index] = { ...updated[index], status: payload.new.status }; return updated; }
-            return [...prev, { id: payload.new.id, token: payload.new.token_number, name: payload.new.patient_name, phone: payload.new.patient_phone || '', time: 'Just now', status: payload.new.status, type: payload.new.source === 'online' ? 'Online Booking' : 'Offline पर्चा', ageGender: '30 / M', allergies: ['None'], notes: 'Walk-in' }];
-          });
-        }
-      }).subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, []);
+    setLoading(true);
+    syncFromStore();
+    setLoading(false);
+
+    // Subscribe to multi-window cross-tab events
+    const unsub = subscribeToClinicalEvents(() => {
+      syncFromStore();
+    });
+
+    return () => unsub();
+  }, [selectedDoctorId]);
 
   const playChimeSound = () => {
     if (!soundEnabled || typeof window === 'undefined') return;
@@ -121,48 +128,36 @@ export default function DoctorDashboard() {
     } catch (e) { console.log('Chime ring audio error:', e); }
   };
 
-  const handleNextToken = async () => {
-    const nextVal = currentToken + 1;
-    if (nextVal > totalIssued && patients.length > 0) setTotalIssued(nextVal);
-    setCurrentToken(nextVal);
+  const handleNextToken = () => {
+    const res = advanceDoctorToken(selectedDoctorId);
     playChimeSound();
-    setPatients((prev) => prev.map((p) => {
-      if (p.token === currentToken) return { ...p, status: 'completed' };
-      if (p.token === nextVal) return { ...p, status: 'in_consultation' };
-      return p;
-    }));
-    try {
-      const doctorId = session?.id || 'doc-001';
-      await supabase.from('clinic_queues').update({ current_token: nextVal, updated_at: new Date().toISOString() }).eq('doctor_id', doctorId);
-      await supabase.channel('opd-live-queue').send({ type: 'broadcast', event: 'token-update', payload: { currentToken: nextVal, doctorId } });
-    } catch (e) { console.log('Token update warning:', e); }
+    syncFromStore();
   };
 
-  const handleToggleQueueStatus = async () => {
-    const newStatus = queueStatus === 'active' ? 'paused' : 'active';
-    setQueueStatus(newStatus);
-    try { await supabase.from('clinic_queues').update({ status: newStatus }).eq('doctor_id', session?.id || 'doc-001'); } catch (e) {}
+  const handleToggleQueueStatus = () => {
+    const next = storeToggleStatus(selectedDoctorId);
+    setQueueStatus(next);
   };
 
-  const handleResetQueue = async () => {
-    setCurrentToken(1);
-    try { await supabase.from('clinic_queues').update({ current_token: 1 }).eq('doctor_id', session?.id || 'doc-001'); } catch (e) {}
+  const handleResetQueue = () => {
+    storeResetQueue(selectedDoctorId);
+    syncFromStore();
   };
 
-  const handleAddOfflinePatient = async (e: React.FormEvent) => {
-    e.preventDefault(); if (!offlineName) return;
+  const handleAddOfflinePatient = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!offlineName) return;
     setAddingPatient(true);
-    const newToken = (patients.length > 0 ? Math.max(...patients.map((p) => p.token)) : 0) + 1;
-    const newPatient: PatientEntry = { id: `q-off-${Date.now()}`, token: newToken, name: offlineName, phone: offlinePhone || 'N/A', time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), status: 'waiting', type: 'Offline पर्चा', ageGender: '30 / M', allergies: ['None'], notes: 'Walk-in' };
-    setPatients((prev) => [...prev, newPatient]); setTotalIssued((prev) => Math.max(prev, newToken));
-    setOfflineName(''); setOfflinePhone('');
-    try { await supabase.from('queue_entries').insert([{ token_number: newToken, patient_name: offlineName, patient_phone: offlinePhone, source: 'walk_in', status: 'waiting' }]); } catch (err) {}
-    finally { setAddingPatient(false); }
+    addWalkInPatient(selectedDoctorId, offlineName, offlinePhone);
+    setOfflineName('');
+    setOfflinePhone('');
+    syncFromStore();
+    setAddingPatient(false);
   };
 
-  const updatePatientStatus = async (patientId: string, newStatus: PatientEntry['status']) => {
-    setPatients((prev) => prev.map((p) => (p.id === patientId ? { ...p, status: newStatus } : p)));
-    try { await supabase.from('queue_entries').update({ status: newStatus }).eq('id', patientId); } catch (e) {}
+  const updatePatientStatus = (patientId: string, newStatus: PatientEntry['status']) => {
+    updateQueueEntryStatus(patientId, newStatus);
+    syncFromStore();
   };
 
   // Filter patients by search query & tab status

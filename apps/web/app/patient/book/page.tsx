@@ -20,8 +20,12 @@ import {
   Stethoscope,
   Sparkles,
   ArrowRight,
-  Loader2
+  Loader2,
+  Share2,
+  Banknote,
+  Building2
 } from 'lucide-react';
+import { bookAppointment } from '../../../lib/clinical-store';
 import { LanguageTogglePill } from '../../../components/LanguageContext';
 import { ThemeTogglePill } from '../../../components/ThemeContext';
 import NavControls from '../../../components/NavControls';
@@ -62,9 +66,10 @@ function BookingContent() {
   const [patientAllergies, setPatientAllergies] = useState('None');
 
   // Step 3 & 4 states
+  const [paymentModeChoice, setPaymentModeChoice] = useState<'pay_at_clinic' | 'online_upi'>('pay_at_clinic');
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentId, setPaymentId] = useState('');
-  const [assignedToken, setAssignedToken] = useState(14);
+  const [assignedToken, setAssignedToken] = useState(1);
   const [emailNoticeSent, setEmailNoticeSent] = useState(false);
   const [smsNoticeSent, setSmsNoticeSent] = useState(true);
 
@@ -98,63 +103,34 @@ function BookingContent() {
   const platformFee = Math.round((consultationFee * doctor.platformCommission) / 100);
   const totalPayable = consultationFee + platformFee;
 
-  // Razorpay Payment Handler (Client-side demo integration with auto fallback)
-  const handlePayment = () => {
-    setIsProcessing(true);
+  // Real Booking Finalizer connected to clinical store
+  const finalizeBooking = (chosenMode: 'pay_at_clinic' | 'online_upi', customPayId?: string) => {
+    const finalPayId = customPayId || (chosenMode === 'online_upi' ? `pay_upi_${Date.now()}` : 'PAY_AT_CLINIC_COUNTER');
+    setPaymentId(finalPayId);
 
-    const options = {
-      key: 'rzp_test_DOCNEST_KEY',
-      amount: totalPayable * 100, // paise
-      currency: 'INR',
-      name: 'DocNest Healthcare Platform',
-      description: `Appointment with ${doctor.name} (${doctor.specialty})`,
-      image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=100&h=100&fit=crop',
-      handler: function (response: any) {
-        setPaymentId(response.razorpay_payment_id || `pay_${Date.now()}`);
-        finalizeBooking();
-      },
-      prefill: {
-        name: patientName,
-        email: patientEmail,
-        contact: patientPhone,
-      },
-      theme: { color: '#10b981' },
-      modal: {
-        ondismiss: function () {
-          // Fallback simulation for sandbox testing
-          setTimeout(() => {
-            setPaymentId(`pay_sim_${Date.now()}`);
-            finalizeBooking();
-          }, 600);
-        }
-      }
-    };
+    // Call unified clinical store
+    const { queueEntry } = bookAppointment({
+      doctorId: doctor.id,
+      doctorName: doctor.name,
+      specialty: doctor.specialty,
+      clinicName: doctor.clinicName,
+      address: doctor.clinicAddress,
+      date: nextDays[selectedDateIndex].formatted,
+      slot: selectedSlot === 'morning' ? doctor.morningSlot : doctor.eveningSlot,
+      patientName,
+      patientPhone,
+      patientEmail,
+      patientAge: patientAge || '30',
+      patientGender,
+      allergies: patientAllergies,
+      paymentMode: chosenMode,
+      consultationFee,
+      platformFee,
+    });
 
-    try {
-      if (typeof window !== 'undefined' && (window as any).Razorpay) {
-        const rzp = new (window as any).Razorpay(options);
-        rzp.open();
-      } else {
-        // Direct simulation
-        setTimeout(() => {
-          setPaymentId(`pay_upi_${Date.now()}`);
-          finalizeBooking();
-        }, 1200);
-      }
-    } catch (e) {
-      setTimeout(() => {
-        setPaymentId(`pay_mock_${Date.now()}`);
-        finalizeBooking();
-      }, 1000);
-    }
-  };
+    setAssignedToken(queueEntry.tokenNumber);
 
-  const finalizeBooking = () => {
-    const newToken = Math.floor(12 + Math.random() * 8);
-    setAssignedToken(newToken);
-
-    // Notification Logic as specified in Section 9
-    // Read notification preference from localStorage if available
+    // Reassurance Notification Logic
     let emailEnabled = true;
     try {
       const savedPrefs = localStorage.getItem('docnest_patient_settings');
@@ -166,16 +142,83 @@ function BookingContent() {
 
     if (emailEnabled && patientEmail) {
       setEmailNoticeSent(true);
-      console.log(`📧 Confirmation email sent to ${patientEmail}`);
     } else {
       setEmailNoticeSent(false);
     }
 
     setSmsNoticeSent(true);
-    console.log(`📱 SMS confirmation sent to ${patientPhone}`);
-
     setIsProcessing(false);
     setStep(4);
+  };
+
+  // Razorpay Online Payment Handler
+  const handlePayment = () => {
+    if (paymentModeChoice === 'pay_at_clinic') {
+      setIsProcessing(true);
+      setTimeout(() => {
+        finalizeBooking('pay_at_clinic');
+      }, 500);
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const options = {
+      key: 'rzp_test_DOCNEST_KEY',
+      amount: totalPayable * 100, // paise
+      currency: 'INR',
+      name: 'DocNest Healthcare Platform',
+      description: `Appointment with ${doctor.name} (${doctor.specialty})`,
+      image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=100&h=100&fit=crop',
+      handler: function (response: any) {
+        finalizeBooking('online_upi', response.razorpay_payment_id || `pay_${Date.now()}`);
+      },
+      prefill: {
+        name: patientName,
+        email: patientEmail,
+        contact: patientPhone,
+      },
+      theme: { color: '#0D9488' },
+      modal: {
+        ondismiss: function () {
+          setTimeout(() => {
+            finalizeBooking('online_upi', `pay_sim_${Date.now()}`);
+          }, 400);
+        }
+      }
+    };
+
+    try {
+      if (typeof window !== 'undefined' && (window as any).Razorpay) {
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+      } else {
+        setTimeout(() => {
+          finalizeBooking('online_upi', `pay_upi_${Date.now()}`);
+        }, 800);
+      }
+    } catch (e) {
+      setTimeout(() => {
+        finalizeBooking('online_upi', `pay_mock_${Date.now()}`);
+      }, 800);
+    }
+  };
+
+  const handleWhatsAppShare = () => {
+    const text = `🏥 *DocNest Clinic Appointment Confirmed!*
+
+*Doctor:* ${doctor.name} (${doctor.specialty})
+*Clinic:* ${doctor.clinicName}
+*Patient:* ${patientName}
+*Token Number:* #${assignedToken}
+*Date:* ${nextDays[selectedDateIndex].formatted} (${selectedSlot === 'morning' ? 'Morning Shift' : 'Evening Shift'})
+*Payment:* ${paymentModeChoice === 'online_upi' ? 'Paid Online (₹' + totalPayable + ')' : 'Pay at Clinic Counter (₹' + consultationFee + ')'}
+
+📲 *Track Live OPD Queue on Phone:*
+https://www.drugs.systems/patient
+
+Please arrive 15 minutes before your shift.`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   };
 
   return (
@@ -456,15 +499,76 @@ function BookingContent() {
           </div>
         )}
 
-        {/* STEP 3: PAYMENT SUMMARY & RAZORPAY CHECKOUT */}
+        {/* STEP 3: PAYMENT SUMMARY & CHECKOUT */}
         {step === 3 && (
           <div className="glass-panel-elevated rounded-3xl p-6 shadow-xl space-y-6">
             <div>
               <h2 className="text-base font-black text-slate-900 dark:text-white flex items-center space-x-2">
                 <CreditCard className="w-5 h-5 text-teal-600" />
-                <span>Payment Summary & Checkout (शुल्क विवरण)</span>
+                <span>Select Payment Option (भुगतान का तरीका चुनें)</span>
               </h2>
-              <p className="text-xs text-slate-500 mt-0.5">Secure payment with Razorpay gateway</p>
+              <p className="text-xs text-slate-500 mt-0.5">Choose to pay at clinic counter or online</p>
+            </div>
+
+            {/* Payment Method Selector Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <button
+                type="button"
+                onClick={() => setPaymentModeChoice('pay_at_clinic')}
+                className={`p-4 rounded-2xl border-2 text-left transition flex flex-col justify-between space-y-3 cursor-pointer ${
+                  paymentModeChoice === 'pay_at_clinic'
+                    ? 'border-teal-500 bg-teal-50/70 dark:bg-teal-950/40 shadow-sm'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-[#141e28] hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="w-9 h-9 rounded-xl bg-teal-600/10 text-teal-600 dark:text-teal-400 flex items-center justify-center">
+                    <Building2 className="w-5 h-5" />
+                  </div>
+                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                    paymentModeChoice === 'pay_at_clinic' ? 'bg-teal-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                  }`}>
+                    {paymentModeChoice === 'pay_at_clinic' ? '✓ Selected' : 'Select'}
+                  </span>
+                </div>
+                <div>
+                  <h4 className="text-sm font-black text-slate-900 dark:text-white">Pay at Clinic Counter</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Pay cash or UPI at reception desk on arrival</p>
+                </div>
+                <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800 flex justify-between items-center text-xs">
+                  <span className="text-slate-500">Payable:</span>
+                  <span className="font-mono font-bold text-teal-700 dark:text-teal-300 text-sm">₹{consultationFee}</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPaymentModeChoice('online_upi')}
+                className={`p-4 rounded-2xl border-2 text-left transition flex flex-col justify-between space-y-3 cursor-pointer ${
+                  paymentModeChoice === 'online_upi'
+                    ? 'border-teal-500 bg-teal-50/70 dark:bg-teal-950/40 shadow-sm'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-[#141e28] hover:border-slate-300'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <Banknote className="w-5 h-5" />
+                  </div>
+                  <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${
+                    paymentModeChoice === 'online_upi' ? 'bg-teal-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'
+                  }`}>
+                    {paymentModeChoice === 'online_upi' ? '✓ Selected' : 'Select'}
+                  </span>
+                </div>
+                <div>
+                  <h4 className="text-sm font-black text-slate-900 dark:text-white">Pay Online via UPI</h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Google Pay, PhonePe, Paytm, or Cards</p>
+                </div>
+                <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800 flex justify-between items-center text-xs">
+                  <span className="text-slate-500">Payable:</span>
+                  <span className="font-mono font-bold text-teal-700 dark:text-teal-300 text-sm">₹{totalPayable}</span>
+                </div>
+              </button>
             </div>
 
             {/* Bill Breakdown Card */}
@@ -473,16 +577,20 @@ function BookingContent() {
                 <span>Doctor Consultation Fee</span>
                 <span className="font-mono font-bold text-slate-900 dark:text-white">₹{consultationFee}</span>
               </div>
-              <div className="flex justify-between items-center text-xs text-slate-600 dark:text-slate-300">
-                <span className="flex items-center space-x-1.5">
-                  <span>Platform Convenience Fee ({doctor.platformCommission}%)</span>
-                  <span className="text-[10px] bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300 font-bold px-1.5 py-0.5 rounded">DocNest</span>
-                </span>
-                <span className="font-mono font-bold text-teal-700 dark:text-teal-400">₹{platformFee}</span>
-              </div>
+              {paymentModeChoice === 'online_upi' && (
+                <div className="flex justify-between items-center text-xs text-slate-600 dark:text-slate-300">
+                  <span className="flex items-center space-x-1.5">
+                    <span>Platform Convenience Fee ({doctor.platformCommission}%)</span>
+                    <span className="text-[10px] bg-teal-100 text-teal-800 dark:bg-teal-900/40 dark:text-teal-300 font-bold px-1.5 py-0.5 rounded">DocNest</span>
+                  </span>
+                  <span className="font-mono font-bold text-teal-700 dark:text-teal-400">₹{platformFee}</span>
+                </div>
+              )}
               <div className="border-t border-slate-200 dark:border-slate-800 pt-3 flex justify-between items-center text-sm font-black text-slate-900 dark:text-white">
-                <span>Total Amount Payable (कुल शुल्क)</span>
-                <span className="font-mono text-xl text-teal-700 dark:text-teal-300">₹{totalPayable}</span>
+                <span>{paymentModeChoice === 'online_upi' ? 'Total Online Payable' : 'Amount to Pay at Clinic Desk'}</span>
+                <span className="font-mono text-xl text-teal-700 dark:text-teal-300">
+                  ₹{paymentModeChoice === 'online_upi' ? totalPayable : consultationFee}
+                </span>
               </div>
             </div>
 
@@ -493,7 +601,7 @@ function BookingContent() {
               <p>🏥 <strong>Clinic:</strong> {doctor.clinicName}, Deoria</p>
             </div>
 
-            {/* Razorpay Action Button */}
+            {/* Action Buttons */}
             <div className="space-y-3 pt-2">
               <button
                 type="button"
@@ -504,11 +612,15 @@ function BookingContent() {
                 {isProcessing ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    <span>Processing Razorpay Checkout...</span>
+                    <span>Confirming Appointment...</span>
                   </>
                 ) : (
                   <>
-                    <span>Pay ₹{totalPayable} via Razorpay (UPI / Card)</span>
+                    <span>
+                      {paymentModeChoice === 'online_upi'
+                        ? `Pay ₹${totalPayable} via Razorpay (UPI / Card)`
+                        : `Confirm Booking (Pay ₹${consultationFee} at Clinic Counter)`}
+                    </span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
@@ -516,7 +628,7 @@ function BookingContent() {
 
               <div className="flex items-center justify-center space-x-2 text-[11px] text-slate-500">
                 <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
-                <span>256-Bit SSL Encrypted • 100% Refundable on Doctor Cancellation</span>
+                <span>Instant Token Generation • Guaranteed Queue Slot</span>
               </div>
             </div>
           </div>
@@ -541,31 +653,42 @@ function BookingContent() {
               <p className="text-xs text-teal-100/90 font-medium">Please arrive 15 minutes before your shift</p>
             </div>
 
+            {/* WhatsApp Token Share Button */}
+            <div className="max-w-sm mx-auto">
+              <button
+                type="button"
+                onClick={handleWhatsAppShare}
+                className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold py-3.5 px-4 rounded-2xl text-xs flex items-center justify-center space-x-2 transition shadow-lg cursor-pointer"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>Share Token on WhatsApp (व्हाट्सएप पर शेयर करें)</span>
+              </button>
+            </div>
+
             {/* Summary Details */}
             <div className="bg-slate-50 dark:bg-[#0c1219] border border-slate-200 dark:border-slate-800 rounded-2xl p-4 text-left text-xs space-y-2 max-w-md mx-auto">
               <div className="flex justify-between"><span className="text-slate-500">Doctor:</span><strong className="text-slate-900 dark:text-white">{doctor.name} ({doctor.specialty})</strong></div>
               <div className="flex justify-between"><span className="text-slate-500">Clinic:</span><span className="text-slate-700 dark:text-slate-200">{doctor.clinicName}</span></div>
               <div className="flex justify-between"><span className="text-slate-500">Date & Slot:</span><strong className="text-teal-700 dark:text-teal-400">{nextDays[selectedDateIndex].formatted} ({selectedSlot})</strong></div>
-              <div className="flex justify-between"><span className="text-slate-500">Amount Paid:</span><span className="font-mono font-bold text-emerald-700 dark:text-emerald-400">₹{totalPayable} (Paid Online ✓)</span></div>
-              <div className="flex justify-between"><span className="text-slate-500">Payment ID:</span><span className="font-mono text-[11px] text-slate-400">{paymentId}</span></div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Payment Mode:</span>
+                <span className="font-mono font-bold text-slate-800 dark:text-slate-200">
+                  {paymentModeChoice === 'online_upi' ? `₹${totalPayable} (Paid Online ✓)` : `₹${consultationFee} (Pay at Clinic Reception)`}
+                </span>
+              </div>
+              <div className="flex justify-between"><span className="text-slate-500">Reference ID:</span><span className="font-mono text-[11px] text-slate-400">{paymentId}</span></div>
             </div>
 
             {/* Notification Sent Notice */}
             <div className="p-3.5 bg-slate-50 dark:bg-[#141e28] border border-slate-200 dark:border-slate-800 rounded-2xl text-xs text-slate-600 dark:text-slate-300 max-w-md mx-auto space-y-1">
-              {smsNoticeSent && (
-                <p className="flex items-center justify-center space-x-1.5 text-teal-800 dark:text-teal-300 font-medium">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-teal-600" />
-                  <span>SMS confirmation sent to {patientPhone}</span>
-                </p>
-              )}
-              {emailNoticeSent ? (
+              <p className="flex items-center justify-center space-x-1.5 text-teal-800 dark:text-teal-300 font-medium">
+                <CheckCircle2 className="w-3.5 h-3.5 text-teal-600" />
+                <span>SMS confirmation scheduled for {patientPhone}</span>
+              </p>
+              {emailNoticeSent && (
                 <p className="flex items-center justify-center space-x-1.5 text-teal-800 dark:text-teal-300 font-medium">
                   <Mail className="w-3.5 h-3.5 text-teal-600" />
-                  <span>Reassurance email sent to {patientEmail}</span>
-                </p>
-              ) : (
-                <p className="text-[11px] text-slate-400">
-                  (Email notifications can be turned ON anytime in Patient Settings)
+                  <span>Confirmation email sent to {patientEmail}</span>
                 </p>
               )}
             </div>

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getSession } from '../../../lib/auth';
 import { supabase } from '../../../lib/supabase';
+import { savePrescription, getQueueEntries, updateQueueEntryStatus } from '../../../lib/clinical-store';
 import {
   Printer, Plus, Trash2, Save, Download, Stethoscope,
   User, Calendar, Pill, CheckCircle2, FileText, ArrowLeft, Search, Check, Sparkles, Zap, MessageSquare, Clock
@@ -329,7 +330,7 @@ function PrescriptionContent() {
   const handleShareWhatsApp = () => {
     const docName = session?.name || 'Dr. Amit Kumar';
     const clinic = session?.clinic || 'Gupta Clinic & Joint Care Center';
-    const message = `🏥 *${clinic}*\n👨‍⚕️ *${docName}*\n\nनमस्ते *${patientName}*,\nआपका डिजिटल पर्चा (Token #${tokenNumber}) तैयार है।\n\n📋 *निदान (Diagnosis):* ${diagnosis}\n💊 *दवाएं (${medicines.length}):*\n${medicines.map((m, i) => `${i + 1}. ${m.name} (${m.dosage}) - ${m.duration}`).join('\n')}\n\n📅 *पुनः परामर्श तिथि (Follow-up):* ${followUpDateStr}\n\nपर्चा ऑनलाइन देखें: https://docnest.in/rx/DN-2026-${tokenNumber}`;
+    const message = `🏥 *${clinic}*\n👨‍⚕️ *${docName}*\n\nनमस्ते *${patientName}*,\nआपका डिजिटल पर्चा (Token #${tokenNumber}) तैयार है।\n\n📋 *निदान (Diagnosis):* ${diagnosis}\n💊 *दवाएं (${medicines.length}):*\n${medicines.map((m, i) => `${i + 1}. ${m.name} (${m.dosage}) - ${m.duration}`).join('\n')}\n\n📅 *पुनः परामर्श तिथि (Follow-up):* ${followUpDateStr}\n\nपर्चा ऑनलाइन देखें: https://www.drugs.systems/patient`;
 
     const cleanPhone = patientPhone.replace(/\D/g, '');
     const targetPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone;
@@ -340,37 +341,69 @@ function PrescriptionContent() {
   const handleSaveRx = async () => {
     try {
       const cleanPhone = patientPhone.replace(/\D/g, '') || '9999888877';
-      const newRxEntry = {
-        id: `rx-${Date.now()}`,
-        date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-        doctor: `${session?.name || 'Dr. Amit Kumar'} (${session?.specialty || 'Orthopedic Surgeon'})`,
-        clinic: session?.clinic || 'Gupta Clinic & Joint Care Center',
+      const docId = session?.id || 'doc-001';
+      const docName = session?.name || 'Dr. Amit Kumar';
+      const clinicTitle = session?.clinic || 'Gupta Clinic & Joint Care Center';
+
+      // 1. Central Clinical Store Persistence (Broadcasts to Pharmacy & Updates Patient History)
+      savePrescription({
+        doctorId: docId,
+        doctorName: docName,
+        clinicName: clinicTitle,
+        patientName: patientName,
+        patientPhone: cleanPhone,
+        tokenNumber: Number(tokenNumber) || 1,
         diagnosis: diagnosis || 'General Clinical Consultation',
-        vitals: 'BP: 120/80 mmHg • Pulse: 74 bpm • Weight: 65 kg',
         advice: advice || 'Take medicines on time as prescribed.',
-        followUp: followUpDateStr,
+        followUpDate: followUpDateStr,
         medicines: medicines.map(m => ({
           name: m.name,
           dosage: m.dosage,
           duration: m.duration,
-          timing: m.timing
-        }))
-      };
+          timing: m.timing,
+          price: 110,
+        })),
+      });
 
-      // Persist to pipeline store for patient portal
+      // 2. Mark this token in the live OPD queue as completed
+      try {
+        const queueEntries = getQueueEntries(docId);
+        const target = queueEntries.find(e => e.tokenNumber === Number(tokenNumber) || e.patientName === patientName);
+        if (target) {
+          updateQueueEntryStatus(target.id, 'completed');
+        }
+      } catch (err) {}
+
+      // 3. Fallback direct storage for patient lookup
       if (typeof window !== 'undefined') {
         const key = `docnest_rx_${cleanPhone}`;
         const existing = JSON.parse(localStorage.getItem(key) || '[]');
+        const newRxEntry = {
+          id: `rx-${Date.now()}`,
+          date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+          doctor: `${docName} (${session?.specialty || 'Orthopedic Surgeon'})`,
+          clinic: clinicTitle,
+          diagnosis: diagnosis || 'General Clinical Consultation',
+          vitals: 'BP: 120/80 mmHg • Pulse: 74 bpm • Weight: 65 kg',
+          advice: advice || 'Take medicines on time as prescribed.',
+          followUp: followUpDateStr,
+          medicines: medicines.map(m => ({
+            name: m.name,
+            dosage: m.dosage,
+            duration: m.duration,
+            timing: m.timing
+          }))
+        };
         localStorage.setItem(key, JSON.stringify([newRxEntry, ...existing]));
       }
 
-      // Sync to Supabase prescriptions table if available
+      // 4. Sync to Supabase prescriptions table if available
       try {
         await supabase.from('prescriptions').insert([{
           patient_name: patientName,
           patient_phone: cleanPhone,
-          doctor_name: session?.name || 'Dr. Amit Kumar',
-          clinic_name: session?.clinic || 'Gupta Clinic',
+          doctor_name: docName,
+          clinic_name: clinicTitle,
           diagnosis: diagnosis,
           advice: advice,
           follow_up_date: followUpDateStr,

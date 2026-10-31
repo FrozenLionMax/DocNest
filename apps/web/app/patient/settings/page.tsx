@@ -148,6 +148,34 @@ export default function PatientSettingsPage() {
             </div>
           </div>
 
+          {/* Legal & Compliance Card */}
+          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-3">
+            <div className="flex items-center space-x-2.5 border-b border-slate-800 pb-3">
+              <ShieldCheck className="w-5 h-5 text-emerald-400" />
+              <div>
+                <h2 className="text-sm font-black text-white">Legal, Security & Compliance</h2>
+                <p className="text-xs text-slate-400">Indian DPDP Act & Healthcare Privacy</p>
+              </div>
+            </div>
+
+            <div className="space-y-2 pt-1 text-xs">
+              <Link
+                href="/privacy"
+                className="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800 hover:border-emerald-500/40 text-slate-300 hover:text-white transition"
+              >
+                <span>Privacy Policy (गोपनीयता नीति)</span>
+                <span className="text-emerald-400 font-bold">View →</span>
+              </Link>
+              <Link
+                href="/terms"
+                className="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800 hover:border-emerald-500/40 text-slate-300 hover:text-white transition"
+              >
+                <span>Terms of Service (नियम व शर्तें)</span>
+                <span className="text-emerald-400 font-bold">View →</span>
+              </Link>
+            </div>
+          </div>
+
           <button
             type="submit"
             className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-black py-4 rounded-2xl text-xs flex items-center justify-center space-x-2 shadow-xl shadow-emerald-950 transition"

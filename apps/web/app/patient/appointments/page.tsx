@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   ChevronLeft,
@@ -21,6 +21,7 @@ import {
 import { LanguageTogglePill } from '../../../components/LanguageContext';
 import { ThemeTogglePill } from '../../../components/ThemeContext';
 import NavControls from '../../../components/NavControls';
+import { getPatientAppointments, subscribeToClinicalEvents } from '../../../lib/clinical-store';
 
 interface PatientAppointment {
   id: string;
@@ -88,6 +89,38 @@ export default function MyAppointmentsPage() {
       hasPrescription: true,
     },
   ]);
+
+  useEffect(() => {
+    const loadAppointments = () => {
+      const stored = getPatientAppointments();
+      if (stored && stored.length > 0) {
+        setAppointments(prev => {
+          const map = new Map<string, PatientAppointment>();
+          stored.forEach(a => map.set(a.id, {
+            id: a.id,
+            token: a.tokenNumber,
+            doctorName: a.doctorName,
+            specialty: a.specialty,
+            clinicName: a.clinicName,
+            address: a.address,
+            date: a.date,
+            slot: a.slot,
+            status: a.status,
+            paidAmount: a.paidAmount,
+            paymentMode: a.paymentMode,
+            hasPrescription: a.hasPrescription,
+          }));
+          prev.forEach(p => {
+            if (!map.has(p.id)) map.set(p.id, p);
+          });
+          return Array.from(map.values());
+        });
+      }
+    };
+    loadAppointments();
+    const unsub = subscribeToClinicalEvents(() => loadAppointments());
+    return () => unsub();
+  }, []);
 
   // Reschedule Modal state
   const [rescheduleApt, setRescheduleApt] = useState<PatientAppointment | null>(null);

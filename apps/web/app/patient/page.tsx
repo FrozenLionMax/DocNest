@@ -220,6 +220,22 @@ export default function PatientHomePage() {
             <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-[#a4ccd9] group-hover:translate-x-1 transition" />
           </Link>
         </section>
+
+        {/* Global Footer & Store Compliance Links */}
+        <footer className="pt-8 pb-16 text-center text-xs text-slate-500 border-t border-slate-800/80 space-y-3">
+          <div className="flex flex-wrap justify-center items-center gap-6 text-slate-400 font-semibold">
+            <Link href="/privacy" className="hover:text-emerald-400 transition">Privacy Policy (गोपनीयता नीति)</Link>
+            <span>•</span>
+            <Link href="/terms" className="hover:text-emerald-400 transition">Terms of Service (नियम व शर्तें)</Link>
+            <span>•</span>
+            <Link href="/doctor/dashboard" className="hover:text-emerald-400 transition">Doctor OPD Queue</Link>
+            <span>•</span>
+            <Link href="/compounder/dispense" className="hover:text-emerald-400 transition">Pharmacy Dispensing</Link>
+          </div>
+          <p className="text-[11px] text-slate-600">
+            DocNest Healthcare Platform • Operating on <span className="font-mono text-emerald-500/80">https://www.drugs.systems</span> • DPDP & DISHA Compliant
+          </p>
+        </footer>
       </main>
 
       {/* Floating App-like Mobile Bottom Navigation */}

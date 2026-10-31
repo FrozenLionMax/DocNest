@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   title: 'DocNest — Healthcare Appointment & Clinic Operations Platform',
   description: 'District Healthcare Platform connecting Patients, Doctors, Compounders, Field Agents, and Administration.',
   manifest: '/manifest.json',
+  icons: {
+    icon: '/icon-192.png',
+    apple: '/icon-192.png',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
