@@ -19,7 +19,10 @@ import {
   FileText,
   Settings,
   Activity,
-  Sparkles
+  Sparkles,
+  Mic,
+  MicOff,
+  Volume2
 } from 'lucide-react';
 import { LanguageTogglePill } from '../../../components/LanguageContext';
 import { ThemeTogglePill } from '../../../components/ThemeContext';
@@ -38,6 +41,66 @@ const SPECIALTY_CHIPS = [
 export default function FindDoctorsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState('all');
+  const [isListening, setIsListening] = useState(false);
+  const [voiceToast, setVoiceToast] = useState<string | null>(null);
+
+  const startVoiceSearch = () => {
+    if (typeof window === 'undefined') return;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setVoiceToast('Voice search not supported in this browser. Please type.');
+      setTimeout(() => setVoiceToast(null), 3500);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'hi-IN'; // Highly tuned for Hindi, Hinglish and Indian English
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+
+      setIsListening(true);
+      setVoiceToast('Listening... बोलिए (e.g. हड्डी के डॉक्टर या Dr. Amit)...');
+
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setSearchQuery(transcript);
+        setVoiceToast(`Recognized: "${transcript}"`);
+        setIsListening(false);
+        setTimeout(() => setVoiceToast(null), 2500);
+
+        // Smart voice specialty mapper
+        const lower = transcript.toLowerCase();
+        if (lower.includes('हड्डी') || lower.includes('ortho') || lower.includes('joint')) {
+          setSelectedSpecialty('orthopedic');
+        } else if (lower.includes('बच्चा') || lower.includes('बाल') || lower.includes('child') || lower.includes('pediatric')) {
+          setSelectedSpecialty('pediatrics');
+        } else if (lower.includes('महिला') || lower.includes('स्त्री') || lower.includes('gynec')) {
+          setSelectedSpecialty('gynecology');
+        } else if (lower.includes('दिल') || lower.includes('हार्ट') || lower.includes('cardio')) {
+          setSelectedSpecialty('cardio');
+        } else if (lower.includes('कान') || lower.includes('नाक') || lower.includes('गला') || lower.includes('ent')) {
+          setSelectedSpecialty('ent');
+        }
+      };
+
+      recognition.onerror = () => {
+        setIsListening(false);
+        setVoiceToast('Could not hear voice clearly. Please try again.');
+        setTimeout(() => setVoiceToast(null), 2500);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch (e) {
+      setIsListening(false);
+      setVoiceToast('Microphone access denied or busy.');
+      setTimeout(() => setVoiceToast(null), 2500);
+    }
+  };
 
   const filteredDoctors = DOCTORS_DIRECTORY.filter((doc) => {
     const matchesSearch =
@@ -91,17 +154,44 @@ export default function FindDoctorsPage() {
               placeholder="Search doctors by name, specialty (e.g. Ortho, Cardio) or location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white dark:bg-[#0c1219] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl pl-12 pr-10 py-3.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition shadow-sm placeholder:text-slate-400 font-medium"
+              className="w-full bg-white dark:bg-[#0c1219] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl pl-12 pr-28 py-3.5 text-sm focus:outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition shadow-sm placeholder:text-slate-400 font-medium"
             />
-            {searchQuery && (
+            <div className="absolute right-2.5 top-2.5 flex items-center space-x-1.5">
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg transition"
+                  title="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
               <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                type="button"
+                onClick={startVoiceSearch}
+                className={`px-2.5 py-1.5 rounded-xl transition cursor-pointer flex items-center space-x-1.5 text-xs font-bold ${
+                  isListening
+                    ? 'bg-rose-500 text-white animate-pulse shadow-md shadow-rose-950'
+                    : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 border border-emerald-200/80 dark:border-emerald-800 shadow-sm'
+                }`}
+                title="Bilingual Voice Search (हिंदी / English में बोलकर खोजें)"
               >
-                <X className="w-5 h-5" />
+                <Mic className={`w-3.5 h-3.5 ${isListening ? 'animate-bounce' : 'text-emerald-600 dark:text-emerald-400'}`} />
+                <span className="text-[11px] hidden sm:inline">
+                  {isListening ? 'बोलिए...' : 'बोलकर खोजें'}
+                </span>
               </button>
-            )}
+            </div>
           </div>
+
+          {/* Voice Search Status Toast */}
+          {voiceToast && (
+            <div className="p-3 bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 rounded-2xl text-xs text-emerald-800 dark:text-emerald-300 flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+              <span className="font-bold">{voiceToast}</span>
+            </div>
+          )}
 
           {/* Specialty Filter Glass Morphic Capsules (Item #5) */}
           <div className="flex items-center space-x-2.5 overflow-x-auto pb-1 scrollbar-none pt-1">
