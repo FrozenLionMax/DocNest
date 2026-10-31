@@ -5,6 +5,7 @@ import './globals.css';
 import { LanguageProvider } from '../components/LanguageContext';
 import CommandPalette from '../components/CommandPalette';
 import ServiceWorkerRegistration from '../components/ServiceWorkerRegistration';
+import MobileBottomNav from '../components/MobileBottomNav';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -51,6 +52,7 @@ export default function RootLayout({
           <ServiceWorkerRegistration />
           {children}
           <CommandPalette />
+          <MobileBottomNav />
         </LanguageProvider>
       </body>
     </html>

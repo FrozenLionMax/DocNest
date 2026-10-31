@@ -52,10 +52,27 @@ html, body {
 }
 
 /* Prevent text overflow on small phone screens (320px - 414px) */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   h1, h2, h3, h4, h5, h6 {
     word-break: break-word;
     overflow-wrap: break-word;
+  }
+
+  /* Ensure page content never gets cut off by mobile bottom nav or Android gesture pill */
+  body {
+    padding-bottom: max(calc(env(safe-area-inset-bottom) + 68px), 80px) !important;
+  }
+
+  /* Optimized mobile touch target standards (44x44px minimum) */
+  .btn-touch {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Native micro-haptic active scale on buttons */
+  button:active, a:active {
+    transform: scale(0.98);
+    transition: transform 0.08s ease;
   }
 }
 
