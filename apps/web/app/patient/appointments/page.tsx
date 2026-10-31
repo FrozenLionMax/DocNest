@@ -273,6 +273,23 @@ export default function MyAppointmentsPage() {
                     </div>
                   </div>
 
+                  {/* Live Queue Wait Time Estimator Badge */}
+                  <div className="bg-emerald-500/10 border border-emerald-500/25 rounded-2xl p-3 flex flex-wrap items-center justify-between text-xs gap-2">
+                    <div className="flex items-center space-x-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="font-bold text-slate-800 dark:text-slate-200">
+                        OPD Live: <strong className="text-emerald-700 dark:text-emerald-400 font-mono font-black">Serving #10</strong>
+                      </span>
+                      <span className="text-slate-400">•</span>
+                      <span className="text-slate-600 dark:text-slate-300 font-medium">
+                        {Math.max(0, apt.token - 10)} patients ahead of you
+                      </span>
+                    </div>
+                    <div className="text-teal-800 dark:text-teal-300 font-bold font-mono">
+                      Est. Wait: ~{Math.max(0, apt.token - 10) * 6} mins
+                    </div>
+                  </div>
+
                   <div className="bg-slate-50 dark:bg-[#0c1219] p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div className="flex items-center space-x-2 text-slate-700 dark:text-slate-300 font-medium">
                       <Clock className="w-4 h-4 text-teal-600" />

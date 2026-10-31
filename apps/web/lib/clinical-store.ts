@@ -520,3 +520,82 @@ export function markPrescriptionDispensed(rxId: string): PrescriptionRecord[] {
   setStorage(RX_KEY, updated);
   return updated;
 }
+
+// --- Family Member Multi-Profile Management ---
+
+export interface FamilyMemberProfile {
+  id: string;
+  name: string;
+  relationship: 'Self' | 'Father' | 'Mother' | 'Spouse' | 'Son' | 'Daughter' | 'Other';
+  age: number;
+  gender: 'Male' | 'Female' | 'Other';
+  bloodGroup?: string;
+  allergies?: string;
+  notes?: string;
+}
+
+const FAMILY_KEY = 'docnest_family_members_v2';
+
+const SEED_FAMILY: FamilyMemberProfile[] = [
+  { id: 'fam-1', name: 'Rahul Sharma (राहुल शर्मा)', relationship: 'Self', age: 32, gender: 'Male', bloodGroup: 'B+', allergies: 'Penicillin' },
+  { id: 'fam-2', name: 'Om Prakash Sharma (पिताजी)', relationship: 'Father', age: 64, gender: 'Male', bloodGroup: 'B+', allergies: 'None', notes: 'Hypertension & Joint Pain' },
+  { id: 'fam-3', name: 'Shanti Devi (माताजी)', relationship: 'Mother', age: 60, gender: 'Female', bloodGroup: 'O+', allergies: 'None', notes: 'Type 2 Diabetes' },
+  { id: 'fam-4', name: 'Aarav Sharma (बेटा)', relationship: 'Son', age: 6, gender: 'Male', bloodGroup: 'B+', allergies: 'None' },
+];
+
+export function getFamilyMembers(): FamilyMemberProfile[] {
+  return getStorage<FamilyMemberProfile[]>(FAMILY_KEY, SEED_FAMILY);
+}
+
+export function saveFamilyMember(member: FamilyMemberProfile): FamilyMemberProfile[] {
+  const current = getFamilyMembers();
+  const exists = current.findIndex(m => m.id === member.id);
+  let updated: FamilyMemberProfile[];
+  if (exists >= 0) {
+    updated = current.map(m => m.id === member.id ? member : m);
+  } else {
+    updated = [...current, { ...member, id: member.id || `fam-${Date.now()}` }];
+  }
+  setStorage(FAMILY_KEY, updated);
+  return updated;
+}
+
+export function deleteFamilyMember(id: string): FamilyMemberProfile[] {
+  const current = getFamilyMembers();
+  const updated = current.filter(m => m.id !== id);
+  setStorage(FAMILY_KEY, updated);
+  return updated;
+}
+
+// --- Dynamic Live Queue Wait-Time Estimator ---
+
+export function getQueueEstimatedWaitTime(doctorId: string, targetToken: number): {
+  currentToken: number;
+  patientsAhead: number;
+  estimatedMinutes: number;
+  estimatedTimeStr: string;
+  isInsideConsultation: boolean;
+  isCompleted: boolean;
+} {
+  const state = getClinicState(doctorId);
+  const currentToken = state.currentToken || 1;
+  const ahead = Math.max(0, targetToken - currentToken);
+  const isInsideConsultation = targetToken === currentToken;
+  const isCompleted = targetToken < currentToken;
+
+  const avgConsultDurationMinutes = 6;
+  const estimatedMinutes = ahead * avgConsultDurationMinutes;
+
+  const now = new Date();
+  now.setMinutes(now.getMinutes() + estimatedMinutes);
+  const estimatedTimeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  return {
+    currentToken,
+    patientsAhead: ahead,
+    estimatedMinutes,
+    estimatedTimeStr,
+    isInsideConsultation,
+    isCompleted
+  };
+}

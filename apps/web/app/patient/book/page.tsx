@@ -25,7 +25,7 @@ import {
   Banknote,
   Building2
 } from 'lucide-react';
-import { bookAppointment } from '../../../lib/clinical-store';
+import { bookAppointment, getFamilyMembers, FamilyMemberProfile } from '../../../lib/clinical-store';
 import { LanguageTogglePill } from '../../../components/LanguageContext';
 import { ThemeTogglePill } from '../../../components/ThemeContext';
 import NavControls from '../../../components/NavControls';
@@ -47,6 +47,10 @@ function BookingContent() {
   const [selectedDateIndex, setSelectedDateIndex] = useState<number>(0);
   const [selectedSlot, setSelectedSlot] = useState<'morning' | 'evening'>('morning');
 
+  // Family Members Profile state
+  const [familyList, setFamilyList] = useState<FamilyMemberProfile[]>([]);
+  const [selectedFamId, setSelectedFamId] = useState<string>('fam-1');
+
   // Step 2 states
   const [patientName, setPatientName] = useState('Rahul Sharma (राहुल शर्मा)');
   const [patientPhone, setPatientPhone] = useState('9999888877');
@@ -55,6 +59,9 @@ function BookingContent() {
   const [patientGender, setPatientGender] = useState('Male');
 
   useEffect(() => {
+    const list = getFamilyMembers();
+    setFamilyList(list);
+
     const s = getSession();
     if (s) {
       setSession(s);
@@ -63,6 +70,14 @@ function BookingContent() {
       if (s.email) setPatientEmail(s.email);
     }
   }, []);
+
+  const selectFamilyMember = (m: FamilyMemberProfile) => {
+    setSelectedFamId(m.id);
+    setPatientName(m.name);
+    setPatientAge(m.age ? String(m.age) : '30');
+    setPatientGender(m.gender);
+    if (m.allergies) setPatientAllergies(m.allergies);
+  };
   const [patientAllergies, setPatientAllergies] = useState('None');
 
   // Step 3 & 4 states
@@ -405,6 +420,34 @@ Please arrive 15 minutes before your shift.`;
                 <span>Patient Information (मरीज का विवरण)</span>
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">Details will appear on your official digital prescription</p>
+            </div>
+
+            {/* Family Profile Quick Selector */}
+            <div className="p-3.5 bg-slate-50 dark:bg-[#0c1219] rounded-2xl border border-slate-200/90 dark:border-slate-800 space-y-2">
+              <span className="text-[11px] font-black text-teal-700 dark:text-teal-400 uppercase tracking-wider block">
+                Who is this consultation for? (यह पर्चा किसके लिए है?)
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {familyList.map((m) => {
+                  const isSelected = selectedFamId === m.id;
+                  const icon = m.relationship === 'Self' ? '👤' : m.relationship === 'Father' ? '👴' : m.relationship === 'Mother' ? '👵' : m.relationship === 'Son' || m.relationship === 'Daughter' ? '👶' : '👥';
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => selectFamilyMember(m)}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 cursor-pointer ${
+                        isSelected
+                          ? 'bg-teal-600 text-white shadow-md ring-2 ring-teal-400 font-black'
+                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-teal-500'
+                      }`}
+                    >
+                      <span>{icon}</span>
+                      <span>{m.name.split(' (')[0]} ({m.relationship})</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             <div className="space-y-3.5">
