@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Allow: /pharmacy/
+Allow: /patient/
+Disallow: /admin/
+Disallow: /api/
+
+Sitemap: https://www.drugs.systems/sitemap.xml

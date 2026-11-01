@@ -509,6 +509,18 @@ export default function LandingPage() {
                 </Link>
               </li>
               <li>
+                <Link href="/pharmacy" className="hover:text-white transition flex items-center space-x-1.5 text-teal-300 font-bold">
+                  <span className="text-teal-400">›</span>
+                  <span>Verified Pharmacies & Chemists</span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/pharmacy/deoria-drug-house" className="hover:text-white transition flex items-center space-x-1.5 text-slate-300">
+                  <span className="text-teal-400">›</span>
+                  <span>Deoria Drug House (Akhil Tripathi)</span>
+                </Link>
+              </li>
+              <li>
                 <Link href="/patient" className="hover:text-white transition flex items-center space-x-1.5">
                   <span className="text-[#8dbcc7]">›</span>
                   <span>Patient Medical Records</span>
