@@ -23,6 +23,9 @@ export const metadata: Metadata = {
     icon: '/icon-192.png',
     apple: '/icon-192.png',
   },
+  verification: {
+    google: 'bm8f9N33w0Ihe1tU6B8CXl4BdPCtj8aIkKiI_Dy0k_s',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
@@ -42,6 +45,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap"
           rel="stylesheet"
         />
+        <meta name="google-site-verification" content="bm8f9N33w0Ihe1tU6B8CXl4BdPCtj8aIkKiI_Dy0k_s" />
         <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
       </head>
       <body
